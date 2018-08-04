@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto 10", group="FaltechH2O")
+@Autonomous(name="Auto Thursday1", group="FaltechH2O")
 //@Disabled
 public class FaltechH2OAuto extends LinearOpMode {
 

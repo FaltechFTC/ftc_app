@@ -47,7 +47,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tele3", group="FaltechH2O")
+@TeleOp(name="Tele Thursday1", group="FaltechH2O")
 
 public class FaltechH2OTeleop extends OpMode{
 
@@ -68,7 +68,8 @@ public class FaltechH2OTeleop extends OpMode{
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Insert Soul to Play Game, Very Addictive");    //
+        telemetry.addData("Say", "Insert Social Security Number to Play Game, **not a scam**");    //
+        telemetry.update();
     }
 
     /*
@@ -91,35 +92,54 @@ public class FaltechH2OTeleop extends OpMode{
     @Override
     public void loop() {
         processDriving ();
-      //  processDude();
+        processDude();
         processClaw();
     }
     
     public void processDriving() {
-        double left;
-        double right;
-
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y;
-        right = -gamepad1.right_stick_y;
+        double forward = deadstick (-gamepad1.right_stick_y);
+        double side= deadstick (gamepad1.left_stick_x)/2;
 
-        robot.leftDrive.setPower(left);
-        robot.rightDrive.setPower(right);
+        double leftDrive=forward+side;
+        double rightDrive=forward-side;
 
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
+        double maxPower=1.0;
+        maxPower=Math.max(maxPower,Math.abs(forward));
+        maxPower=Math.max(maxPower,Math.abs(side));
+
+        leftDrive=leftDrive/maxPower;
+        rightDrive=rightDrive/maxPower;
+
+        robot.leftDrive.setPower(leftDrive);
+        robot.rightDrive.setPower(rightDrive);
+
+
+        telemetry.addData("drivejoy",  "%.2f ,%.2f", forward,side);
+        telemetry.addData("drivepower",  "%.2f ,%.2f", leftDrive, rightDrive);
+        telemetry.update();
+
+    }
+
+    public float deadstick (float value){
+
+        if (value > -0.07 && value < 0.07)
+           return 0 ;
+        else
+            return value;
     }
 
     public void processDude() {
-        double pos=0.0;
+        double pos=1.0;
         
         if (gamepad1.y)
-            pos=1.0;
+            pos=0.0;
 
         robot.dude.setPosition(pos);
 
         // Send telemetry message to signify robot running;
-        telemetry.addData("claw",  "Offset = %.2f", pos);
+        telemetry.addData("claw", "Offset = %.2f", pos);
+        telemetry.update();
     }
 
     public void processClaw() {
@@ -137,5 +157,7 @@ public class FaltechH2OTeleop extends OpMode{
      */
     @Override
     public void stop() {
+        robot.leftDrive.setPower(0);
+        robot.rightDrive.setPower(0);
     }
 }

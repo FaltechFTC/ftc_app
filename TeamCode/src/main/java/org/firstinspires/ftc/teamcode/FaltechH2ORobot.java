@@ -102,7 +102,7 @@ public class FaltechH2ORobot {
 
     private void initDude() {
         dude = hwMap.get(Servo.class, "dude");
-        dude.setPosition(MID_SERVO);
+        dude.setPosition(1.0);
     }
 
     private void initClaw() {
