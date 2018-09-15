@@ -58,6 +58,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //@Disabled
 public class FaltechH2OAuto extends LinearOpMode {
 
+    //ari was here
     /* Declare OpMode members. */
     FaltechH2ORobot robot   = new FaltechH2ORobot();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
