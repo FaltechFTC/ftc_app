@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.hardware.ServoController;
  *
  * In addition, the Matrix Controller has been assigned the name:  "matrix controller"
  */
-public class FaltechH2ORobotMatrix extends FaltechH2ORobot
+public class  FaltechH2ORobotMatrix extends FaltechH2ORobot
 {
     /* Public OpMode members. */
     private MatrixDcMotorController matrixMotorController = null;
