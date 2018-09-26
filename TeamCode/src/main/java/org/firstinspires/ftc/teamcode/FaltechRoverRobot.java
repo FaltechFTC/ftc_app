@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class FaltechRoverRobot {
 
     public DcMotor mtrFL = null;
@@ -13,15 +15,17 @@ public class FaltechRoverRobot {
 
     HardwareMap hwMap = null;
     private ElapsedTime period = new ElapsedTime();
+    public Telemetry myTelemetry = null;
 
     //Constructor//
     public FaltechRoverRobot() {
 
     }
 
-    public void init(HardwareMap ahwMap) {
+    public void init(HardwareMap ahwMap, Telemetry myTelemetry) {
         // Save reference to Hardware map
         hwMap = ahwMap;
+        initDrive();
     }
 
     private void initDrive() {
@@ -37,10 +41,10 @@ public class FaltechRoverRobot {
         mtrBL.setPower(0);
         mtrBR.setPower(0);
 
-//        mtrFL.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-//        mtrFR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-//        mtrBL.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-//        mtrBR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        mtrFL.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        mtrFR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        mtrBL.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        mtrBR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -48,6 +52,24 @@ public class FaltechRoverRobot {
         mtrFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mtrBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mtrBR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    public void forwardTeleOp(double power){
+        mtrFR.setPower(power);
+        mtrFL.setPower(power);
+        mtrBR.setPower(power);
+        mtrBL.setPower(power);
+    }
+    public void strafeTeleOp(double power){
+    mtrFR.setPower(-power);
+    mtrFL.setPower(power);
+    mtrBR.setPower(power);
+    mtrBL.setPower(-power);
+    }
+    public void turnTeleOp(double power){
+        mtrFR.setPower(power);
+        mtrBR.setPower(power);
+        mtrFL.setPower(-power);
+        mtrBL.setPower(-power);
     }
 }
 
