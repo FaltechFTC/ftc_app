@@ -4,7 +4,7 @@ public class FaltechLinearExtensionTeleop {
     /**
      *Created by Error87C on 9/6/18
      */
-if (rightTrigger > 0.2 && rightTrigger < 0.5){
+/*    if (rightTrigger > 0.2 && rightTrigger < 0.5){
 
         robot.mtrCollector.setPower(0.5);
 
@@ -17,6 +17,6 @@ if (rightTrigger > 0.2 && rightTrigger < 0.5){
             robot.mtrCollector.setPower(0.0);
 
         }
-
+*/
     }
     //Test

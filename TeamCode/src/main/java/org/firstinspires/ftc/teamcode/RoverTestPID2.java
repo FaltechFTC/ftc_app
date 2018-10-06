@@ -24,9 +24,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="RobotTestPID", group="7079")
+@Autonomous(name="RoverTestPID2", group="7079")
 //@Disabled
-public class RoverTestPID extends LinearOpMode
+public class RoverTestPID2 extends LinearOpMode
 {
     DcMotor                 leftMotor;
     DcMotor                 rightMotor;
@@ -42,9 +42,12 @@ public class RoverTestPID extends LinearOpMode
     public void runOpMode() throws InterruptedException
     {
         leftMotor = hardwareMap.dcMotor.get("mtrFL");
+
         rightMotor = hardwareMap.dcMotor.get("mtrFR");
 
+        leftMotor.setDirection(DcMotor.Direction.FORWARD);
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
+
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -66,7 +69,7 @@ public class RoverTestPID extends LinearOpMode
         imu.initialize(parameters);
 
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
-        pidRotate = new PIDController(.005, 0, 0);
+        pidRotate = new PIDController(.01, 0, 0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -84,8 +87,9 @@ public class RoverTestPID extends LinearOpMode
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
-        telemetry.addData("angle", getAngle());
         telemetry.update();
+
+        resetRelativeAngleToZero();
 
         // wait for start button.
 
@@ -99,15 +103,13 @@ public class RoverTestPID extends LinearOpMode
         // Set up parameters for driving in a straight line.
         pidDrive.setSetpoint(0);
         pidDrive.setOutputRange(0, power);
-        pidDrive.setInputRange(-90, 90);
+        pidDrive.setInputRange(0.0, 90.0);
         pidDrive.enable();
 
         // drive until end of period.
 
-        while (opModeIsActive())
-        {
             // Use PID with imu input to drive in a straight line.
-            correction = pidDrive.performPID(getAngle());
+        //    correction = pidDrive.performPID(getAngle());
 
             telemetry.addData("1 imu heading", lastAngles.firstAngle);
             telemetry.addData("2 global heading", globalAngle);
@@ -126,26 +128,32 @@ public class RoverTestPID extends LinearOpMode
             bButton = gamepad1.b;
       //      touched = touch.getState();
 
-            rotate(90, power);
+        boolean once=true;
+        while (once) {
+            once=false;
 
-//            if (!touched || aButton || bButton)
-//            {
-//                // backup.
-//                leftMotor.setPower(power);
-//                rightMotor.setPower(power);
+            if (!opModeIsActive()) break;
+
+            rotate(-45.0, power);
+            sleep(2000);
+
+//            if (!opModeIsActive()) break;
 //
-//                sleep(500);
+//            rotate(45.0, power);
+//            sleep(2000);
 //
-//                // stop.
-//                leftMotor.setPower(0);
-//                rightMotor.setPower(0);
+//            if (!opModeIsActive()) break;
 //
-//                // turn 90 degrees right.
-//                if (!touched || aButton) rotate(-90, power);
+//            rotate(-90.0, power);
+//            sleep(2000);
 //
-//                // turn 90 degrees left.
-//                if (bButton) rotate(90, power);
-//            }
+//            if (!opModeIsActive()) break;
+//
+//            rotate(180.0, power);
+//            sleep(2000);
+//
+//            if (!opModeIsActive()) break;
+
         }
 
         // turn the motors off.
@@ -156,7 +164,7 @@ public class RoverTestPID extends LinearOpMode
     /**
      * Resets the cumulative angle tracking to zero.
      */
-    private void resetAngle()
+    private void resetRelativeAngleToZero()
     {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
@@ -167,7 +175,7 @@ public class RoverTestPID extends LinearOpMode
      * Get current cumulative angle rotation from last reset.
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle()
+    private double getRelativeAngle()
     {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
@@ -178,25 +186,38 @@ public class RoverTestPID extends LinearOpMode
 
         double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
 
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
+        // remap -180 to +180
+        if (deltaAngle < -180) deltaAngle += 360;
+        else if (deltaAngle > 180) deltaAngle -= 360;
 
         globalAngle += deltaAngle;
 
-        lastAngles = angles;
-
-        return globalAngle;
+        return deltaAngle;
     }
+
+    private double getCurrentAngle()
+    {
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double currentAngle = angles.firstAngle;
+
+        return currentAngle;
+    }
+
+
+
 
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
-    private void rotate(int degrees, double power) {
+    private void rotate(double degrees, double maxPower)
+    {
+        if (degrees==0.0) return ;
         // restart imu angle tracking.
-        resetAngle();
+        resetRelativeAngleToZero();
+
 
         // start pid controller. PID controller will monitor the turn angle with respect to the
         // target angle and reduce power as we approach the target angle with a minimum of 20%.
@@ -211,8 +232,8 @@ public class RoverTestPID extends LinearOpMode
         pidRotate.reset();
         pidRotate.setSetpoint(degrees);
         pidRotate.setInputRange(0, 90);
-        pidRotate.setOutputRange(.20, power);
-        pidRotate.setTolerance(2);
+        pidRotate.setOutputRange(.20, maxPower);
+        pidRotate.setTolerance(3);
         pidRotate.enable();
 
         // getAngle() returns + when rotating counter clockwise (left) and - when rotating
@@ -220,27 +241,37 @@ public class RoverTestPID extends LinearOpMode
 
         // rotate until turn is completed.
 
-        if (degrees < 0) {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0) {
-                leftMotor.setPower(-power);
-                rightMotor.setPower(power);
-                sleep(100);
-            }
-
-            do {
-                power = pidRotate.performPID(getAngle()); // power will be - on right turn.
-                leftMotor.setPower(power);
-                rightMotor.setPower(-power);
-            } while (opModeIsActive() && !pidRotate.onTarget());
-        } else    // left turn.
+        double direction= (degrees>=0.0) ? 1.0 : -1.0;
+/*
+        // On right turn we have to get off zero first.
+        while (opModeIsActive() && getRelativeAngle() == 0)
         {
-            do {
-                power = pidRotate.performPID(getAngle()); // power will be + on left turn.
-                leftMotor.setPower(power);
-                rightMotor.setPower(-power);
-            } while (opModeIsActive() && !pidRotate.onTarget());
+            double minMovePower=maxPower/5;
+            leftMotor.setPower(direction *minMovePower);
+            rightMotor.setPower(-direction * minMovePower);
+            sleep(100);
+            telemetry.addData("In zero Angle 1 imu heading", lastAngles.firstAngle);
+            telemetry.addData("2 global heading", getRelativeAngle());
+            telemetry.addData("3 correction", correction);
         }
+*/
+        do
+        {
+            double relativeAngle = getRelativeAngle();
+            double currentAngle = getCurrentAngle();
+            double drivepower = pidRotate.performPID(relativeAngle); // power will be - on right turn.
+            leftMotor.setPower(direction *drivepower);
+            rightMotor.setPower(-direction * drivepower);
+            telemetry.addData(" last first angle", lastAngles.firstAngle);
+            telemetry.addData("relativeAngle", relativeAngle);
+            telemetry.addData("currentAngle", currentAngle);
+            telemetry.addData("Power is", drivepower);
+            telemetry.addData(" correction", correction);
+            dumpPID("pidR",pidRotate);
+            telemetry.update();
+
+        } while (opModeIsActive() && !pidRotate.onTarget());
+
         // turn the motors off.
         rightMotor.setPower(0);
         leftMotor.setPower(0);
@@ -248,9 +279,10 @@ public class RoverTestPID extends LinearOpMode
         // wait for rotation to stop.
         sleep(500);
 
-        // reset angle tracking on new heading.
-        resetAngle();
     }
 
+    void dumpPID (String caption, PIDController pid) {
+        telemetry.addData(caption, "P="+pid.getP()+", I="+pid.getI()+", D="+pid.getD()+", E="+pid.getError()+", SP="+pid.getSetpoint());
 
+    }
 }

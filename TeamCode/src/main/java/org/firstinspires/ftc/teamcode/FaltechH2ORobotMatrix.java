@@ -70,7 +70,7 @@ public class  FaltechH2ORobotMatrix extends FaltechH2ORobot
     public void init(HardwareMap ahwMap) {
 
         // Initialize base Motor and Servo objects
-        super.init(ahwMap);
+        super.init(ahwMap,telemetry);
 
         /*
          * Matrix controllers are special.

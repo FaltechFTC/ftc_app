@@ -29,14 +29,14 @@ public class Onbotautodude extends LinearOpMode {
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
-        robot.claw.setPosition(1.0);
-        robot.clawHinge.setPosition(1.0);
-        robot.dude.setPosition(1.0);
+//        robot.claw.setPosition(1.0);
+//        robot.clawHinge.setPosition(1.0);
+//        robot.dude.setPosition(1.0);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        robot.clawHinge.setPosition(0.0);
+    //    robot.clawHinge.setPosition(0.0);
 
         robot.leftDrive.setPower(FORWARD_SPEED);
         robot.rightDrive.setPower(FORWARD_SPEED);
@@ -55,12 +55,12 @@ public class Onbotautodude extends LinearOpMode {
         robot.rightDrive.setPower(0);
 
 
-        robot.clawHinge.setPosition(0.5);
+     //   robot.clawHinge.setPosition(0.5);
         sleep(100);
 
-        robot.claw.setPosition(0.0); // open claw
+    //    robot.claw.setPosition(0.0); // open claw
         sleep(500);
-        robot.clawHinge.setPosition(0.0);  // lift claw
+      //  robot.clawHinge.setPosition(0.0);  // lift claw
         sleep(1000);
 
         // doodoo stuff goes here
@@ -76,7 +76,7 @@ public class Onbotautodude extends LinearOpMode {
         robot.leftDrive.setPower(0);
         robot.rightDrive.setPower(0);
 
-        robot.dude.setPosition(0.0);
+//        robot.dude.setPosition(0.0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();

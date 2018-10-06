@@ -73,7 +73,7 @@ public class FaltechH2OAutoTestEverything extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap);
+        robot.init(hardwareMap,telemetry);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
@@ -113,30 +113,30 @@ public class FaltechH2OAutoTestEverything extends LinearOpMode {
         robot.leftDrive.setPower(0);
         robot.rightDrive.setPower(0);
 
-        robot.dude.setPosition(0);
+   //     robot.dude.setPosition(0);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 3.0)) {
             telemetry.addData("Path", "dude position 0");
             telemetry.update();
         }
 
-        robot.dude.setPosition(1);
+//        robot.dude.setPosition(1);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 3.0)) {
             telemetry.addData("Path", "dude position 1");
             telemetry.update();
         }
 
-        robot.claw.setPosition(0.0);
-        robot.clawHinge.setPosition(0.0);
+//        robot.claw.setPosition(0.0);
+//        robot.clawHinge.setPosition(0.0);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 3.0)) {
             telemetry.addData("Path", "claws position 0");
             telemetry.update();
         }
 
-        robot.claw.setPosition(1.0);
-        robot.clawHinge.setPosition(1.0);
+//        robot.claw.setPosition(1.0);
+//        robot.clawHinge.setPosition(1.0);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 3.0)) {
             telemetry.addData("Path", "claws position 1");

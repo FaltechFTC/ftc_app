@@ -47,9 +47,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tele Thursday1", group="FaltechH2O")
+@TeleOp(name="PidTeleop", group="7079")
 
-public class FaltechH2OTeleop extends OpMode{
+public class FaltechPIDTeleop extends OpMode{
 
     /* Declare OpMode members. */
     FaltechH2ORobot robot       = new FaltechH2ORobot(); // use the class created to define a Pushbot's hardware
@@ -92,8 +92,7 @@ public class FaltechH2OTeleop extends OpMode{
     @Override
     public void loop() {
         processDriving ();
-        processDude();
-        processClaw();
+        processPID();
     }
     
     public void processDriving() {
@@ -121,6 +120,14 @@ public class FaltechH2OTeleop extends OpMode{
 
     }
 
+    public void processPID() {
+
+        if (gamepad1.x) robot.rotate(45,.3);
+        else if (gamepad1.y) robot.rotate(-45,.3);
+        else if (gamepad1.a) robot.rotate(90,.3);
+        else if (gamepad1.b) robot.rotate(-90,.3);
+    }
+
     public float deadstick (float value){
 
         if (value > -0.07 && value < 0.07)
@@ -135,7 +142,7 @@ public class FaltechH2OTeleop extends OpMode{
         if (gamepad1.y)
             pos=0.0;
 
-//        robot.dude.setPosition(pos);
+      //  robot.dude.setPosition(pos);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("claw", "Offset = %.2f", pos);
@@ -151,7 +158,7 @@ public class FaltechH2OTeleop extends OpMode{
 
 //        robot.claw.setPosition(posclaw);
 //        robot.clawHinge.setPosition(posclawhinge);
-   }
+    }
     /*
      * Code to run ONCE after the driver hits STOP
      */
