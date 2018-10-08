@@ -59,6 +59,21 @@ public class Pid {
         return Math.min(max, Math.max(min, value));
     }
 
+    @Override
+    public String toString() {
+        return "Pid{" +
+                "kp=" + kp +
+                ", ti=" + ti +
+                ", td=" + td +
+                ", integralMin=" + integralMin +
+                ", integralMax=" + integralMax +
+                ", outputMin=" + outputMin +
+                ", outputMax=" + outputMax +
+                ", previousError=" + previousError +
+                ", runningIntegral=" + runningIntegral +
+                '}';
+    }
+
     // Proportional factor to scale error to output.
     private double kp;
     // The number of seconds to eliminate all past errors.

@@ -114,18 +114,26 @@ public class FaltechPIDTeleop extends OpMode{
         robot.rightDrive.setPower(rightDrive);
 
 
+        telemetry.addData("angles", "relative="+robot.getRelativeAngle()+" absolute"+robot.getCurrentAbsoluteAngle());
         telemetry.addData("drivejoy",  "%.2f ,%.2f", forward,side);
         telemetry.addData("drivepower",  "%.2f ,%.2f", leftDrive, rightDrive);
         telemetry.update();
 
+
+
+
+
     }
 
     public void processPID() {
+        double maxTurningPower=.3;
+        double maxDrivePower=.5;
+        if (gamepad1.x) robot.rotate2(45,maxTurningPower);
+        if (gamepad1.y) robot.rotate2(-45,maxTurningPower);
+        if (gamepad1.a) robot.driveToHeading(0,maxDrivePower, maxTurningPower/2, 4000);
+        if (gamepad1.b) robot.driveToHeading(15,maxDrivePower, maxTurningPower/2, 4000);
+        if (gamepad1.dpad_up) robot.resetRelativeAngleToZero();
 
-        if (gamepad1.x) robot.rotate(45,.3);
-        else if (gamepad1.y) robot.rotate(-45,.3);
-        else if (gamepad1.a) robot.rotate(90,.3);
-        else if (gamepad1.b) robot.rotate(-90,.3);
     }
 
     public float deadstick (float value){
