@@ -17,7 +17,7 @@ public class RoverTeleop extends OpMode{
     public static class RoverTankTeleop extends RoverTeleop {
 
         @Override public void init() {
-            robot = new RoverRobot(new DriveMecanum());
+            robot = new RoverRobot(new DriveTank());
             super.init();
         }
     }
