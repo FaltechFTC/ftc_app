@@ -36,7 +36,6 @@ public class FaltechH2ORobot {
     public DcMotor leftDrive = null;
     public DcMotor rightDrive = null;
 
-    AxesOrder axesOrder= AxesOrder.ZYX;
 
 //    public Servo clawHinge = null;
 //    public Servo claw = null;
@@ -49,6 +48,7 @@ public class FaltechH2ORobot {
     //  DigitalChannel          touch;
     BNO055IMU imu;
     Orientation lastAngles = new Orientation();
+    AxesOrder axesOrder= AxesOrder.ZYX;
     double                  globalAngle, power = .30, correction;
     boolean                 aButton, bButton, touched;
     PIDController           pidDrive, pidRotate;
