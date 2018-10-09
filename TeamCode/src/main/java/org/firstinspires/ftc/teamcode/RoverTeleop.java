@@ -23,6 +23,7 @@ public class RoverTeleop extends OpMode{
     }
 
     RoverRobot robot = null;
+    RoverRobot.Operation operation= null;
 
     @Override
     public void init() {
@@ -42,8 +43,12 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-        doDrive();
-        doArm();
+        doOperations();
+        if (operation==null) {
+            doDrive();
+            doArm();
+        }
+
     }
 
     void doDrive() {
@@ -54,14 +59,20 @@ public class RoverTeleop extends OpMode{
     }
 
 
-    public void processPID() {
+    public void doOperations() {
         double maxTurningPower=.3;
         double maxDrivePower=.5;
-        if (gamepad1.x) robot.rotate2(45,maxTurningPower);
-        if (gamepad1.x) robot.rotate2(-45,maxTurningPower);
-        if (gamepad1.a) robot.driveToHeading(0,maxDrivePower, maxTurningPower/2, 4000);
-        if (gamepad1.a) robot.driveToHeading(15,maxDrivePower, maxTurningPower/2, 4000);
-        if (gamepad1.dpad_up) robot.resetRelativeAngleToZero();
+        double degreesError=2.0;
+        long timeoutMS=4000;
+
+        if (operation!=null) {      // if we have an existing operation
+            if (!operation.loop())  // loop the operation
+                operation=null;     // and throw it away if it finished
+        } else {
+            if (gamepad1.x) operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, timeoutMS);
+            if (gamepad1.y) operation = robot.getOperationRotateToHeading(-45, maxTurningPower, degreesError, timeoutMS);
+            if (gamepad1.dpad_up) robot.resetRelativeAngleToZero();
+        }
     }
 
     void doArm() {

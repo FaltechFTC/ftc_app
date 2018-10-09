@@ -283,6 +283,114 @@ public class RoverRobot {
         RobotLog.i("driveToHeading() done");
     }
 
+
+    public class Operation {
+        public long timeoutMS=9999;
+        public long startMS=System.currentTimeMillis();
+        public long curMS=0;
+        public boolean done=false;
+        public boolean timeout=false;
+        public long numLoops=0;
+        public Operation() {
+        }
+
+        public boolean run() {
+            return run(10);
+        }
+        public boolean run(long timeBetweenLoopsMS) {
+            while(loop()) {
+                sleep(timeBetweenLoopsMS);
+            }
+            return !timeout; // true if we ran to completion, else false means we timed out
+        }
+
+        public boolean loop() {
+            if (done) return false;
+            numLoops++;
+            curMS=System.currentTimeMillis();
+            if (curMS-startMS > timeoutMS) {timeout=true; done(); return false;}
+            return true;
+            // keep looping ...
+        }
+
+        public void done() {
+            done=true;
+        }
+    }
+
+    Operation getOperationRotateToHeading(double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
+        return new RotateToHeading(targetDegrees, maxPower, targetDegreesAcceptableError, timeoutMS);
+    }
+
+    public class RotateToHeading extends Operation {
+        double targetDegrees, maxPower, targetDegreesAcceptableError;
+        long lastTime = System.currentTimeMillis();
+        Pid pidR;
+
+        Boolean onTarget = false;
+        Boolean halt = false;
+        double deltaTime = .001;
+
+        public RotateToHeading (double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
+            this.targetDegrees=targetDegrees;
+            this.maxPower=maxPower;
+            this.timeoutMS=timeoutMS;
+            this.targetDegreesAcceptableError=targetDegreesAcceptableError;
+
+            RobotLog.i("RotateToHeading( targetDegrees=%f, maxPower=%f) ", targetDegrees, maxPower);
+            // restart imu angle tracking.
+            resetRelativeAngleToZero();
+
+            double drivePidKp = 1.0;     // Tuning variable for PID.
+            double drivePidTi = 0.5;   // Eliminate integral error in 1 sec.
+            double drivePidTd = 0.5;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
+
+            double drivePidIntMax = 180.0;
+            double drivePidIntMin = -drivePidIntMax;
+
+            pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxPower, maxPower);
+            RobotLog.i(pidR.toString());
+        }
+
+        public void done() {
+            super.done();
+            drive.stop();
+            RobotLog.i("rotate2() done");
+        }
+
+        public boolean loop() {
+            if (!super.loop()) return false;
+
+            RobotLog.i("begin loop %d : %s", numLoops, pidR.toString());
+
+            double relativeAngle = -getRelativeAngle();
+            double deltaTime = ((double) (curMS - lastTime)) / 1000.0;
+
+            RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
+
+            double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
+            RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
+
+            drive.driveFRS(0.0, rotatePower, 0.0);
+
+            lastTime = curMS;
+
+            if (Math.abs(relativeAngle - targetDegrees) < targetDegreesAcceptableError)
+                onTarget = true;
+
+            telemetry.addData("angles", "target=" + targetDegrees + " relative=" + relativeAngle);
+            telemetry.addData("power", rotatePower);
+            telemetry.addData("time", "Delta=" + deltaTime + " total=" + (lastTime - startMS));
+            telemetry.addData("pidR", pidR.toString());
+            telemetry.addData("status", onTarget ? "On TARGET" : (halt ? "HALT" : "running"));
+            RobotLog.i("onTarget=%s Halt=%s", onTarget.toString(), halt.toString());
+            telemetry.update();
+
+            if (onTarget) done();
+            return !done;
+        }
+    }
+
     protected void sleep(long millis) {
         try {
             Thread.sleep(millis);
