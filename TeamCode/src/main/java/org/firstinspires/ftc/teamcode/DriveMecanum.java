@@ -46,6 +46,13 @@ public class DriveMecanum extends IDrive{
 
     }
 
+    public double getMaxPower() { return maxPower;}
+    public void setMaxPower(double p) {maxPower=p;}
+
+
+    public boolean isMecanum() { return true;}
+
+
     @Override
     public void init(HardwareMap hwMap, Telemetry telemetry) {
         // Save reference to Hardware map
@@ -76,9 +83,10 @@ public class DriveMecanum extends IDrive{
 
 
     @Override
-    public void driveFRS(double forward, double rotate, double sideways) {
+    public void driveFRS(double forward, double rotate, double sideways, double maxPower) {
         Motion motion=createMotionFromFRS(sideways,forward,rotate);
         Wheels wheels = motionToWheels(motion);
+        setPower(wheels);
     }
 
     @Override
@@ -196,8 +204,7 @@ public class DriveMecanum extends IDrive{
         double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
         double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
         double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
-        return new Wheels(frontLeft, frontRight,
-                          backLeft, backRight);
+        return new Wheels(frontLeft, frontRight, backLeft, backRight);
     }
 
     /**

@@ -43,6 +43,7 @@ public class DriveTank extends IDrive{
 
     }
 
+
     @Override
     public void init(HardwareMap hwMap, Telemetry telemetry) {
         // Save reference to Hardware map
@@ -66,10 +67,12 @@ public class DriveTank extends IDrive{
     }
 
 
+
     @Override
-    public void driveFRS(double forward, double rotate, double sideways) {
+    public void driveFRS(double forward, double rotate, double sideways,double maxPower) {
         mtrFL.setPower(forward+rotate);
         mtrFR.setPower(forward-rotate);
+        //TODO NEEDS CLAMP
     }
 
     @Override
