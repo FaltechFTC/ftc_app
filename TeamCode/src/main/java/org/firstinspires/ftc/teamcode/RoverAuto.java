@@ -18,7 +18,7 @@ public class RoverAuto extends LinearOpMode {
     10. Turn around
     11. Go back to the crater for parking
      */
-
+    // Update from 10/13/18
     private RoverRobot robot = null;
     RoverRobot.Operation operation= null;
 
