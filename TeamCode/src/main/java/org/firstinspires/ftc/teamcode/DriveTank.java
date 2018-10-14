@@ -99,7 +99,6 @@ public class DriveTank extends IDrive{
     }
 
 
-
     // encoder clicks
     public double getClicksPerRevolution() {
         return 1440;
@@ -112,9 +111,9 @@ public class DriveTank extends IDrive{
     }
 
     public void resetEncoders() {
-        mtrFL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrFR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+
     public double getEncoderClicksLeft() {
         return mtrFL.getCurrentPosition();
 
@@ -123,7 +122,6 @@ public class DriveTank extends IDrive{
         return mtrFR.getCurrentPosition();
 
     }
-
 
 
 }

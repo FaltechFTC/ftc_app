@@ -122,6 +122,30 @@ public class DriveMecanum extends IDrive{
         mtrBR.setPower(w.backRight);
     }
 
+
+    // encoder clicks
+    public double getClicksPerRevolution() {
+        return 1440;
+    }
+    public double getGearReduction() {
+        return 1.0;
+    }
+    public double getWheelCircumfrence() {
+        return 12.56; // inches
+    }
+
+    public void resetEncoders() {
+        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public double getEncoderClicksLeft() {
+        return (mtrBL.getCurrentPosition() + mtrFL.getCurrentPosition())/2.0;
+    }
+
+    public double getEncoderClicksRight() {
+        return (mtrBR.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
+    }
+
     /**
      * Mecanum motion vector.
      */
@@ -224,35 +248,6 @@ public class DriveMecanum extends IDrive{
         }
       }
     }
-
-
-    // encoder clicks
-    public double getClicksPerRevolution() {
-        return 1440;
-    }
-    public double getGearReduction() {
-        return 1.0;
-    }
-    public double getWheelCircumfrence() {
-        return 12.56; // inches
-    }
-
-
-
-    public void resetEncoders() {
-        mtrBL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrBR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrFL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrFR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-    public double getEncoderClicksLeft() {
-       return (mtrBL.getCurrentPosition() + mtrFL.getCurrentPosition())/2.0;
-    }
-    public double getEncoderClicksRight() {
-        return (mtrBR.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
-    }
-
-
 
 
 
