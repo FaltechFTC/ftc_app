@@ -225,74 +225,35 @@ public class DriveMecanum extends IDrive{
       }
     }
 
-    private void setRobotMode(){
+
+    // encoder clicks
+    public double getClicksPerRevolution() {
+        return 1440;
+    }
+    public double getGearReduction() {
+        return 1.0;
+    }
+    public double getWheelCircumfrence() {
+        return 12.56; // inches
+    }
+
+
+
+    public void resetEncoders() {
         mtrBL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         mtrBR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         mtrFL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         mtrFR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        // Set them to run to position
-        mtrBL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mtrBR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mtrFL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mtrFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-
-    double motor_count = 1440;
-    double gear_reduction = 0.5;
-    double wheel_circumference = 12.56;
-    double counts_per_inch = (motor_count * gear_reduction / wheel_circumference);
-
-    private void setTargetPositions(double inches){
-        double BLtarget;
-        double BRtarget;
-        double FLtarget;
-        double FRtarget;
-
-        BLtarget = mtrBL.getCurrentPosition() + (inches * counts_per_inch);
-        BRtarget = mtrBR.getCurrentPosition() + (inches * counts_per_inch);
-        FLtarget = mtrFL.getCurrentPosition() + (inches * counts_per_inch);
-        FRtarget = mtrFR.getCurrentPosition() + (inches * counts_per_inch);
-
-        mtrBL.setTargetPosition((int) BLtarget);
-        mtrBR.setTargetPosition((int) BRtarget);
-        mtrFL.setTargetPosition((int) FLtarget);
-        mtrFR.setTargetPosition((int) FRtarget);
-
+    public double getEncoderClicksLeft() {
+       return (mtrBL.getCurrentPosition() + mtrFL.getCurrentPosition())/2.0;
     }
-
-    private void timeOutExit(double timeout){
-
-        while ((runTime.seconds() < (timeout))
-                && (mtrBL.isBusy() &&mtrBR.isBusy()
-                && mtrFL.isBusy() && mtrFR.isBusy())) {
-
-            // Display it for the driver.
-            telemetry.addData("Path1",  "Running to target position");
-            telemetry.addData("Path2",  "Running at:",
-                    mtrBL.getCurrentPosition(),
-                    mtrBR.getCurrentPosition(),
-                    mtrFL.getCurrentPosition(),
-                    mtrFR.getCurrentPosition());
-            telemetry.update();
-        }
-
-    }
-
-    private void resetEncoderMode(){
-        mtrBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        mtrBR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        mtrFL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        mtrFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public double getEncoderClicksRight() {
+        return (mtrBR.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
     }
 
 
-    public void goInches(double inches, double speed, double power, double timeout){
-        runTime.reset();
-        setRobotMode();
-        setTargetPositions(inches);
-        driveFRS(speed, 0.0, 0.0, power);
-        timeOutExit(timeout);
-        resetEncoderMode();
-        stop();
-    }
+
+
+
 }

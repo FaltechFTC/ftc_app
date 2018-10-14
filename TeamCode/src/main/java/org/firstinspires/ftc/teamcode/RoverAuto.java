@@ -61,31 +61,38 @@ public class RoverAuto extends LinearOpMode {
         double maxDrivePower=.5;
         double degreesError=2.0;
         long timeoutMS=4000;
-
-        robot.drive.driveFRS(0.3,0.0,0.0);
-        sleep(2000);
-        robot.stop();
+//        operation = robot.getOperationDriveToHeading(0,maxDrivePower, maxTurningPower, degreesError, timeoutMS, 15);
+//        operation.run();
+//        robot.stop();
 
         operation = robot.getOperationRotateToHeading(-75, maxTurningPower, degreesError, timeoutMS);
         operation.run();
         robot.stop();
 
-        robot.drive.driveFRS(0.6,0.0,0.0);
-        sleep(2000);
-        robot.stop();
-
-
-        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
-        operation.run();
-        robot.stop();
-
-        robot.drive.driveFRS(0.6,0.0,0.0);
-        sleep(4500);
-        robot.stop();
-
-        robot.drive.driveFRS(-0.6,0.0,0.0);
-        sleep(5500);
-        robot.stop();
+//        robot.drive.driveFRS(0.3,0.0,0.0);
+//        sleep(2000);
+//        robot.stop();
+//
+//        operation = robot.getOperationRotateToHeading(-75, maxTurningPower, degreesError, timeoutMS);
+//        operation.run();
+//        robot.stop();
+//
+//        robot.drive.driveFRS(0.6,0.0,0.0);
+//        sleep(2000);
+//        robot.stop();
+//
+//
+//        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
+//        operation.run();
+//        robot.stop();
+//
+//        robot.drive.driveFRS(0.6,0.0,0.0);
+//        sleep(4500);
+//        robot.stop();
+//
+//        robot.drive.driveFRS(-0.6,0.0,0.0);
+//        sleep(5500);
+//        robot.stop();
 
 
     }
