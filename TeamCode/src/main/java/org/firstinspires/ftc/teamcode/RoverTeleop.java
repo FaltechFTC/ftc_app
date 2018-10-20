@@ -32,7 +32,7 @@ public class RoverTeleop extends OpMode{
     boolean clawArmLeft = false;
     float clawRight = 0;
     boolean clawArmRight = false;
-
+    float motorClicks = 1120;
 
 
     @Override
@@ -56,17 +56,18 @@ public class RoverTeleop extends OpMode{
     public void loop() {
       //  doOperations();
         if (operation==null) {
-            doDrive();
+           doDrive();
             doArm();
             doClaw();
+            doArmExtender();
         }
 
     }
 
     void doDrive() {
-        double forward = FaltechUtilities.clipDeadzone(-gamepad1.right_stick_y);
-        double rotate = FaltechUtilities.clipDeadzone(gamepad1.left_stick_x);
-        double sideways = FaltechUtilities.clipDeadzone(-gamepad1.right_stick_x);
+        double forward = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_y);
+        double rotate = FaltechUtilities.scaleSpeedFunction(gamepad1.left_stick_x);
+        double sideways = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_x);
 
 //        telemetry.addData("Forward Value" , forward);
 //        telemetry.addData("Rotate Value" , rotate);
@@ -93,12 +94,19 @@ public class RoverTeleop extends OpMode{
         }
     }
 
-    void doArm() {
-        if (gamepad1.left_trigger > 0.2 ){
+    double currentPosition = 0.0;
 
-        }
+
+
+    public void doArm() {
+
+        double armSpeed= FaltechUtilities.clipDeadzone(gamepad1.right_trigger-gamepad1.left_trigger,.2);
+        double targetPosDegrees=armSpeed>=0 ? 120 : 0;
+        roverCollector.setPositionDegrees(targetPosDegrees);
+        roverCollector.setSpeed(armSpeed);
+        telemetry.addData("Arm Speed =", armSpeed);
+        telemetry.update();
     }
-
     public void doClaw() {
          if (!clawArmLeft && gamepad1.b){
              clawArmLeft = true;
@@ -117,8 +125,15 @@ public class RoverTeleop extends OpMode{
         else if (!gamepad1.x){
             clawArmRight = false;
         }
-
-
+    }
+    public void doArmExtender() {
+        if (gamepad1.left_bumper) {
+            roverCollector.mtrArmExtender.setPower(0.8);
+        } else if (gamepad1.right_bumper) {
+            roverCollector.mtrArmExtender.setPower(-0.4);
+        } else {
+            roverCollector.mtrArmExtender.setPower(0.0);
+        }
     }
 }
 
