@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -70,10 +71,10 @@ public class DriveMecanum extends IDrive{
         motors = new DcMotor[] {mtrFL, mtrFR, mtrBL, mtrBR};
 
         // set motor direction based on installed orientation.
-        mtrFR.setDirection(DcMotor.Direction.REVERSE);
+        mtrFR.setDirection(DcMotor.Direction.FORWARD);
         mtrBR.setDirection(DcMotor.Direction.REVERSE);
         mtrFL.setDirection(DcMotor.Direction.FORWARD);
-        mtrBL.setDirection(DcMotor.Direction.FORWARD);
+        mtrBL.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Set all motors to run without encoders.
@@ -116,6 +117,12 @@ public class DriveMecanum extends IDrive{
     }
 
     public void setPower(Wheels w) {
+        telemetry.addData("Front Left power is", w.frontLeft);
+        telemetry.addData("Front Right power is", w.frontRight);
+        telemetry.addData("Back Left power is", w.backLeft);
+        telemetry.addData("Back Right power is", w.backRight);
+        telemetry.update();
+
         mtrFL.setPower(w.frontLeft);
         mtrFR.setPower(w.frontRight);
         mtrBL.setPower(w.backLeft);
@@ -203,8 +210,8 @@ public class DriveMecanum extends IDrive{
         double vTheta = motion.vTheta;
 
         double frontLeft = vD * Math.sin(-thetaD + Math.PI / 4) - vTheta;
-        double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
-        double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
+        double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
+        double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
         double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
         return new Wheels(frontLeft, frontRight, backLeft, backRight);
     }
@@ -237,7 +244,7 @@ public class DriveMecanum extends IDrive{
         mtrFR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    double motor_count = 1440;
+    double motor_count = 1120;
     double gear_reduction = 0.5;
     double wheel_circumference = 12.56;
     double counts_per_inch = (motor_count * gear_reduction / wheel_circumference);
@@ -294,5 +301,9 @@ public class DriveMecanum extends IDrive{
         timeOutExit(timeout);
         resetEncoderMode();
         stop();
+    }
+    public double clicksPerInch(){
+
+        return (0.0);
     }
 }

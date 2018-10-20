@@ -9,6 +9,8 @@ public class RoverTeleop extends OpMode{
 
         @Override public void init() {
             robot = new RoverRobot(new DriveMecanum());
+            roverCollector = new RoverCollector();
+
             super.init();
         }
     }
@@ -23,18 +25,27 @@ public class RoverTeleop extends OpMode{
     }
 
     RoverRobot robot = null;
+    RoverCollector roverCollector = null;
     RoverRobot.Operation operation= null;
+
+    float clawLeft = 0;
+    boolean clawArmLeft = false;
+    float clawRight = 0;
+    boolean clawArmRight = false;
+
+
 
     @Override
     public void init() {
         robot.init(hardwareMap, telemetry);
         telemetry.addData("Robot" , "Initialized");
         telemetry.update();
+        roverCollector.init(hardwareMap, telemetry);
     }
 
     public void start() {
         // do anything we need on button start
-    };
+    }
 
 
     public void stop() {
@@ -43,10 +54,11 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-        doOperations();
+      //  doOperations();
         if (operation==null) {
             doDrive();
             doArm();
+            doClaw();
         }
 
     }
@@ -55,6 +67,12 @@ public class RoverTeleop extends OpMode{
         double forward = FaltechUtilities.clipDeadzone(-gamepad1.right_stick_y);
         double rotate = FaltechUtilities.clipDeadzone(gamepad1.left_stick_x);
         double sideways = FaltechUtilities.clipDeadzone(-gamepad1.right_stick_x);
+
+//        telemetry.addData("Forward Value" , forward);
+//        telemetry.addData("Rotate Value" , rotate);
+//        telemetry.addData("Sideways Value" , sideways);
+//
+//        telemetry.update();
         robot.drive.driveFRS(forward,rotate,sideways);
     }
 
@@ -76,32 +94,31 @@ public class RoverTeleop extends OpMode{
     }
 
     void doArm() {
-    /*Created by Error87C on 9/6/18   */
-/*    if (rightTrigger > 0.2 && rightTrigger < 0.5){
-
-        robot.mtrCollector.setPower(0.5);
-
-    } else if (rightTrigger > 0.5){
-
-        robot.mtrCollector.setPower(1.0);
-
-        { else
-
-            robot.mtrCollector.setPower(0.0);
+        if (gamepad1.left_trigger > 0.2 ){
 
         }
-*/
     }
 
     public void doClaw() {
-        double posclaw = 0.0;
-        double posclawhinge = 0.0;
+         if (!clawArmLeft && gamepad1.b){
+             clawArmLeft = true;
+             clawLeft = 1 - clawLeft;
+             roverCollector.leftClaw.setPosition(clawLeft);
+         }
+         else if (!gamepad1.b){
+             clawArmLeft = false;
+         }
 
-        if (gamepad1.right_trigger > 0.3) posclaw = 1.0;
-        if (gamepad1.left_trigger > 0.3) posclawhinge = 1.0;
+        if (!clawArmRight && gamepad1.x){
+            clawArmRight = true;
+            clawRight = 1 - clawRight;
+            roverCollector.rightClaw.setPosition(clawRight);
+        }
+        else if (!gamepad1.x){
+            clawArmRight = false;
+        }
 
-//        robot.claw.setPosition(posclaw);
-//        robot.clawHinge.setPosition(posclawhinge);
+
     }
 }
 

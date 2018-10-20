@@ -21,10 +21,19 @@ public abstract class IDrive {
     public boolean isMecanum() { return false;}
 
     double maxPower =1.0;
+
     public double getMaxPower() { return maxPower;}
     public void setMaxPower(double p) {maxPower=p;}
 
 
     // todo, adding encoding style functions here?
     // todo, add getters here
+
+    public double clicksPerInch(){
+
+        return(0.0);
+    }
+
+
+
 }
