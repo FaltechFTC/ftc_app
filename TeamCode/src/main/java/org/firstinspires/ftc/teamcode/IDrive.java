@@ -26,6 +26,28 @@ public abstract class IDrive {
     public void setMaxPower(double p) {maxPower=p;}
 
 
+    abstract public double getClicksPerRevolution(); // encoder clicks
+    abstract public double getGearReduction(); // ratio
+    abstract public double getWheelCircumfrence();  // inches
+
+    abstract public void resetEncoders();
+    abstract public double getEncoderClicksLeft();
+    abstract public double getEncoderClicksRight();
+
+    public double getEncoderClicks() {
+        return (getEncoderClicksLeft()+getEncoderClicksRight())/2.0;
+    };
+
+    public double convertInchesToClicks( double inches) {
+        return inches* getClicksPerRevolution() * getGearReduction() / getWheelCircumfrence();
+    }
+
+    public double convertClicksToInches(double clicks) {
+        return clicks*getWheelCircumfrence()/(getClicksPerRevolution()*getGearReduction());
+    }
+
+
+
     // todo, adding encoding style functions here?
     // todo, add getters here
 
