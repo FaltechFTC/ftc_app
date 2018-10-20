@@ -65,9 +65,9 @@ public class RoverTeleop extends OpMode{
     }
 
     void doDrive() {
-        double forward = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_y);
-        double rotate = FaltechUtilities.scaleSpeedFunction(gamepad1.left_stick_x);
-        double sideways = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_x);
+        double forward = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_y);
+        double rotate = FaltechUtilities.scaleSpeedFunction(gamepad1.right_stick_x);
+        double sideways = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_x);
 
 //        telemetry.addData("Forward Value" , forward);
 //        telemetry.addData("Rotate Value" , rotate);
@@ -108,21 +108,21 @@ public class RoverTeleop extends OpMode{
         telemetry.update();
     }
     public void doClaw() {
-         if (!clawArmLeft && gamepad1.b){
+         if (!clawArmLeft && gamepad1.x){
              clawArmLeft = true;
              clawLeft = 1 - clawLeft;
              roverCollector.leftClaw.setPosition(clawLeft);
          }
-         else if (!gamepad1.b){
+         else if (!gamepad1.x){
              clawArmLeft = false;
          }
 
-        if (!clawArmRight && gamepad1.x){
+        if (!clawArmRight && gamepad1.b){
             clawArmRight = true;
             clawRight = 1 - clawRight;
             roverCollector.rightClaw.setPosition(clawRight);
         }
-        else if (!gamepad1.x){
+        else if (!gamepad1.b){
             clawArmRight = false;
         }
     }
