@@ -10,6 +10,7 @@ public class RoverTeleop extends OpMode{
         @Override public void init() {
             robot = new RoverRobot(new DriveMecanum());
             roverCollector = new RoverCollector();
+            roverLift = new RoverLift();
 
             super.init();
         }
@@ -26,6 +27,7 @@ public class RoverTeleop extends OpMode{
 
     RoverRobot robot = null;
     RoverCollector roverCollector = null;
+    RoverLift roverLift = null;
     RoverRobot.Operation operation= null;
 
     float clawLeft = 0;
@@ -41,6 +43,7 @@ public class RoverTeleop extends OpMode{
         telemetry.addData("Robot" , "Initialized");
         telemetry.update();
         roverCollector.init(hardwareMap, telemetry);
+        roverLift.init(hardwareMap, telemetry);
     }
 
     public void start() {
@@ -60,6 +63,7 @@ public class RoverTeleop extends OpMode{
             doArm();
             doClaw();
             doArmExtender();
+            doRobotLift();
         }
 
     }
@@ -134,6 +138,17 @@ public class RoverTeleop extends OpMode{
         } else {
             roverCollector.mtrArmExtender.setPower(0.0);
         }
+    }
+
+    public void doRobotLift(){
+
+        if (gamepad1.y) {
+            roverLift.setTargetPosition(3);
+            roverLift.mtrRoverLift.setPower(0.5);
+        } else {
+            roverLift.mtrRoverLift.setPower(0);
+        }
+
     }
 }
 
