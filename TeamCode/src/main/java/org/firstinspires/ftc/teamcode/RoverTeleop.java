@@ -12,6 +12,20 @@ public class RoverTeleop extends OpMode{
             roverCollector = new RoverCollector();
             roverLift = new RoverLift();
 
+            driverMode=0;
+            super.init();
+        }
+    }
+
+    @TeleOp(name="RoverMecanumTeleopMode1", group="7079")
+    public static class RoverMecanumTeleopMode1 extends RoverTeleop {
+
+        @Override public void init() {
+            robot = new RoverRobot(new DriveMecanum());
+            roverCollector = new RoverCollector();
+            roverLift = new RoverLift();
+
+            driverMode=1;
             super.init();
         }
     }
@@ -29,6 +43,7 @@ public class RoverTeleop extends OpMode{
     RoverCollector roverCollector = null;
     RoverLift roverLift = null;
     RoverRobot.Operation operation= null;
+    int driverMode =0;
 
     float clawLeft = 0;
     boolean clawArmLeft = false;
@@ -44,6 +59,7 @@ public class RoverTeleop extends OpMode{
         telemetry.update();
         roverCollector.init(hardwareMap, telemetry);
         roverLift.init(hardwareMap, telemetry);
+
     }
 
     public void start() {
@@ -64,15 +80,28 @@ public class RoverTeleop extends OpMode{
             doClaw();
             doArmExtender();
             doRobotLift();
+            doTeamMarker();
         }
 
     }
 
     void doDrive() {
-        double forward = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_y);
-        double rotate = FaltechUtilities.scaleSpeedFunction(gamepad1.right_stick_x);
-        double sideways = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_x);
+        double leftX = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_x);
+        double leftY = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_y);
+        double rightX = FaltechUtilities.scaleSpeedFunction(gamepad1.right_stick_x);
+        double rightY = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_y);
 
+        double forward, rotate, sideways;
+        if (driverMode==0) {
+            forward=leftY;
+            rotate=rightX;
+            sideways=leftX;
+        }
+        else {
+            forward=rightY;
+            rotate=leftX;
+            sideways=rightX;
+        }
 //        telemetry.addData("Forward Value" , forward);
 //        telemetry.addData("Rotate Value" , rotate);
 //        telemetry.addData("Sideways Value" , sideways);
@@ -140,15 +169,22 @@ public class RoverTeleop extends OpMode{
         }
     }
 
-    public void doRobotLift(){
+    public void doRobotLift() {
 
-        if (gamepad1.y) {
-            roverLift.setTargetPosition(3);
-            roverLift.mtrRoverLift.setPower(0.5);
-        } else {
-            roverLift.mtrRoverLift.setPower(0);
-        }
+        //make a function on the lift, that says, run to power (make sure it isn't running to encoder)
 
+        double liftPower = FaltechUtilities.clipDeadzone(gamepad2.right_trigger - gamepad2.left_trigger, .1);
+
+        roverLift.setPower(liftPower);
+
+    }
+    public void doTeamMarker(){
+     if (gamepad2.y){
+         robot.teamMarker.setPosition(1);
+     }
+     else if (gamepad2.x){
+         robot.teamMarker.setPosition(0);
+     }
     }
 }
 

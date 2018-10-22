@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.github.pmtischler.control.Pid;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -23,6 +24,7 @@ public class RoverRobot {
     Orientation lastAngles = new Orientation();
     public final AxesOrder axesOrder = AxesOrder.ZYX;
     double globalAngle;
+    public Servo teamMarker = null;
 
     //Constructor//
     public RoverRobot(IDrive drive) {
@@ -33,6 +35,8 @@ public class RoverRobot {
         // Save reference to Hardware map
         this.hwMap = hwMap;
         this.telemetry = telemetry;
+
+        teamMarker = hwMap.get(Servo.class, "teamMarker");
 
         drive.init(hwMap, telemetry);
         initIMU();

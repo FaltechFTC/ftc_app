@@ -19,8 +19,8 @@ public class RoverLift {
 
         mtrRoverLift = hwMap.get(DcMotor.class, "mtrRoverLift");
         mtrRoverLift.setDirection(DcMotor.Direction.FORWARD);
-        mtrRoverLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        mtrRoverLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     double encoderTick = 1120;
     double diameter = 1;
@@ -29,6 +29,10 @@ public class RoverLift {
     public void setTargetPosition(double inches){
         double targetPosition = mtrRoverLift.getCurrentPosition() + (encoderPerInch * inches);
         mtrRoverLift.setTargetPosition((int) targetPosition);
+    }
+
+    public void setPower(double power){
+        mtrRoverLift.setPower(power);
     }
 
 }
