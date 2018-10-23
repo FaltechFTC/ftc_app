@@ -117,16 +117,11 @@ public class DriveMecanum extends IDrive{
     }
 
     public void setPower(Wheels w) {
-        telemetry.addData("Front Left power is", w.frontLeft);
-        telemetry.addData("Front Right power is", w.frontRight);
-        telemetry.addData("Back Left power is", w.backLeft);
-        telemetry.addData("Back Right power is", w.backRight);
-        telemetry.update();
-
         mtrFL.setPower(w.frontLeft);
         mtrFR.setPower(w.frontRight);
         mtrBL.setPower(w.backLeft);
         mtrBR.setPower(w.backRight);
+        telemetry.addData("Wheel Powers", "FL="+w.frontLeft+"FR="+w.frontRight+"BL="+w.backLeft+"BR="+w.backRight);
     }
 
 

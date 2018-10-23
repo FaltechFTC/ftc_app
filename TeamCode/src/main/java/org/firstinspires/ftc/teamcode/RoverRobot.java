@@ -20,25 +20,32 @@ public class RoverRobot {
     public Telemetry telemetry = null;
 
     IDrive drive = null;
+    RoverCollector roverCollector = null;
+    RoverLift roverLift = null;
+
     BNO055IMU imu = null;
     Orientation lastAngles = new Orientation();
     public final AxesOrder axesOrder = AxesOrder.ZYX;
     double globalAngle;
     public Servo teamMarker = null;
+    boolean isAutonomous=false;
 
     //Constructor//
     public RoverRobot(IDrive drive) {
         this.drive = drive;
     }
 
-    public void init(HardwareMap hwMap, Telemetry telemetry) {
+    public void init(HardwareMap hwMap, Telemetry telemetry, boolean isAutonomous) {
         // Save reference to Hardware map
         this.hwMap = hwMap;
         this.telemetry = telemetry;
+        this.isAutonomous=isAutonomous;
 
         teamMarker = hwMap.get(Servo.class, "teamMarker");
 
         drive.init(hwMap, telemetry);
+        roverCollector.init(hwMap, telemetry,isAutonomous);
+        roverLift.init(hwMap, telemetry, isAutonomous);
         initIMU();
     }
 

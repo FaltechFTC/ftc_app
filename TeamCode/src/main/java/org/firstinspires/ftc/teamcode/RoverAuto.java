@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="RoverTankAuto", group="7079")
 public class RoverAuto extends LinearOpMode {
@@ -40,9 +41,14 @@ public class RoverAuto extends LinearOpMode {
 
     }
      */
+
     // Update from 10/13/18
     private RoverRobot robot = null;
     RoverRobot.Operation operation= null;
+    boolean isRedAlliance=false;
+    boolean isStartFacingCrater=true;
+    boolean isEnableCV=false;
+    boolean isStartLatched=false;
 
     @Override
     public void runOpMode() {
@@ -51,9 +57,10 @@ public class RoverAuto extends LinearOpMode {
         robot = new RoverRobot(new DriveTank());
 
 
-        robot.init(hardwareMap, telemetry);
+        robot.init(hardwareMap, telemetry,true);
         telemetry.addData("Robot" , "Initialized");
-        telemetry.update();
+
+        configMode();
 
         waitForStart();
 
@@ -97,5 +104,27 @@ public class RoverAuto extends LinearOpMode {
 
     }
 
+    void configMode() {
+
+        while (!gamepad1.start) {
+            if (gamepad1.x) isRedAlliance= !isRedAlliance;
+            if (gamepad1.y) isStartFacingCrater= !isStartFacingCrater;
+            if (gamepad1.a) isEnableCV= !isEnableCV;
+            if (gamepad1.b) isStartLatched= !isStartLatched;
+
+            // just a test...  to be reworked...  can we do this at start?
+            double liftPower=FaltechUtilities.clipDeadzone(gamepad1.right_trigger-gamepad1.left_trigger,.2);
+            if (liftPower>0) robot.roverLift.mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // TODO: remove this...
+            robot.roverLift.setPower(liftPower);
+
+            telemetry.addData("Alliance", isRedAlliance?"Red":"Blue");
+            telemetry.addData("Facing", isStartFacingCrater?"Crater":"Depot");
+            telemetry.addData("CV", isEnableCV?"Enabled":"Disabled");
+            telemetry.addData("Hanging", isStartLatched?"Latched":"On The Ground");
+            telemetry.addData("ConfigMode" , "Press START to leave config mode.");
+            telemetry.update();
+            sleep(100);
+        }
+    }
 
 }

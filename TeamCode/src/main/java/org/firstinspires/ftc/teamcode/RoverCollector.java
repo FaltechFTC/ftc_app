@@ -24,7 +24,7 @@ public class RoverCollector {
     public RoverCollector(){
     }
 
-    public void init(HardwareMap hwMap, Telemetry telemetry) {
+    public void init(HardwareMap hwMap, Telemetry telemetry, boolean isAutonomous) {
         // Save reference to Hardware map
         this.hwMap = hwMap;
         this.telemetry = telemetry;

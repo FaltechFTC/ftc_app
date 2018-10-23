@@ -12,18 +12,22 @@ public class RoverLift {
     private ElapsedTime period = new ElapsedTime();
     public Telemetry telemetry = null;
 
-    public void init(HardwareMap hwMap, Telemetry telemetry) {
+    public void init(HardwareMap hwMap, Telemetry telemetry, boolean isAutonomous) {
         // Save reference to Hardware map
         this.hwMap = hwMap;
         this.telemetry = telemetry;
 
         mtrRoverLift = hwMap.get(DcMotor.class, "mtrRoverLift");
         mtrRoverLift.setDirection(DcMotor.Direction.FORWARD);
-//        mtrRoverLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (isAutonomous) {
+            mtrRoverLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else {
+            mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
     double encoderTick = 1120;
-    double diameter = 1;
+    double diameter = .5;
     double encoderPerInch = encoderTick / (diameter * Math.PI);
 
     public void setTargetPosition(double inches){

@@ -11,10 +11,6 @@ import java.util.Locale;
 public class RoverTestTeleOp extends OpMode{
     RoverTestBot robot = new RoverTestBot();
 
-
-
-
-
     @Override
     public void init() {
         robot.init(hardwareMap, telemetry);
