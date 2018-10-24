@@ -54,7 +54,7 @@ public class RoverTeleop extends OpMode{
         doOperations();
         if (operation==null) {
             doDrive();
-            doArm();
+            doArmLift();
             doClaw();
             doArmExtender();
             doRobotLift();
@@ -87,14 +87,40 @@ public class RoverTeleop extends OpMode{
 
     double currentPosition = 0.0;
 
+    int armLiftOpMode=0;
+    double armLiftHoldPower=0;
 
-    public void doArm() {
-        double armSpeed= FaltechUtilities.clipDeadzone(gamepad1.right_trigger-gamepad1.left_trigger,.2);
-        double targetPosDegrees=armSpeed>=0 ? 120 : 0;
-        robot.roverCollector.setPositionDegrees(targetPosDegrees);
-        robot.roverCollector.setSpeed(armSpeed);
-        telemetry.addData("Arm Speed =", armSpeed);
-        telemetry.update();
+    public void doArmLift() {
+        if (gamepad1.dpad_down) armLiftOpMode=1-armLiftOpMode;
+        telemetry.addData("Arm Lift Mode:" , ""+armLiftOpMode);
+
+        if (gamepad1.dpad_left) armLiftHoldPower=Math.max(armLiftHoldPower-.1,0);
+        if (gamepad1.dpad_right) armLiftHoldPower=Math.min(armLiftHoldPower+.1,.5);
+        telemetry.addData("Arm Lift Hold Power:" , armLiftHoldPower);
+
+        if (armLiftOpMode==0) {
+            /*From Coach Ted : my concern with this approach is that it tells both motors ro race to 120 or 0
+              So any variations in the load on the motors will cause one to run ahead of the other, and that
+              twist will cause failure.
+             */
+            double armSpeed = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .2);
+            double targetPosDegrees = armSpeed >= 0 ? 120 : 0;
+            robot.roverCollector.setPositionDegrees(targetPosDegrees);
+            armSpeed=Math.abs(armSpeed/4); // speed is absolute when using position.  scale it down
+            robot.roverCollector.setSpeed(armSpeed);
+            telemetry.addData("Arm Speed =", armSpeed);
+        } else {
+            /* From Coach Ted:  This version attempts to bump the encoder just a bit each loop
+               which is like setting a short term goal on the encoder.  This should keep the motors more in sync
+               as we reset the goals every loop.
+             */
+            double armDelta = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .2);
+            double armSpeed = armDelta/4;
+            double degreesToMoveEachLoop=.2;
+            double targetChangeDegrees = armDelta*degreesToMoveEachLoop;
+            robot.roverCollector.setPositionIncremental(targetChangeDegrees, armSpeed, armLiftHoldPower);
+
+        }
     }
 
     float clawLeft = 0, clawRight = 0;

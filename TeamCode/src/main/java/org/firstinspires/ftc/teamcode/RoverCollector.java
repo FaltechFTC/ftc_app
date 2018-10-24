@@ -58,18 +58,19 @@ public class RoverCollector {
         rightClaw.setPosition(1.0);
     }
     double armSpeed;
+    double encoderClicksPerRevolution=1120.0;
+    double motorGearBoxRatio=40.0;
+    double armGearRatio=125.0/45.0;   //45 tooth driving 125 tooth gear
+    double clicksPerDegree=encoderClicksPerRevolution*motorGearBoxRatio*armGearRatio/360.0;
 
-    public double convertDegreesToEncoder(double inputDegrees){
-        double clicks = inputDegrees*1120.0*400.0/360.0;
+    public int convertDegreesToEncoder(double inputDegrees){
+        int clicks = (int) (inputDegrees*clicksPerDegree);
         return clicks;
 
     }
     public double currentDegrees(DcMotor mtr){
-
-      double current = mtr.getCurrentPosition()/(360*400);
-      return current;
-
-
+      double current = mtr.getCurrentPosition();
+      return current/clicksPerDegree;
     }
 
 //    public double calculateArmSpeed(double target, DcMotor motor){
@@ -88,14 +89,15 @@ public class RoverCollector {
     public void setPositionDegrees(double targetDegrees) {
         setPosition((int)convertDegreesToEncoder(targetDegrees));
     }
+
     public void setPosition(int targetEncoder) {
+        int curLeft=mtrLeftCollector.getCurrentPosition();
+        int curRight=mtrRightCollector.getCurrentPosition();
+
         mtrLeftCollector.setTargetPosition(targetEncoder);
         mtrRightCollector.setTargetPosition(-targetEncoder);
-        telemetry.addData("Set Left Position =", mtrLeftCollector.getCurrentPosition());
-        telemetry.addData("Set Right Position =", mtrRightCollector.getCurrentPosition());
-        telemetry.update();
-
-
+        telemetry.addData("Current Arm Positions ", "Left="+curLeft+" Right="+(-curRight));
+        telemetry.addData("Target Arm Position ", targetEncoder);
     }
 
     public void setSpeed(double armSpeed) {
@@ -108,5 +110,32 @@ public class RoverCollector {
         mtrLeftCollector.setPower(targetPower);
         mtrRightCollector.setPower(targetPower);
     }
+
+    public boolean setPositionIncremental(double targetChangeDegrees, double armSpeed, double armLiftHoldPower)
+    {
+        int curLeft=mtrLeftCollector.getCurrentPosition();
+        int curRight=mtrRightCollector.getCurrentPosition();
+
+        int avgPos=(curLeft-curRight)/2;
+        int targetEncoder=avgPos+convertDegreesToEncoder(targetChangeDegrees);
+
+        mtrLeftCollector.setTargetPosition(targetEncoder);
+        mtrRightCollector.setTargetPosition(-targetEncoder);
+
+        boolean atTarget=false;
+        if (Math.abs(curLeft-curRight)<10 && Math.abs(curLeft-targetEncoder)<10) atTarget=true;
+        double targetPower;
+        if (atTarget) targetPower=armLiftHoldPower;
+        else targetPower=armSpeed;
+
+        mtrLeftCollector.setPower(targetPower);
+        mtrRightCollector.setPower(targetPower);
+
+        telemetry.addData("Current Arm Positions ", "Left="+curLeft+" Right="+(-curRight));
+        telemetry.addData("Target Arm Position ", targetEncoder);
+        telemetry.addData("Arm Power", targetPower);
+        return atTarget;
+    }
+
 
 }
