@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="RoverTankAuto", group="7079")
+@Autonomous(name="RoverAuto", group="7079")
 public class RoverAuto extends LinearOpMode {
     /*
     1. Lower from lander
@@ -54,13 +54,13 @@ public class RoverAuto extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("About to start", "Robot Initialization");
         telemetry.update();
-        robot = new RoverRobot(new DriveTank());
+        robot = new RoverRobot(new DriveMecanum());
 
 
         robot.init(hardwareMap, telemetry,true);
         telemetry.addData("Robot" , "Initialized");
 
-        configMode();
+     //   configMode();
 
         waitForStart();
 
@@ -68,38 +68,11 @@ public class RoverAuto extends LinearOpMode {
         double maxDrivePower=.5;
         double degreesError=2.0;
         long timeoutMS=4000;
-//        operation = robot.getOperationDriveToHeading(0,maxDrivePower, maxTurningPower, degreesError, timeoutMS, 15);
-//        operation.run();
-//        robot.stop();
 
         operation = robot.getOperationRotateToHeading(-75, maxTurningPower, degreesError, timeoutMS);
         operation.run();
         robot.stop();
 
-//        robot.drive.driveFRS(0.3,0.0,0.0);
-//        sleep(2000);
-//        robot.stop();
-//
-//        operation = robot.getOperationRotateToHeading(-75, maxTurningPower, degreesError, timeoutMS);
-//        operation.run();
-//        robot.stop();
-//
-//        robot.drive.driveFRS(0.6,0.0,0.0);
-//        sleep(2000);
-//        robot.stop();
-//
-//
-//        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
-//        operation.run();
-//        robot.stop();
-//
-//        robot.drive.driveFRS(0.6,0.0,0.0);
-//        sleep(4500);
-//        robot.stop();
-//
-//        robot.drive.driveFRS(-0.6,0.0,0.0);
-//        sleep(5500);
-//        robot.stop();
 
 
     }
