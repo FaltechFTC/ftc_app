@@ -39,8 +39,7 @@ public class RoverTestPID2 extends LinearOpMode
 
     // called when init button is  pressed.
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() {
         leftMotor = hardwareMap.dcMotor.get("mtrFL");
 
         rightMotor = hardwareMap.dcMotor.get("mtrFR");

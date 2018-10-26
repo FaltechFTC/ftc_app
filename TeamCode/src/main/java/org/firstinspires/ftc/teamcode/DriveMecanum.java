@@ -106,6 +106,10 @@ public class DriveMecanum extends IDrive{
         if (encoderModeOn) setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         else setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+    public void setEncoderToRunToPosition() {
+
+         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
 
     public void setRunMode(DcMotor.RunMode runMode) {
         for (DcMotor m : motors) m.setMode(runMode);
@@ -127,7 +131,7 @@ public class DriveMecanum extends IDrive{
 
     // encoder clicks
     public double getClicksPerRevolution() {
-        return 1440;
+        return 1120;
     }
     public double getGearReduction() {
         return 1.0;
@@ -255,6 +259,45 @@ public class DriveMecanum extends IDrive{
     double gear_reduction = 0.5;
     double wheel_circumference = 12.56;
     double counts_per_inch = (motor_count * gear_reduction / wheel_circumference);
+
+    public void setTargetPosition(int targetPosition){
+        mtrBL.setTargetPosition(mtrBL.getCurrentPosition()+targetPosition);
+        mtrBR.setTargetPosition(mtrBR.getCurrentPosition()+targetPosition);
+        mtrFL.setTargetPosition(mtrFL.getCurrentPosition()+targetPosition);
+        mtrFR.setTargetPosition(mtrFR.getCurrentPosition()+targetPosition);
+
+
+    }
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private void timeOutExit(double timeout){
+
+        while ((runtime.seconds() < (timeout))
+                && (mtrBL.isBusy() &&mtrBR.isBusy()
+                && mtrFL.isBusy() && mtrFR.isBusy())) {
+
+            // Display it for the driver.
+            telemetry.addData("Path1",  "Running to target position");
+            telemetry.addData("Path2",  "Running at:",
+                    mtrBL.getCurrentPosition(),
+                    mtrBR.getCurrentPosition(),
+                    mtrFL.getCurrentPosition(),
+                    mtrFR.getCurrentPosition());
+            telemetry.update();
+        }
+
+    }
+
+    public void driveToInches(double inches, double power, double timeOut){
+        int driveToPosition = (int) ((getClicksPerRevolution()*inches)/getWheelCircumfrence());
+        //set the motors to run to position
+        setEncoderToRunToPosition();
+        setTargetPosition(driveToPosition);
+        runtime.reset();
+        driveFRS(power, 0, 0, 0);
+        timeOutExit(timeOut);
+    }
+    
 
 }
 

@@ -18,14 +18,14 @@ public class FaltechUtilities {
 
         //gear 1 inputs
         double gear1MinInput = 0.1;
-        double gear1MaxInput = 0.5;
+        double gear1MaxInput = 0.65;
 
         //gear 1 outputs
         double gear1MinOutput = 0.05;
         double gear1MaxOutput = 0.25;
 
         //gear 2 inputs
-        double gear2MinInput = 0.5;
+        double gear2MinInput = 0.65;
         double gear2MaxInput = 1;
 
         //gear 2 outputs

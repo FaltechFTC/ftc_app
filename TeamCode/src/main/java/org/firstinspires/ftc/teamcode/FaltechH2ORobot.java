@@ -143,7 +143,7 @@ public class FaltechH2ORobot {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                ; // eat the exception
+                // eat the exception
             }
         }
         telemetry.addData("Mode", "Calibrated");
@@ -430,7 +430,7 @@ public class FaltechH2ORobot {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            ; // eat it
+            // eat it
         }
 
     }

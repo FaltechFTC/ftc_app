@@ -12,6 +12,7 @@ public abstract class IDrive {
         driveFRS(forward,rotate, sideways, getMaxPower());
     }
     abstract public void driveFRS(double forward, double rotate, double sideways, double maxPower);
+    abstract public void driveToInches(double inches, double power, double timeOut);
 
     abstract public void setHaltModeCoast(boolean coastModeOn);
     abstract public void setRunModeEncoder(boolean encoderModeOn);
@@ -36,7 +37,7 @@ public abstract class IDrive {
 
     public double getEncoderClicks() {
         return (getEncoderClicksLeft()+getEncoderClicksRight())/2.0;
-    };
+    }
 
     public double convertInchesToClicks( double inches) {
         return inches* getClicksPerRevolution() * getGearReduction() / getWheelCircumfrence();

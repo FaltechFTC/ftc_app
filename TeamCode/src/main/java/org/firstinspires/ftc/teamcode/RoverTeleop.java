@@ -47,7 +47,7 @@ public class RoverTeleop extends OpMode{
 
     public void stop() {
         robot.stop();
-    };
+    }
 
     @Override
     public void loop() {
@@ -176,9 +176,9 @@ public class RoverTeleop extends OpMode{
             double degreesError=2.0;
             long timeoutMS=4000;
 
-            if (gamepad1.dpad_right) operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, timeoutMS);
-            else if (gamepad1.dpad_left) operation = robot.getOperationRotateToHeading(-45, maxTurningPower, degreesError, timeoutMS);
-            else if (gamepad1.dpad_up) {
+            if (gamepad2.dpad_right) operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, timeoutMS);
+            else if (gamepad2.dpad_left) operation = robot.getOperationRotateToHeading(-45, maxTurningPower, degreesError, timeoutMS);
+            else if (gamepad2.dpad_up) {
                 if (operation!=null) {operation.done(); operation=null;}
                 robot.resetRelativeAngleToZero();
             }

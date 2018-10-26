@@ -20,8 +20,8 @@ public class RoverRobot {
     public Telemetry telemetry = null;
 
     IDrive drive = null;
-    RoverCollector roverCollector = null;
-    RoverLift roverLift = null;
+    RoverCollector roverCollector = new RoverCollector();
+    RoverLift roverLift = new RoverLift();
 
     BNO055IMU imu = null;
     Orientation lastAngles = new Orientation();
@@ -44,6 +44,7 @@ public class RoverRobot {
         teamMarker = hwMap.get(Servo.class, "teamMarker");
 
         drive.init(hwMap, telemetry);
+        drive.setRunModeEncoder(isAutonomous);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
         initIMU();
@@ -105,7 +106,7 @@ public class RoverRobot {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                ; // eat the exception
+                // eat the exception
             }
         }
         telemetry.addData("Mode", "Calibrated");
@@ -426,7 +427,7 @@ public class RoverRobot {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            ; // eat it
+            // eat it
         }
 
     }

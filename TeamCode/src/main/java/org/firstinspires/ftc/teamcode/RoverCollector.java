@@ -87,7 +87,7 @@ public class RoverCollector {
 //    }
 
     public void setPositionDegrees(double targetDegrees) {
-        setPosition((int)convertDegreesToEncoder(targetDegrees));
+        setPosition(convertDegreesToEncoder(targetDegrees));
     }
 
     public void setPosition(int targetEncoder) {
