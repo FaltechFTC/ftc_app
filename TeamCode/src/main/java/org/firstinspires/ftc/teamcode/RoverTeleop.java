@@ -66,36 +66,45 @@ public class RoverTeleop extends OpMode{
     void doDrive() {
         double leftX = FaltechUtilities.scaleSpeedFunction(gamepad1.left_stick_x);
         double leftY = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_y);
-        double rightX = FaltechUtilities.scaleSpeedFunction(gamepad1.right_stick_x);
+        double rightX = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_x);
         double rightY = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_y);
 
         double forward, rotate, sideways;
         if (driverMode==0) {
             forward=leftY;
             rotate=rightX;
-            sideways=leftX;
+            sideways=leftX*.5;
         } else {
             forward=rightY;
             rotate=leftX;
-            sideways=rightX;
+            sideways=rightX*.7;
         }
 
+        double maxPower=Math.max(Math.abs(forward),Math.abs(rotate));
+        maxPower=Math.max(maxPower,Math.abs(sideways));
+        maxPower=Math.max(maxPower,0.7);
+
         telemetry.addData("Drive:" , "F="+forward+" S="+sideways+" R="+rotate);
-        robot.drive.driveFRS(forward,rotate,sideways);
+        robot.drive.driveFRS(forward,rotate,sideways,maxPower);
     }
 
 
     double currentPosition = 0.0;
 
-    int armLiftOpMode=0;
-    double armLiftHoldPower=0;
+    int armLiftOpMode=1;
+    double armLiftHoldPower=.15;
 
     public void doArmLift() {
         if (gamepad1.dpad_down) armLiftOpMode=1-armLiftOpMode;
         telemetry.addData("Arm Lift Mode:" , ""+armLiftOpMode);
 
         if (gamepad1.dpad_left) armLiftHoldPower=Math.max(armLiftHoldPower-.1,0);
-        if (gamepad1.dpad_right) armLiftHoldPower=Math.min(armLiftHoldPower+.1,.5);
+        if (gamepad1.dpad_right) armLiftHoldPower=Math.min(armLiftHoldPower+.1,.7);
+        if (gamepad1.a) {
+            if (armLiftHoldPower == 0 ) armLiftHoldPower = 0.15;
+            else armLiftHoldPower = 0;
+        }
+
         telemetry.addData("Arm Lift Hold Power:" , armLiftHoldPower);
 
         if (armLiftOpMode==0) {
@@ -119,6 +128,7 @@ public class RoverTeleop extends OpMode{
             double degreesToMoveEachLoop=.2;
             double targetChangeDegrees = armDelta*degreesToMoveEachLoop;
             robot.roverCollector.setPositionIncremental(targetChangeDegrees, armSpeed, armLiftHoldPower);
+
 
         }
     }

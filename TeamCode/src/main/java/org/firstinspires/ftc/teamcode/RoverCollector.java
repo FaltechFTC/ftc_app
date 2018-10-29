@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -113,10 +112,10 @@ public class RoverCollector {
 
     public boolean setPositionIncremental(double targetChangeDegrees, double armSpeed, double armLiftHoldPower)
     {
-        int curLeft=mtrLeftCollector.getCurrentPosition();
-        int curRight=mtrRightCollector.getCurrentPosition();
+        int curLeft=Math.abs(mtrLeftCollector.getCurrentPosition());
+        int curRight=Math.abs(mtrRightCollector.getCurrentPosition());
 
-        int avgPos=(curLeft-curRight)/2;
+        int avgPos=(curLeft+curRight)/2;
         int targetEncoder=avgPos+convertDegreesToEncoder(targetChangeDegrees);
 
         mtrLeftCollector.setTargetPosition(targetEncoder);
@@ -125,6 +124,35 @@ public class RoverCollector {
         boolean atTarget=false;
         if (Math.abs(curLeft-curRight)<10 && Math.abs(curLeft-targetEncoder)<10) atTarget=true;
         double targetPower;
+
+        if (armSpeed > 0 ) targetPower = armSpeed ;
+        else targetPower=armLiftHoldPower;
+
+        mtrLeftCollector.setPower(targetPower);
+        mtrRightCollector.setPower(targetPower);
+
+        telemetry.addData("Current Arm Positions ", "Left="+curLeft+" Right="+(-curRight));
+        telemetry.addData("Target Arm Position ", targetEncoder);
+        telemetry.addData("Arm Power", targetPower);
+        return atTarget;
+    }
+
+    //old one
+    public boolean setPositionIncrementalold(double targetChangeDegrees, double armSpeed, double armLiftHoldPower)
+    {
+        int curLeft=Math.abs(mtrLeftCollector.getCurrentPosition());
+        int curRight=Math.abs(mtrRightCollector.getCurrentPosition());
+
+        int avgPos=(curLeft+curRight)/2;
+        int targetEncoder=avgPos+convertDegreesToEncoder(targetChangeDegrees);
+
+        mtrLeftCollector.setTargetPosition(targetEncoder);
+        mtrRightCollector.setTargetPosition(-targetEncoder);
+
+        boolean atTarget=false;
+        if (Math.abs(curLeft-curRight)<10 && Math.abs(curLeft-targetEncoder)<10) atTarget=true;
+        double targetPower;
+
         if (atTarget) targetPower=armLiftHoldPower;
         else targetPower=armSpeed;
 

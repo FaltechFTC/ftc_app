@@ -98,6 +98,10 @@ public class DriveTank extends IDrive{
         for (DcMotor m : motors) m.setPower(0);
     }
 
+    public void driveToInches(double inches, double power, double timeOut)
+    {
+
+    }
 
     // encoder clicks
     public double getClicksPerRevolution() {
