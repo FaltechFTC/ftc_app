@@ -131,7 +131,7 @@ public class DriveMecanum extends IDrive{
 
     // encoder clicks
     public double getClicksPerRevolution() {
-        return 1120;
+        return 560;
     }
     public double getGearReduction() {
         return 1.0;
@@ -261,10 +261,13 @@ public class DriveMecanum extends IDrive{
     double counts_per_inch = (motor_count * gear_reduction / wheel_circumference);
 
     public void setTargetPosition(int targetPosition){
-        mtrBL.setTargetPosition(mtrBL.getCurrentPosition()+targetPosition);
+
+        mtrFR.setTargetPosition(mtrFR.getCurrentPosition()-targetPosition);
         mtrBR.setTargetPosition(mtrBR.getCurrentPosition()+targetPosition);
         mtrFL.setTargetPosition(mtrFL.getCurrentPosition()+targetPosition);
-        mtrFR.setTargetPosition(mtrFR.getCurrentPosition()+targetPosition);
+        mtrBL.setTargetPosition(mtrBL.getCurrentPosition()-targetPosition);
+
+
 
 
     }
@@ -295,7 +298,9 @@ public class DriveMecanum extends IDrive{
         setTargetPosition(driveToPosition);
         runtime.reset();
         driveFRS(power, 0, 0, 0);
+
         timeOutExit(timeOut);
+        resetEncoders();
     }
     
 

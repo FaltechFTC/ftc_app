@@ -69,15 +69,19 @@ public class RoverAuto extends LinearOpMode {
         double degreesError=2.0;
         long timeoutMS=4000;
 
-//        operation = robot.getOperationRotateToHeading(-75, maxTurningPower, degreesError, timeoutMS);
-//        operation.run();
-//        robot.stop();
-
+//
+//
         telemetry.addData("About to execute drive ","inches");
         telemetry.update();
 
-        robot.drive.driveToInches(9, 0.5, 5);
+        robot.drive.driveToInches(12,0.3,5);
 
+        telemetry.addData("About to execute rotate "," to 75 left");
+        telemetry.update();
+
+        operation = robot.getOperationRotateToHeading(75, maxTurningPower, degreesError, timeoutMS);
+        operation.run();
+        robot.stop();
 
 
     }
