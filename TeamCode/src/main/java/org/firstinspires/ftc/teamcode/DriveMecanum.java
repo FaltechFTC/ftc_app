@@ -291,18 +291,32 @@ public class DriveMecanum extends IDrive{
 
     }
 
+    public void setPowerToAllMotors (double power) {
+        for (DcMotor m : motors) m.setPower(power);
+
+    }
+
+
     public void driveToInches(double inches, double power, double timeOut){
         int driveToPosition = (int) ((getClicksPerRevolution()*inches)/getWheelCircumfrence());
+
+       int mtrFLCurrPosition = mtrFL.getCurrentPosition();
+       int mtrFRCurrPosition = mtrFR.getCurrentPosition();
+       int mtrBLCurrPosition = mtrBL.getCurrentPosition();
+       int mtrBRCurrPosition = mtrBR.getCurrentPosition();
+
+        boolean isTargetReached = false;
         //set the motors to run to position
         setEncoderToRunToPosition();
         setTargetPosition(driveToPosition);
         runtime.reset();
-        driveFRS(power, 0, 0, 0);
+        //apply the power
+        setPowerToAllMotors(power);
 
         timeOutExit(timeOut);
-        resetEncoders();
+
+        stop();
     }
-    
 
 }
 

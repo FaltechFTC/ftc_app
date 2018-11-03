@@ -73,15 +73,26 @@ public class RoverAuto extends LinearOpMode {
 //
         telemetry.addData("About to execute drive ","inches");
         telemetry.update();
+        // TODO: Write the code for robot drop and back up to lander
 
         robot.drive.driveToInches(12,0.3,5);
+        robot.drive.setRunModeEncoder(false);
 
         telemetry.addData("About to execute rotate "," to 75 left");
         telemetry.update();
 
-        operation = robot.getOperationRotateToHeading(75, maxTurningPower, degreesError, timeoutMS);
+        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
         operation.run();
         robot.stop();
+
+        robot.drive.driveToInches(-12,0.3,5);
+        robot.drive.setRunModeEncoder(false);
+
+        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
+        operation.run();
+        robot.stop();
+
+
 
 
     }
