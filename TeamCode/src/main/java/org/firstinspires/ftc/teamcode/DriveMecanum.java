@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -152,6 +151,14 @@ public class DriveMecanum extends IDrive{
         return (mtrBR.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
     }
 
+    public double getEncoderClicksLeftAbs() {
+        return (Math.abs(mtrBL.getCurrentPosition()) + Math.abs(mtrFL.getCurrentPosition()))/2.0;
+    }
+
+    public double getEncoderClicksRightAbs() {
+        return (Math.abs(mtrBR.getCurrentPosition()) + Math.abs(mtrFR.getCurrentPosition()))/2.0;
+    }
+
     /**
      * Mecanum motion vector.
      */
@@ -266,10 +273,6 @@ public class DriveMecanum extends IDrive{
         mtrBR.setTargetPosition(mtrBR.getCurrentPosition()+targetPosition);
         mtrFL.setTargetPosition(mtrFL.getCurrentPosition()+targetPosition);
         mtrBL.setTargetPosition(mtrBL.getCurrentPosition()-targetPosition);
-
-
-
-
     }
     private ElapsedTime runtime = new ElapsedTime();
 

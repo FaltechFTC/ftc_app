@@ -91,8 +91,8 @@ public class RoverTeleop extends OpMode{
 
     double currentPosition = 0.0;
 
-    int armLiftOpMode=1;
-    double armLiftHoldPower=.15;
+    int armLiftOpMode=0;
+    double armLiftHoldPower=0;
 
     public void doArmLift() {
         if (gamepad1.dpad_down) armLiftOpMode=1-armLiftOpMode;

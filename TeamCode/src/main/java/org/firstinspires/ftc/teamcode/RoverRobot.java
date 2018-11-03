@@ -162,70 +162,6 @@ public class RoverRobot {
     }
 
 
-    public void driveToHeading(double targetDegrees, double maxDrivePower, double maxTurningPower, double maxTimeMS) {
-        RobotLog.i("driveToHeading( targetDegrees=%f, maxPower=%f, maxTurningPower=%f) ", targetDegrees, maxDrivePower, maxTurningPower);
-        //   if (targetDegrees==0.0) return ;
-
-        // restart imu angle tracking.
-        resetRelativeAngleToZero();
-
-        long startTime = System.currentTimeMillis();
-
-        double drivePidKp = 1.0;     // Tuning variable for PID.
-        double drivePidTi = 0.5;   // Eliminate integral error in 1 sec.
-        double drivePidTd = 0.5;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
-
-        double drivePidIntMax = 180.0;
-        double drivePidIntMin = -drivePidIntMax;
-        double targetDegreesAcceptableError = 1.0;
-
-        Pid pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxTurningPower, maxTurningPower);
-        RobotLog.i(pidR.toString());
-
-        double direction = 1.0;  // (degrees>=0.0) ? 1.0 : -1.0;
-        double deltaTime = .001;
-        long lastTime = System.currentTimeMillis();
-        Boolean onTarget = false;
-        Boolean halt = false;
-        int loops = 0;
-        do {
-
-            RobotLog.i("begin loop %d : %s", loops, pidR.toString());
-
-            double relativeAngle = -getRelativeAngle();
-            double absoluteAngle = getCurrentAbsoluteAngle();
-
-            long curTime = System.currentTimeMillis();
-            deltaTime = ((double) (curTime - lastTime)) / 1000.0;
-
-            RobotLog.i("target=%f  Relative=%f, Absolute=%f", targetDegrees, relativeAngle, absoluteAngle);
-            RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
-
-            double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
-            RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
-
-            drive.driveFRS(maxDrivePower, rotatePower, 0.0);
-
-            lastTime = curTime;
-
-            if (curTime - startTime > maxTimeMS) halt = true;
-
-            telemetry.addData("angles", "target=" + targetDegrees + " relative=" + relativeAngle + " absolute" + absoluteAngle);
-            telemetry.addData("rotatePower", rotatePower);
-            telemetry.addData("time", "Delta=" + deltaTime + " total=" + (lastTime - startTime));
-            telemetry.addData("pidR", pidR.toString());
-            telemetry.addData("status", onTarget ? "On TARGET" : (halt ? "HALT" : "running"));
-            RobotLog.i("onTarget=%s Halt=%s", onTarget.toString(), halt.toString());
-            telemetry.update();
-            sleep(1); // maybe not necessary
-            loops++;
-        } while (!onTarget && !halt);
-
-        drive.stop();
-        RobotLog.i("driveToHeading() done");
-    }
-
-
     public class Operation {
         public long timeoutMS=9999;
         public long startMS=System.currentTimeMillis();
@@ -260,13 +196,6 @@ public class RoverRobot {
         }
     }
 
-    Operation getOperationRotateToHeading(double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
-        return new RotateToHeading(targetDegrees, maxPower, targetDegreesAcceptableError, timeoutMS);
-    }
-
-    Operation getOperationDriveToHeading(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
-        return new DriveToHeading(targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
-    }
 
     public class RotateToHeading extends Operation {
         double targetDegrees, maxPower, targetDegreesAcceptableError;
@@ -289,7 +218,7 @@ public class RoverRobot {
 
             double drivePidKp = 1.0;     // Tuning variable for PID.
             double drivePidTi = 0.5;   // Eliminate integral error in 1 sec.
-            double drivePidTd = 0.5;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
+            double drivePidTd = 0.4;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
 
             double drivePidIntMax = 180.0;
             double drivePidIntMin = -drivePidIntMax;
@@ -357,7 +286,7 @@ public class RoverRobot {
             this.targetDegreesAcceptableError=targetDegreesAcceptableError;
 
             // todo; add logging for distance
-            RobotLog.i("RotateToHeading( targetDegrees=%f, maxDrivePower=%f, maxTurnPower=%f) ", targetDegrees, maxDrivePower, maxTurnPower);
+            RobotLog.i("DriveToHeading( targetDegrees=%f, maxDrivePower=%f, maxTurnPower=%f) ", targetDegrees, maxDrivePower, maxTurnPower);
             // restart imu angle tracking.
             resetRelativeAngleToZero();
 
@@ -369,8 +298,8 @@ public class RoverRobot {
             double drivePidIntMin = -drivePidIntMax;
 
             if (targetDistance>0.0) {
-                drive.resetEncoders();
-                startingEncoder=drive.getEncoderClicks();
+              //  drive.resetEncoders();
+                startingEncoder=drive.getEncoderClicksAbs();
                 targetEncoder=startingEncoder+drive.convertInchesToClicks(targetDistance);
             }
 
@@ -401,14 +330,15 @@ public class RoverRobot {
 
             lastTime = curMS;
 
-            double curEncoder=drive.getEncoderClicks();
+            double curEncoder=drive.getEncoderClicksAbs();
 
             // problem with this is that it needs to use a pid to scale back power to hit this distance accurately.
-            if (curEncoder>=targetEncoder)
+            if (targetDistance!=0.0 && curEncoder>=targetEncoder)
                 onTarget = true;
 
             telemetry.addData("angles", "target=" + targetDegrees + " relative=" + relativeAngle);
-            telemetry.addData("power", rotatePower);
+            telemetry.addData("targetD", "trgtD=" + targetDistance+ " trgtEnc=" + targetEncoder+ " curEnc="+curEncoder);
+            telemetry.addData("power", maxDrivePower);
             telemetry.addData("time", "Delta=" + deltaTime + " total=" + (lastTime - startMS));
             telemetry.addData("pidR", pidR.toString());
             telemetry.addData("status", onTarget ? "On TARGET" : (halt ? "HALT" : "running"));
@@ -421,6 +351,14 @@ public class RoverRobot {
     }
 
 
+
+    Operation getOperationRotateToHeading(double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
+        return new RotateToHeading(targetDegrees, maxPower, targetDegreesAcceptableError, timeoutMS);
+    }
+
+    Operation getOperationDriveToHeading(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
+        return new DriveToHeading(targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
+    }
 
 
     protected void sleep(long millis) {

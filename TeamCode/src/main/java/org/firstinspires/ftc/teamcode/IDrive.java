@@ -35,8 +35,19 @@ public abstract class IDrive {
     abstract public double getEncoderClicksLeft();
     abstract public double getEncoderClicksRight();
 
+
+    public double getEncoderClicksLeftAbs() {
+        return Math.abs(getEncoderClicksLeft());
+    }
+    public double getEncoderClicksRightAbs() {
+        return Math.abs(getEncoderClicksRight());
+    }
+
     public double getEncoderClicks() {
         return (getEncoderClicksLeft()+getEncoderClicksRight())/2.0;
+    }
+    public double getEncoderClicksAbs() {
+        return (getEncoderClicksLeftAbs()+getEncoderClicksRightAbs())/2.0;
     }
 
     public double convertInchesToClicks( double inches) {
