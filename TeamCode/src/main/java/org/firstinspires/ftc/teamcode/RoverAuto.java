@@ -52,8 +52,9 @@ public class RoverAuto extends LinearOpMode {
     double maxPowerAuto = 0.3;
     double maxTurningPower = 0.3;
     double degreesError =3;
-    int goldPosition = 2;
+    int goldPosition = 1;
     double goldDegrees = 5;
+    double knockOffDistance =24;
 
     @Override
     public void runOpMode() {
@@ -85,13 +86,16 @@ public class RoverAuto extends LinearOpMode {
 
         if (goldPosition==1) {
            goldDegrees = 30;
+           knockOffDistance = 28;
         } else if (goldPosition==2 ) {
            goldDegrees = 5;
+           knockOffDistance = 24;
         } else {
            goldDegrees = -30;
+           knockOffDistance = 28;
         }
         robot.drive.setRunModeEncoder(false);
-        operation = robot.getOperationDriveToHeading(goldDegrees,maxPowerAuto,maxTurningPower,5,10000,24);
+        operation = robot.getOperationDriveToHeading(goldDegrees,maxPowerAuto,maxTurningPower,degreesError,10000,knockOffDistance);
         operation.run();
         robot.stop();
 
