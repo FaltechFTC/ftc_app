@@ -154,36 +154,40 @@ public class RoverAuto extends LinearOpMode {
 
         if (!isEnableDepotRun) {
             if (isStartFacingCrater) {
+                // Crater auto
                 operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
                 operation.run();
-
+// rotate in the opposite direction of the 1, 2, 3 turn.
 
                 operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
                 operation.run();
-
+// move forwards 6 degrees to the crater
             }
             else {
+                // Depot Auto
                 operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
                 operation.run();
-
+// rotate in the opposite direction of the 1, 2, 3 turn.
                 operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -12);
                 operation.run();
-
+//Drive back to the original lander pos
                 operation = robot.getOperationRotateToHeading(90, maxTurningPower, degreesError, 3000);
                 operation.run();
-
+// turn 90 degrees, so will be facing towards crater
                 operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 36);
                 operation.run();
-
+//Move forwards to right next to crater
                 operation = robot.getOperationRotateToHeading(40, maxTurningPower, degreesError, 3000);
                 operation.run();
-
+// rotate so facing crater
                 operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
                 operation.run();
+                // move forwards to crater
             }
             robot.roverCollector.setPowerToArmExtender(0.4);
             sleep(1000);
             robot.roverCollector.setPowerToArmExtender(0);
+            // no matter which route, end with extending arm at crater.
         }
     }
 
