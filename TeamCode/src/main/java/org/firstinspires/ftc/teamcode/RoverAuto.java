@@ -4,57 +4,52 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+
+/* all TensorFlow originally from examples provided by First from class ConceptTensorFlowObjectDetection.java */
+
 @Autonomous(name="RoverAuto", group="7079")
 public class RoverAuto extends LinearOpMode {
-    /*
-    1. Lower from lander
-    2. Detach from lander
-    3. Turn to see minerals
-    4. Use openCV to knock off the gold mineral
-    5. Turn to face direction of wall
-    6. Drive to wall
-    7. Turn at wall
-    8. "Wall ride" using range sensor to go to the depot
-    9. Drop off marker
-    10. Turn around
-    11. Go back to the crater for parking
 
-    public void lowerRobot{
-      1.  Measure and bring up the motor using the encoders to land
-      2. Strafe right to move out hook
-    }
-
-    public void detectMinerals{
-    1. Turn robot to see minerals
-    2. Identify position
-    3. Drive to position
-    4. Knock off mineral
-    5. Back up 18 inches
-    }
-
-    public void wallRide{
-    1. Turn left to face wall
-    2. Drive up to wall
-    3. Turn left, and use the range sensor to keep a good distance away from the wall
-    4. "Wall ride" till the depot and drop off marker
-    5. Drive back till the crater and park in the crater
-
-    }
-     */
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
     // Update from 10/13/18
     private RoverRobot robot = null;
     RoverRobot.Operation operation= null;
     boolean isRedAlliance=false;
+    boolean isEnableDepotRun=false;
+    boolean isEnableCraterRun=false;
     boolean isStartFacingCrater=true;
     boolean isEnableCV=false;
     boolean isStartLatched=false;
     double maxPowerAuto = 0.5;
-    double maxTurningPower = 0.1;
+    double maxTurningPower = 0.3;
     double degreesError =3;
     int goldPosition = 1;
     double goldDegrees = 5;
     double knockOffDistance =24;
+
+
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
+     */
+    private VuforiaLocalizer vuforia=null;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
+     * Detection engine.
+     */
+    private TFObjectDetector tfod=null;
 
     @Override
     public void runOpMode() {
@@ -69,6 +64,8 @@ public class RoverAuto extends LinearOpMode {
         telemetry.update();
 
         configMode();
+
+        if (isEnableCV) initVision();
 
         telemetry.addData("Status", "Configured. Waiting for Start");
         telemetry.update();
@@ -89,43 +86,154 @@ public class RoverAuto extends LinearOpMode {
         // Rover Lift Code
         // TODO : Check if there is need to go up before going down, if so we need to add that code
         if (isStartLatched) {
+            // lower the robotc
             robot.roverLift.setTargetPosition(4);
             robot.roverLift.setPower(0.4);
 
-            // Strafe right for 300 milliseconds
-
+            // Strafe right for 300 milliseconds to unlatch
             robot.drive.driveFRS(0, 0, 1, maxPowerAuto);
             sleep(300);
+
+            // tuck the lift arm down out of the way
+            robot.roverLift.setTargetPosition(-4);
+            robot.roverLift.setPower(0.4);
+
+            sleep(2000);  // wait for it to tuck down out of the way.
+
+            // don't use any more power on the lift.
+            robot.roverLift.setPower(0.0);
         }
+
+
         // TODO: We need to check for which spot is the mineral in
 
     }
 
     public void doMinerals() {
-        if (goldPosition == 1) {
-            goldDegrees = 30;
-            knockOffDistance = 28;
-        } else if (goldPosition == 2) {
-            goldDegrees = 5;
-            knockOffDistance = 60;
-        } else {
+
+        if (isEnableCV) doVision(3000);
+
+        if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             goldDegrees = -30;
-            knockOffDistance = 28;
+            knockOffDistance = 22;
+        } else if (goldPosition == 2) { // middle
+            goldDegrees = 0;
+            knockOffDistance = 20;
+        } else {   // right of the robot
+            goldDegrees = 30;
+            knockOffDistance = 22;
         }
         robot.drive.setRunModeEncoder(false);
-        operation = robot.getOperationDriveToHeading(goldDegrees, maxPowerAuto, maxTurningPower, degreesError, 10000, knockOffDistance);
+
+        operation = robot.getOperationRotateToHeading(goldDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
+        robot.drive.setRunModeEncoder(false);
+
+        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, knockOffDistance);
         operation.run();
         robot.stop();
     }
 
     public void doDepot() {
+        if (!isEnableCraterRun) return;
+        /*
+            wallRide{
+    1. Turn left to face wall
+    2. Drive up to wall
+    3. Turn left, and use the range sensor to keep a good distance away from the wall
+    4. "Wall ride" till the depot and drop off marker
+    5. Drive back till the crater and park in the crater
 
+
+         */
     }
 
     public void doCrater() {
+        if (!isEnableCraterRun) return;
 
+        if (!isEnableDepotRun) {
+            if (isStartFacingCrater) {
+                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
+                operation.run();
+
+
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
+                operation.run();
+
+            }
+            else {
+                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
+                operation.run();
+
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -12);
+                operation.run();
+
+                operation = robot.getOperationRotateToHeading(90, maxTurningPower, degreesError, 3000);
+                operation.run();
+
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 36);
+                operation.run();
+
+                operation = robot.getOperationRotateToHeading(40, maxTurningPower, degreesError, 3000);
+                operation.run();
+
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
+                operation.run();
+            }
+            robot.roverCollector.setPowerToArmExtender(0.4);
+            sleep(1000);
+            robot.roverCollector.setPowerToArmExtender(0);
+        }
     }
 
+    public void doVision(int maxMilliseconds) {
+        /** Activate Tensor Flow Object Detection. */
+        if (tfod != null) {
+            tfod.activate();
+        }
+
+         // TODO do timout
+        while (opModeIsActive()) {
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    if (updatedRecognitions.size() == 3) {
+                        int goldMineralX = -1;
+                        int silverMineral1X = -1;
+                        int silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldMineralX = (int) recognition.getLeft();
+                            } else if (silverMineral1X == -1) {
+                                silverMineral1X = (int) recognition.getLeft();
+                            } else {
+                                silverMineral2X = (int) recognition.getLeft();
+                            }
+                        }
+                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                                telemetry.addData("Gold Mineral Position", "Left");
+                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                telemetry.addData("Gold Mineral Position", "Right");
+                            } else {
+                                telemetry.addData("Gold Mineral Position", "Center");
+                            }
+                        }
+                    }
+                    telemetry.update();
+                }
+            }
+        }
+
+        if (tfod != null) {
+        tfod.shutdown();
+    }
+
+    }
     public void doParkingLot() {
 
 //        // Need to drive back 12 inches to start the turn
@@ -187,6 +295,54 @@ public class RoverAuto extends LinearOpMode {
 
     }
 
+
+    public void initVision() {
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+
+    }
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = FaltechUtilities.VUFORIA_KEY;
+        boolean useBackCamera=true;
+        if (useBackCamera)  {
+            parameters.cameraDirection = CameraDirection.BACK;
+        } else /*front camera*/ {
+            /* lifted this from another example, to go off of the front camera ... or should it just be CameraDirection.FRONT */
+            parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        }
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+    }
+
+    /**
+     * Initialize the Tensor Flow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
+
     void configMode() {
         String lastModes="";
 
@@ -204,6 +360,11 @@ public class RoverAuto extends LinearOpMode {
                 isEnableCV= !isEnableCV;
             if (FaltechUtilities.isValueChangedAndEqualTo("1.b",gamepad1.b,true))
                 isStartLatched= !isStartLatched;
+            if (FaltechUtilities.isValueChangedAndEqualTo("1.dl",gamepad1.dpad_left,true))
+                isEnableDepotRun= !isEnableDepotRun;
+            if (FaltechUtilities.isValueChangedAndEqualTo("1.dr",gamepad1.dpad_right,true))
+                isEnableCraterRun= !isEnableCraterRun;
+
 
 
             if (FaltechUtilities.isValueChangedAndEqualTo("1.dd",gamepad1.dpad_down,true)) {
@@ -224,13 +385,17 @@ public class RoverAuto extends LinearOpMode {
             modes+=", CV="+(isEnableCV?"Enabled":"Disabled");
             modes+=", Hanging="+(isStartLatched?"Latched":"On The Ground");
             modes+=", Gold = "+goldPosition;
+            modes+=", Depot Run="+(isEnableDepotRun?"On":"Off");
+            modes+=", Crater Run="+(isEnableCraterRun?"On":"Off");
 
             if (!modes.equals(lastModes)) {
-                telemetry.addData("Alliance", isRedAlliance?"Red":"Blue");
-                telemetry.addData("Facing", isStartFacingCrater?"Crater":"Depot");
-                telemetry.addData("CV", isEnableCV?"Enabled":"Disabled");
-                telemetry.addData("Hanging", isStartLatched?"Latched":"On The Ground");
-                telemetry.addData("Gold Position = ", goldPosition);
+                telemetry.addData("Alliance (X)", isRedAlliance?"Red":"Blue");
+                telemetry.addData("Facing (Y)", isStartFacingCrater?"Crater":"Depot");
+                telemetry.addData("Vision(A)", isEnableCV?"Enabled":"Disabled");
+                telemetry.addData("Hanging(B)", isStartLatched?"Latched":"On The Ground");
+                telemetry.addData("Gold Position(Dpad_Down) = ", goldPosition);
+                telemetry.addData("Depot(Dpad_Left) = ", isEnableDepotRun?"On":"Off");
+                telemetry.addData("Crater(Dpad_Right) = ", isEnableCraterRun?"On":"Off");
                 telemetry.addData("ConfigMode" , "Press right bumper to leave config mode.");
                 telemetry.update();
 

@@ -166,4 +166,10 @@ public class RoverCollector {
     }
 
 
+    public void setPowerToArmExtender(double power){
+        mtrArmExtender.setPower(power);
+
+    }
+
+
 }

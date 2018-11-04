@@ -286,7 +286,7 @@ public class RoverRobot {
             this.targetDegreesAcceptableError=targetDegreesAcceptableError;
 
             // todo; add logging for distance
-            RobotLog.i("DriveToHeading( targetDegrees=%f, maxDrivePower=%f, maxTurnPower=%f) ", targetDegrees, maxDrivePower, maxTurnPower);
+            RobotLog.i("DriveToHeading( targetDegrees=%f, maxDrivePower=%f, maxTurnPower=%f, targetDistance=%f) ", targetDegrees, maxDrivePower, maxTurnPower, targetDistance);
             // restart imu angle tracking.
             resetRelativeAngleToZero();
 
@@ -301,6 +301,7 @@ public class RoverRobot {
               //  drive.resetEncoders();
                 startingEncoder=drive.getEncoderClicksAbs();
                 targetEncoder=startingEncoder+drive.convertInchesToClicks(targetDistance);
+                RobotLog.i("DriveToHeading( startingEncoder=%f  targetEncoder=%f) ", startingEncoder, targetEncoder);
             }
 
             pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxTurnPower, maxTurnPower);
@@ -332,9 +333,15 @@ public class RoverRobot {
 
             double curEncoder=drive.getEncoderClicksAbs();
 
+            RobotLog.i("DriveToHeading( startingEncoder=%f  targetEncoder=%f  currentEncoder=%f", startingEncoder, targetEncoder, curEncoder);
+
             // problem with this is that it needs to use a pid to scale back power to hit this distance accurately.
-            if (targetDistance!=0.0 && curEncoder>=targetEncoder)
+            if (targetDistance!=0.0 && curEncoder>=targetEncoder) {
                 onTarget = true;
+                RobotLog.i("ON TARGET!");
+            } else {
+                RobotLog.i("NOT ON TARGET!");
+            }
 
             telemetry.addData("angles", "target=" + targetDegrees + " relative=" + relativeAngle);
             telemetry.addData("targetD", "trgtD=" + targetDistance+ " trgtEnc=" + targetEncoder+ " curEnc="+curEncoder);

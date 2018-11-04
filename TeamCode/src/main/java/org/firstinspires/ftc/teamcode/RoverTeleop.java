@@ -162,8 +162,8 @@ public class RoverTeleop extends OpMode{
 
     public void doArmExtender() {
         double armPower;
-        if (gamepad1.left_bumper) armPower=.8;
-        else if (gamepad1.right_bumper) armPower=-0.4;
+        if (gamepad1.right_bumper) armPower=.85;
+        else if (gamepad1.left_bumper) armPower=-0.4;
         else armPower=0.0;
         robot.roverCollector.mtrArmExtender.setPower(armPower);
     }
