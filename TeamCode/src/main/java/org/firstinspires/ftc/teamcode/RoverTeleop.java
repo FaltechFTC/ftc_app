@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+
 public class RoverTeleop extends OpMode{
     @TeleOp(name="RoverMecanumTeleop", group="7079")
     public static class RoverMecanumTeleop extends RoverTeleop {
@@ -95,17 +96,20 @@ public class RoverTeleop extends OpMode{
     double armLiftHoldPower=0;
 
     public void doArmLift() {
-        if (gamepad1.dpad_down) armLiftOpMode=1-armLiftOpMode;
-        telemetry.addData("Arm Lift Mode:" , ""+armLiftOpMode);
 
-        if (gamepad1.dpad_left) armLiftHoldPower=Math.max(armLiftHoldPower-.1,0);
-        if (gamepad1.dpad_right) armLiftHoldPower=Math.min(armLiftHoldPower+.1,.7);
-        if (gamepad1.a) {
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpaddown",gamepad1.dpad_down,true))
+            armLiftOpMode=1-armLiftOpMode;
+
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadup",gamepad1.dpad_up,true)) {
             if (armLiftHoldPower == 0 ) armLiftHoldPower = 0.15;
             else armLiftHoldPower = 0;
         }
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadleft",gamepad1.dpad_left,true))
+            armLiftHoldPower=Math.max(armLiftHoldPower-.1,0);
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadright",gamepad1.dpad_right,true))
+            armLiftHoldPower=Math.min(armLiftHoldPower+.1,.7);
 
-        telemetry.addData("Arm Lift Hold Power:" , armLiftHoldPower);
+        telemetry.addData("Arm Lift" , "Mode="+armLiftOpMode+" Power="+armLiftHoldPower);
 
         if (armLiftOpMode==0) {
             /*From Coach Ted : my concern with this approach is that it tells both motors ro race to 120 or 0

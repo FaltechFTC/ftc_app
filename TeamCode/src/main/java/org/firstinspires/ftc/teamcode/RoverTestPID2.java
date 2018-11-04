@@ -13,9 +13,9 @@ package org.firstinspires.ftc.teamcode;
 // overshoot.
 
 
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -25,7 +25,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous(name="RoverTestPID2", group="7079")
-//@Disabled
+@Disabled
 public class RoverTestPID2 extends LinearOpMode
 {
     DcMotor                 leftMotor;

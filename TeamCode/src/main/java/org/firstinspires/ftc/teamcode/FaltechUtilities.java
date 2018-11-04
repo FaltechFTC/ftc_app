@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import java.util.HashMap;
+
 public class FaltechUtilities {
 
     public static double DEFAULT_DEADZONE = .08;
@@ -45,6 +47,40 @@ public class FaltechUtilities {
             output = direction *( gear2MinOutput + p*(gear2MaxOutput - gear2MinOutput));
         }
         return output;
+    }
+
+    static HashMap lastValues = new HashMap();
+    /** This function helps to find out if the gamepad button value changed or not.
+     * This helps to avoid seeing the same button press each loop, so that you only see
+     * the transition from on to off, or off to on.
+     * Example:
+     *  void loop () {
+     *      if (isValueChanged("1.x",gamepad1.x)) {
+     *          if (gamepad1.x) ... // button just depressed, won't trigger again until released and pressed again
+     *
+     *      }
+     *  }
+     * @param key
+     * @param newValue
+     * @return
+     */
+    public static boolean isValueChanged(String key, Object newValue) {
+        boolean valueChanged=false;
+        Object lastValue=lastValues.get(key);
+        if (lastValue!=null && lastValue!=newValue) valueChanged=true;
+        lastValues.put(key,newValue);  // store new value so that we know if it changed next time.
+        return valueChanged;
+    }
+
+    /** wrapper function to check if value was changed AND also equal to a given target
+     *
+     * @param key
+     * @param newValue
+     * @param targetValue
+     * @return
+     */
+    public static boolean isValueChangedAndEqualTo(String key, Object newValue, Object targetValue) {
+        return (isValueChanged(key,newValue) && newValue==targetValue);
     }
 }
 
