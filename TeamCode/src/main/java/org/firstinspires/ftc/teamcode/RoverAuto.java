@@ -49,9 +49,12 @@ public class RoverAuto extends LinearOpMode {
     boolean isStartFacingCrater=true;
     boolean isEnableCV=false;
     boolean isStartLatched=false;
-    double maxPowerAuto = 0.3;
-    double maxTurningPower = 0.3;
+    double maxPowerAuto = 0.5;
+    double maxTurningPower = 0.1;
     double degreesError =3;
+    int goldPosition = 2;
+    double goldDegrees = 5;
+    double knockOffDistance =24;
 
     @Override
     public void runOpMode() {
@@ -70,46 +73,56 @@ public class RoverAuto extends LinearOpMode {
 
         // Rover Lift Code
         // TODO : Check if there is need to go up before going down, if so we need to add that code
-        // TODO : how to pass is latched before auto starts
+       if (isStartLatched) {
+           robot.roverLift.setTargetPosition(4);
+           robot.roverLift.setPower(0.4);
 
-        robot.roverLift.setTargetPosition(4);
-        robot.roverLift.setPower(0.4);
+           // Strafe right for 300 milliseconds
 
-        // Strafe right for 300 milliseconds
-
-        robot.drive.driveFRS(0,0,1,maxPowerAuto);
-
+           robot.drive.driveFRS(0, 0, 1, maxPowerAuto);
+           sleep(300);
+       }
         // TODO: We need to check for which spot is the mineral in
 
+        if (goldPosition==1) {
+           goldDegrees = 30;
+           knockOffDistance = 28;
+        } else if (goldPosition==2 ) {
+           goldDegrees = 5;
+           knockOffDistance = 60;
+        } else {
+           goldDegrees = -30;
+           knockOffDistance = 28;
+        }
         robot.drive.setRunModeEncoder(false);
-        operation = robot.getOperationDriveToHeading(5,maxPowerAuto,0.2,5,10000,10);
+        operation = robot.getOperationDriveToHeading(goldDegrees,maxPowerAuto,maxTurningPower,degreesError,10000,knockOffDistance);
         operation.run();
         robot.stop();
 
 
-        // Need to drive back 12 inches to start the turn
-
-        robot.drive.driveToInches(-12,0.3,5);
-        robot.drive.setRunModeEncoder(false);
-
-        // Turn 50 degrees left
-        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
-        operation.run();
-        robot.stop();
-
-        robot.drive.driveToInches(15,0.3,5);
-        robot.drive.setRunModeEncoder(false);
-
-        // Turn 50 degrees left
-        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
-        operation.run();
-        robot.stop();
-
-        // TODO : Drive up to the Team Depot, need to measure the length and use driveInches or driveToHeading function
-        // TODO : Drop the team Marker once we reach the Team Depot
-        // TODO : Drive back to the crater
-        // TODO : Extend the arm based on time so that it crosses the crater
-
+//        // Need to drive back 12 inches to start the turn
+//
+//        robot.drive.driveToInches(-12,0.3,5);
+//        robot.drive.setRunModeEncoder(false);
+//
+//        // Turn 50 degrees left
+//        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//        robot.stop();
+//
+//        robot.drive.driveToInches(15,0.3,5);
+//        robot.drive.setRunModeEncoder(false);
+//
+//        // Turn 50 degrees left
+//        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//        robot.stop();
+//
+//        // TODO : Drive up to the Team Depot, need to measure the length and use driveInches or driveToHeading function
+//        // TODO : Drop the team Marker once we reach the Team Depot
+//        // TODO : Drive back to the crater
+//        // TODO : Extend the arm based on time so that it crosses the crater
+//
 
 //
 //
@@ -135,14 +148,14 @@ public class RoverAuto extends LinearOpMode {
 //        robot.drive.driveFRS(0,0,1,0.3);
 //        sleep(500);
 //        robot.stop();
-        robot.drive.setRunModeEncoder(false);
-        operation = robot.getOperationDriveToHeading(5,0.3,0.2,5,10000,15);
-        operation.run();
-        robot.stop();
-
-        operation = robot.getOperationDriveToHeading(5,0.3,0,5,10000,-15);
-        operation.run();
-        robot.stop();
+//        robot.drive.setRunModeEncoder(false);
+//        operation = robot.getOperationDriveToHeading(5,0.3,0.2,5,10000,15);
+//        operation.run();
+//        robot.stop();
+//
+//        operation = robot.getOperationDriveToHeading(5,0.3,0,5,10000,-15);
+//        operation.run();
+//        robot.stop();
 
 
 

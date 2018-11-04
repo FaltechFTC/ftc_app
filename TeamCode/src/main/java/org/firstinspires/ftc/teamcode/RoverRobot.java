@@ -290,9 +290,9 @@ public class RoverRobot {
             // restart imu angle tracking.
             resetRelativeAngleToZero();
 
-            double drivePidKp = 1.0;     // Tuning variable for PID.
-            double drivePidTi = 0.5;   // Eliminate integral error in 1 sec.
-            double drivePidTd = 0.5;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
+            double drivePidKp = 0.5;     // Tuning variable for PID.
+            double drivePidTi = 0;   // Eliminate integral error in 1 sec.
+            double drivePidTd = 0.2;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
 
             double drivePidIntMax = 180.0;
             double drivePidIntMin = -drivePidIntMax;
