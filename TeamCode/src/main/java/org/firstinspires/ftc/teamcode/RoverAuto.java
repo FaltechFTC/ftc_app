@@ -49,10 +49,10 @@ public class RoverAuto extends LinearOpMode {
     boolean isStartFacingCrater=true;
     boolean isEnableCV=false;
     boolean isStartLatched=false;
-    double maxPowerAuto = 0.3;
-    double maxTurningPower = 0.3;
+    double maxPowerAuto = 0.5;
+    double maxTurningPower = 0.1;
     double degreesError =3;
-    int goldPosition = 1;
+    int goldPosition = 2;
     double goldDegrees = 5;
     double knockOffDistance =24;
 
@@ -89,7 +89,7 @@ public class RoverAuto extends LinearOpMode {
            knockOffDistance = 28;
         } else if (goldPosition==2 ) {
            goldDegrees = 5;
-           knockOffDistance = 24;
+           knockOffDistance = 60;
         } else {
            goldDegrees = -30;
            knockOffDistance = 28;
