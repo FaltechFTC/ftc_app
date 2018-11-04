@@ -49,6 +49,9 @@ public class RoverAuto extends LinearOpMode {
     boolean isStartFacingCrater=true;
     boolean isEnableCV=false;
     boolean isStartLatched=false;
+    double maxPowerAuto = 0.3;
+    double maxTurningPower = 0.3;
+    double degreesError =3;
 
     @Override
     public void runOpMode() {
@@ -64,10 +67,49 @@ public class RoverAuto extends LinearOpMode {
 
         waitForStart();
 
-        double maxTurningPower=.3;
-        double maxDrivePower=.5;
-        double degreesError=2.0;
-        long timeoutMS=4000;
+
+        // Rover Lift Code
+        // TODO : Check if there is need to go up before going down, if so we need to add that code
+        // TODO : how to pass is latched before auto starts
+
+        robot.roverLift.setTargetPosition(4);
+        robot.roverLift.setPower(0.4);
+
+        // Strafe right for 300 milliseconds
+
+        robot.drive.driveFRS(0,0,1,maxPowerAuto);
+
+        // TODO: We need to check for which spot is the mineral in
+
+        robot.drive.setRunModeEncoder(false);
+        operation = robot.getOperationDriveToHeading(5,maxPowerAuto,0.2,5,10000,10);
+        operation.run();
+        robot.stop();
+
+
+        // Need to drive back 12 inches to start the turn
+
+        robot.drive.driveToInches(-12,0.3,5);
+        robot.drive.setRunModeEncoder(false);
+
+        // Turn 50 degrees left
+        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
+
+        robot.drive.driveToInches(15,0.3,5);
+        robot.drive.setRunModeEncoder(false);
+
+        // Turn 50 degrees left
+        operation = robot.getOperationRotateToHeading(-50, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
+
+        // TODO : Drive up to the Team Depot, need to measure the length and use driveInches or driveToHeading function
+        // TODO : Drop the team Marker once we reach the Team Depot
+        // TODO : Drive back to the crater
+        // TODO : Extend the arm based on time so that it crosses the crater
+
 
 //
 //
@@ -108,7 +150,6 @@ public class RoverAuto extends LinearOpMode {
     }
 
     void configMode() {
-
         while (!gamepad1.start) {
             if (gamepad1.x) isRedAlliance= !isRedAlliance;
             if (gamepad1.y) isStartFacingCrater= !isStartFacingCrater;

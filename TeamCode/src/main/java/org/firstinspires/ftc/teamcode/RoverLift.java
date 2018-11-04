@@ -26,7 +26,7 @@ public class RoverLift {
             mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
-    double encoderTick = 1120;
+    double encoderTick = 560;
     double diameter = .5;
     double encoderPerInch = encoderTick / (diameter * Math.PI);
 
