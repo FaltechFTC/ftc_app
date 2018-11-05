@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -27,8 +28,8 @@ public class RoverAuto extends LinearOpMode {
     RoverRobot.Operation operation= null;
     boolean isRedAlliance=false;
     boolean isEnableDepotRun=false;
-    boolean isEnableCraterRun=false;
-    boolean isStartFacingCrater=true;
+    boolean isEnableCraterRun=true;
+    boolean isStartFacingCrater=false;
     boolean isEnableCV=false;
     boolean isStartLatched=false;
     double maxPowerAuto = 0.5;
@@ -37,6 +38,7 @@ public class RoverAuto extends LinearOpMode {
     int goldPosition = 1;
     double goldDegrees = 5;
     double knockOffDistance =24;
+    private ElapsedTime runTime = new ElapsedTime();
 
 
     /**
@@ -115,13 +117,13 @@ public class RoverAuto extends LinearOpMode {
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             goldDegrees = -30;
-            knockOffDistance = 22;
+            knockOffDistance = 16;
         } else if (goldPosition == 2) { // middle
             goldDegrees = 0;
-            knockOffDistance = 20;
+            knockOffDistance = 14;
         } else {   // right of the robot
             goldDegrees = 30;
-            knockOffDistance = 22;
+            knockOffDistance = 16;
         }
         robot.drive.setRunModeEncoder(false);
 
@@ -133,10 +135,11 @@ public class RoverAuto extends LinearOpMode {
         operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, knockOffDistance);
         operation.run();
         robot.stop();
+        sleep(1500);
     }
 
     public void doDepot() {
-        if (!isEnableCraterRun) return;
+        if (!isEnableDepotRun) return;
         /*
             wallRide{
     1. Turn left to face wall
@@ -165,23 +168,29 @@ public class RoverAuto extends LinearOpMode {
             }
             else {
                 // Depot Auto
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -10);
+                operation.run();
+                sleep(1500);
+// Back up
                 operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
                 operation.run();
-// rotate in the opposite direction of the 1, 2, 3 turn.
-                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -12);
+                sleep(1500);
+//Rotate so in original lander pos
+                operation = robot.getOperationRotateToHeading(-120, maxTurningPower, degreesError, 3000);
                 operation.run();
-//Drive back to the original lander pos
-                operation = robot.getOperationRotateToHeading(90, maxTurningPower, degreesError, 3000);
+                sleep(1500);
+// turn 90 degrees, so will be facing to left of crater.
+                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 12);
                 operation.run();
-// turn 90 degrees, so will be facing towards crater
-                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 36);
-                operation.run();
+                sleep(1500);
 //Move forwards to right next to crater
                 operation = robot.getOperationRotateToHeading(40, maxTurningPower, degreesError, 3000);
                 operation.run();
+                sleep(1500);
 // rotate so facing crater
-                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
+                operation = robot.getOperationDriveToHeading(-5, maxPowerAuto, 0, degreesError, 10000, 6);
                 operation.run();
+                sleep(1500);
                 // move forwards to crater
             }
             robot.roverCollector.setPowerToArmExtender(0.4);
@@ -193,49 +202,48 @@ public class RoverAuto extends LinearOpMode {
 
     public void doVision(int maxMilliseconds) {
         /** Activate Tensor Flow Object Detection. */
-        if (tfod != null) {
-            tfod.activate();
-        }
+        if (tfod == null)  return;
 
-         // TODO do timout
-        while (opModeIsActive()) {
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    if (updatedRecognitions.size() == 3) {
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldMineralX = (int) recognition.getLeft();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getLeft();
-                            } else {
-                                silverMineral2X = (int) recognition.getLeft();
-                            }
-                        }
-                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Left");
-                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Right");
-                            } else {
-                                telemetry.addData("Gold Mineral Position", "Center");
-                            }
-                        }
-                    }
-                    telemetry.update();
+        ElapsedTime runTime = new ElapsedTime();
+        runTime.reset();
+
+        int goldMineralX = -1;
+        int silverMineral1X = -1;
+        int silverMineral2X = -1;
+
+        while (opModeIsActive() && runTime.milliseconds()<maxMilliseconds) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions == null) continue;
+
+            telemetry.addData("# Object Detected", updatedRecognitions.size());
+            for (Recognition recognition : updatedRecognitions) {
+                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                    goldMineralX = (int) recognition.getLeft();
+                    telemetry.addData("Gold", goldMineralX);
+                } else if (silverMineral1X == -1) {
+                    silverMineral1X = (int) recognition.getLeft();
+                    telemetry.addData("Silver1", silverMineral1X);
+                } else {
+                    silverMineral2X = (int) recognition.getLeft();
+                    telemetry.addData("Silver2", silverMineral1X);
                 }
             }
+            telemetry.update();
+            sleep(400);
+
         }
 
-        if (tfod != null) {
         tfod.shutdown();
-    }
+
+        if (goldMineralX < silverMineral1X || goldMineralX < silverMineral2X) goldPosition=1;
+        else if (goldMineralX > silverMineral1X )  goldPosition=2;
+        else  goldPosition=3;
+
+        telemetry.addData("Gold Mineral Position", goldPosition);
+        telemetry.update();
+        sleep(2000);
 
     }
     public void doParkingLot() {
