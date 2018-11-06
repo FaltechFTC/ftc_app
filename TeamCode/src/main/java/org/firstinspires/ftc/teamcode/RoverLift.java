@@ -18,13 +18,14 @@ public class RoverLift {
         this.telemetry = telemetry;
 
         mtrRoverLift = hwMap.get(DcMotor.class, "mtrRoverLift");
-        mtrRoverLift.setDirection(DcMotor.Direction.FORWARD);
+        mtrRoverLift.setDirection(DcMotor.Direction.REVERSE);
+        mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        mtrRoverLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 //        if (isAutonomous) {
 //            mtrRoverLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
- //           mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        } else {
-            mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-  //      }
+//           mtrRoverLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//      }
     }
     double encoderTick = 560;
     double diameter = .5;

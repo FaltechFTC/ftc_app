@@ -93,31 +93,37 @@ public class RoverAuto extends LinearOpMode {
             telemetry.addData("In the lander", "trying to lower");
             telemetry.update();
 
+            // lift to disengage holding pin
             robot.roverLift.setPower(1.0);
             sleep(600);
 
-            robot.roverLift.setPower(0);
-            sleep(2500);
 
-            robot.roverLift.setPower(-0.5);
-            sleep(700);
+            robot.roverLift.setPower(-.05);   // lower the robot to slowly to ground
+            sleep(1000);
+            robot.roverLift.setPower(-.2);   // lower more, and release arm higher to clear
+            sleep(1000);
+            robot.roverLift.setPower(0);  // stop lift
 
 
-//            // lower the robotc
-//            robot.roverLift.setTargetPosition(4);
-//            robot.roverLift.setPower(0.4);
-
-            // Strafe right for 300 milliseconds to unlatch
-            robot.drive.driveFRS(0, 0, -1, 0.3);
-            sleep(100);
+            // rotate hook out of latch
+            robot.drive.driveFRS(0, -.25, 0, 0.3);
+            sleep(200);
             robot.drive.stop();
 
-            robot.roverLift.setPower(0.5);
+            // put the lift arm away
+            robot.roverLift.setPower(0.25);
             sleep(2000);
-
-
-            // don't use any more power on the lift.
             robot.roverLift.setPower(0.0);
+
+            robot.drive.driveFRS(0, .25, 0, 0.3);
+            sleep(200);
+            robot.drive.stop();
+
+            // back up clean against lander
+            robot.drive.driveFRS(-.15, 0, 0, 0.3);
+            sleep(600);
+            robot.drive.stop();
+
         }
 
 

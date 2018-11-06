@@ -18,6 +18,8 @@ public class RoverCollector {
     public Servo leftClaw = null;
     public Servo rightClaw = null;
 
+    boolean newMode = true;
+
     private ElapsedTime period = new ElapsedTime();
     public Telemetry telemetry = null;
     public RoverCollector(){
@@ -28,23 +30,34 @@ public class RoverCollector {
         this.hwMap = hwMap;
         this.telemetry = telemetry;
 
+        mtrArmExtender = hwMap.get(DcMotor.class, "mtrArmExtender");
+        mtrArmExtender.setDirection(DcMotor.Direction.FORWARD);
+        mtrArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         mtrLeftCollector = hwMap.get(DcMotor.class, "mtrLeftCollector");
         mtrRightCollector = hwMap.get(DcMotor.class, "mtrRightCollector");
-        mtrArmExtender = hwMap.get(DcMotor.class, "mtrArmExtender");
 
-        mtrArmExtender.setDirection(DcMotor.Direction.FORWARD);
         mtrLeftCollector.setDirection(DcMotor.Direction.FORWARD);
-        mtrRightCollector.setDirection(DcMotor.Direction.FORWARD);
+        mtrRightCollector.setDirection(DcMotor.Direction.REVERSE);
 
-        mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if (newMode) {
+            mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            mtrLeftCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            mtrRightCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        } else {
+            mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        mtrLeftCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        mtrRightCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            mtrLeftCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            mtrRightCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
 
-        // TODO: Initialize servo motors.
         leftClaw = hwMap.get(Servo.class, "leftClaw");
         rightClaw = hwMap.get(Servo.class, "rightClaw");
+        // not initializing them, as we're going to manually have them in closed position
     }
 
 
@@ -166,9 +179,26 @@ public class RoverCollector {
     }
 
 
-    public void setPowerToArmExtender(double power){
-        mtrArmExtender.setPower(power);
+    int maxArmEncoder=convertDegreesToEncoder(110);
 
+    public void setPowerToArmExtender(double power){
+        double curLeft=mtrLeftCollector.getCurrentPosition();
+        double curRight=mtrRightCollector.getCurrentPosition();
+
+
+        double easeInDistance=100;
+        double leftPower=power, rightPower=power;
+        if (leftPower>0 && curLeft>maxArmEncoder-easeInDistance)  leftPower*=(maxArmEncoder-curLeft)/easeInDistance;
+        else if (leftPower<0 && curLeft<easeInDistance)  leftPower*=curLeft/easeInDistance;
+
+        if (rightPower>0 && curRight>maxArmEncoder-easeInDistance)  rightPower*=(maxArmEncoder-curRight)/easeInDistance;
+        else if (rightPower<0 && curRight<easeInDistance)  rightPower*=curRight/easeInDistance;
+
+        mtrLeftCollector.setPower(leftPower);
+        mtrRightCollector.setPower(rightPower);
+
+        telemetry.addData("Arm Lift", "Left="+curLeft+" Right="+curRight+" easeIn="+easeInDistance+" maxPos="+maxArmEncoder);
+        telemetry.addData("Arm Lift Inputs", "power="+power+" Lpower="+leftPower+" Rpower="+rightPower);
     }
 
 
