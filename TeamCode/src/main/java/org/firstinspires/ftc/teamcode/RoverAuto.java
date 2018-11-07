@@ -451,7 +451,7 @@ public class RoverAuto extends LinearOpMode {
             modes+=", Depot Run="+(isEnableDepotRun?"On":"Off");
             modes+=", Crater Run="+(isEnableCraterRun?"On":"Off");
 
-            double liftPower = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .1);
+            double liftPower = FaltechUtilities.clipDeadzone( gamepad2.left_stick_y, .1);
             robot.roverLift.setPower(liftPower);
 
             if (!modes.equals(lastModes)) {

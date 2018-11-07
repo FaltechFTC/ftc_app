@@ -40,14 +40,14 @@ public class RoverCollector {
         mtrLeftCollector.setDirection(DcMotor.Direction.FORWARD);
         mtrRightCollector.setDirection(DcMotor.Direction.REVERSE);
 
-        if (newMode) {
+        if (newMode) { // TODO fix this name
             mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             mtrLeftCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             mtrRightCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } else {
+        } else { // get rid of this after the above stuff is working
             mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -179,14 +179,14 @@ public class RoverCollector {
     }
 
 
-    int maxArmEncoder=convertDegreesToEncoder(110);
+    int maxArmEncoder=1355;  //convertDegreesToEncoder(110);
 
     public void setPowerToArmExtender(double power){
         double curLeft=mtrLeftCollector.getCurrentPosition();
         double curRight=mtrRightCollector.getCurrentPosition();
 
 
-        double easeInDistance=100;
+        double easeInDistance=150;
         double leftPower=power, rightPower=power;
         if (leftPower>0 && curLeft>maxArmEncoder-easeInDistance)  leftPower*=(maxArmEncoder-curLeft)/easeInDistance;
         else if (leftPower<0 && curLeft<easeInDistance)  leftPower*=curLeft/easeInDistance;

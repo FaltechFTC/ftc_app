@@ -97,86 +97,44 @@ public class RoverTeleop extends OpMode{
 
     public void doArmLift() {
 
-        double armSpeed = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .15)/4;
-        robot.roverCollector.setPowerToArmExtender(armSpeed);
-        telemetry.addData("ArmLift Speed =", armSpeed);
+        double armSpeed = FaltechUtilities.clipDeadzone((gamepad1.right_trigger - gamepad1.left_trigger),.15);
+        if (armSpeed==0)
+            armSpeed=FaltechUtilities.clipDeadzone((gamepad2.right_trigger - gamepad2.left_trigger), .15);
+        robot.roverCollector.setPowerToArmExtender(armSpeed/3);
+       // telemetry.addData("ArmLift Speed =", armSpeed);
     }
 
-    public void doArmLift1() {
 
-        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpaddown",gamepad1.dpad_down,true))
-            armLiftOpMode=1-armLiftOpMode;
-
-        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadup",gamepad1.dpad_up,true)) {
-            if (armLiftHoldPower == 0 ) armLiftHoldPower = 0.15;
-            else armLiftHoldPower = 0;
-        }
-        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadleft",gamepad1.dpad_left,true))
-            armLiftHoldPower=Math.max(armLiftHoldPower-.1,0);
-        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpadright",gamepad1.dpad_right,true))
-            armLiftHoldPower=Math.min(armLiftHoldPower+.1,.7);
-
-        telemetry.addData("Arm Lift" , "Mode="+armLiftOpMode+" Power="+armLiftHoldPower);
-
-        if (armLiftOpMode==0) {
-            /*From Coach Ted : my concern with this approach is that it tells both motors ro race to 120 or 0
-              So any variations in the load on the motors will cause one to run ahead of the other, and that
-              twist will cause failure.
-             */
-            double armSpeed = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .2);
-            double targetPosDegrees = armSpeed >= 0 ? 120 : 0;
-            robot.roverCollector.setPositionDegrees(targetPosDegrees);
-            armSpeed=Math.abs(armSpeed/4); // speed is absolute when using position.  scale it down
-            robot.roverCollector.setSpeed(armSpeed);
-            telemetry.addData("Arm Speed =", armSpeed);
-        } else {
-            /* From Coach Ted:  This version attempts to bump the encoder just a bit each loop
-               which is like setting a short term goal on the encoder.  This should keep the motors more in sync
-               as we reset the goals every loop.
-             */
-            double armDelta = FaltechUtilities.clipDeadzone(gamepad1.right_trigger - gamepad1.left_trigger, .2);
-            double armSpeed = armDelta/4;
-            double degreesToMoveEachLoop=.2;
-            double targetChangeDegrees = armDelta*degreesToMoveEachLoop;
-            robot.roverCollector.setPositionIncremental(targetChangeDegrees, armSpeed, armLiftHoldPower);
-
-
-        }
-    }
-
-    float clawLeft = 0, clawRight = 0;
-    boolean clawArmLeft = false, clawArmRight = false;
-
+    double clawLeft=0.0;
+    double clawRight = 0.0;
     public void doClaw() {
-         if (!clawArmLeft && gamepad1.x){
-             clawArmLeft = true;
-             clawLeft = 1 - clawLeft;
-             robot.roverCollector.leftClaw.setPosition(clawLeft);
-         }
-         else if (!gamepad1.x){
-             clawArmLeft = false;
-         }
 
-        if (!clawArmRight && gamepad1.b){
-            clawArmRight = true;
+
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.a", gamepad1.a, true)
+                || FaltechUtilities.isValueChangedAndEqualTo("2.a", gamepad2.a, true)
+                ) {
+            clawLeft = 1 - clawLeft;
+            robot.roverCollector.leftClaw.setPosition(clawLeft);
+        }
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.x", gamepad1.b, true)
+                || FaltechUtilities.isValueChangedAndEqualTo("2.x", gamepad2.b, true)
+                ) {
             clawRight = 1 - clawRight;
             robot.roverCollector.rightClaw.setPosition(clawRight);
-        }
-        else if (!gamepad1.b){
-            clawArmRight = false;
+
+
         }
     }
-
     public void doArmExtender() {
         double armPower;
-        if (gamepad1.right_bumper) armPower=.85;
-        else if (gamepad1.left_bumper) armPower=-0.4;
+        if (gamepad1.right_bumper || gamepad2.right_bumper) armPower=.85;
+        else if (gamepad1.left_bumper || gamepad2.left_bumper) armPower=-0.85;
         else armPower=0.0;
         robot.roverCollector.mtrArmExtender.setPower(armPower);
     }
 
     public void doRobotLift() {
-        double liftPower = FaltechUtilities.clipDeadzone(gamepad2.right_trigger - gamepad2.left_trigger, .1);
+        double liftPower = FaltechUtilities.clipDeadzone(gamepad2.left_stick_y, .1);
         robot.roverLift.setPower(liftPower);
     }
 
