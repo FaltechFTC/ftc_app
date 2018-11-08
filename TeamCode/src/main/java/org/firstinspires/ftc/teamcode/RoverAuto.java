@@ -67,7 +67,7 @@ public class RoverAuto extends LinearOpMode {
 
         configMode();
 
-        if (isEnableCV) initVision();
+        if (isEnableCV &&  !isStopRequested()) initVision();
 
         telemetry.addData("Status", "Configured. Waiting for Start");
         telemetry.update();
@@ -78,15 +78,17 @@ public class RoverAuto extends LinearOpMode {
         telemetry.update();
 
 
-        doLander();
-//        doMinerals();
-//        doDepot();
-//        doCrater();
+//       if (!isStopRequested()) doLander();
+      if (!isStopRequested()) doMinerals();
+//       if (!isStopRequested()) doDepot();
+//       if (!isStopRequested()) doCrater();
+        robot.stop();
     }
 
     public void doLander() {
         // Rover Lift Code
         // TODO : Check if there is need to go up before going down, if so we need to add that code
+
         if (isStartLatched) {
 
 
@@ -96,6 +98,7 @@ public class RoverAuto extends LinearOpMode {
             // lift to disengage holding pin
             robot.roverLift.setPower(1.0);
             sleep(600);
+
 
 
             robot.roverLift.setPower(-.05);   // lower the robot to slowly to ground
@@ -111,8 +114,8 @@ public class RoverAuto extends LinearOpMode {
             robot.drive.stop();
 
             // put the lift arm away
-            robot.roverLift.setPower(0.25);
-            sleep(2000);
+            robot.roverLift.setPower(0.6);
+            sleep(2200);
             robot.roverLift.setPower(0.0);
 
             robot.drive.driveFRS(0, .25, 0, 0.3);
@@ -133,7 +136,7 @@ public class RoverAuto extends LinearOpMode {
 
     public void doMinerals() {
 
-        if (isEnableCV) doVision(3000);
+        if (isEnableCV) doVision(28000);
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             goldDegrees = -30;
@@ -193,67 +196,82 @@ public class RoverAuto extends LinearOpMode {
         operation.run();
     }
 
+    public void doArmOverCrater() {
+        robot.roverCollector.setPowerToArmExtender(0.35);
+        sleep(400);
+        robot.roverCollector.setPowerToArmExtender(0);
+        // sleep(1000);
+        robot.roverCollector.mtrArmExtender.setPower(0.9);
+        sleep(2250);
+        robot.roverCollector.mtrArmExtender.setPower(0);
+    }
+
     public void doCrater() {
+
         if (!isEnableCraterRun) return;
 
-        if (!isEnableDepotRun) {
-            if (isStartFacingCrater) {
-                // Crater auto
-                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
-                operation.run();
-// rotate in the opposite direction of the 1, 2, 3 turn.
+        doArmOverCrater();
 
-                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
-                operation.run();
-// move forwards 6 degrees to the crater
-            }
-            else {
-                // Depot Auto
-
-
-//                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -10);
+//
+//        if (!isEnableDepotRun) {
+//            if (isStartFacingCrater) {
+//                // Crater auto
+//                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
+//                operation.run();
+//// rotate in the opposite direction of the 1, 2, 3 turn.
+//
+//                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
+//                operation.run();
+//// move forwards 6 degrees to the crater
+//            }
+//            else {
+//                // Depot Auto
+//
+//
+////                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -10);
+////                operation.run();
+////                sleep(1000);
+//
+//
+//                robot.drive.driveToInches(-12,0.4,2);
+//
+//                robot.drive.setRunModeEncoder(false);
+//
+//                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
 //                operation.run();
 //                sleep(1000);
-
-
-                robot.drive.driveToInches(-12,0.4,2);
-
-                robot.drive.setRunModeEncoder(false);
-
-                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
-                operation.run();
-                sleep(1000);
-
-                // Back up
-
-//Rotate so in original lander pos
-                operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, 3000);
-                operation.run();
-                sleep(1000);
-// turn 90 degrees, so will be facing to left of crater.
-                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 20);
-                operation.run();
-                sleep(1500);
-//Move forwards to right next to crater
-                operation = robot.getOperationRotateToHeading(-40, maxTurningPower, degreesError, 3000);
-                operation.run();
-                sleep(1500);
-// rotate so facing crater
-                operation = robot.getOperationDriveToHeading(-5, maxPowerAuto, 0, degreesError, 10000, 6);
-                operation.run();
-                sleep(1500);
-                // move forwards to crater
-            }
-//            robot.roverCollector.setPowerToArmExtender(0.4);
-//            sleep(1000);
-//            robot.roverCollector.setPowerToArmExtender(0);
-            // no matter which route, end with extending arm at crater.
-        }
+//
+//                // Back up
+//
+////Rotate so in original lander pos
+//                operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, 3000);
+//                operation.run();
+//                sleep(1000);
+//// turn 90 degrees, so will be facing to left of crater.
+//                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 20);
+//                operation.run();
+//                sleep(1500);
+////Move forwards to right next to crater
+//                operation = robot.getOperationRotateToHeading(-40, maxTurningPower, degreesError, 3000);
+//                operation.run();
+//                sleep(1500);
+//// rotate so facing crater
+//                operation = robot.getOperationDriveToHeading(-5, maxPowerAuto, 0, degreesError, 10000, 6);
+//                operation.run();
+//                sleep(1500);
+//                // move forwards to crater
+//            }
+////            robot.roverCollector.setPowerToArmExtender(0.4);
+////            sleep(1000);
+////            robot.roverCollector.setPowerToArmExtender(0);
+//            // no matter which route, end with extending arm at crater.
+//        }
     }
 
     public void doVision(int maxMilliseconds) {
         /** Activate Tensor Flow Object Detection. */
         if (tfod == null)  return;
+        tfod.activate();
 
         ElapsedTime runTime = new ElapsedTime();
         runTime.reset();
@@ -266,21 +284,34 @@ public class RoverAuto extends LinearOpMode {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-            if (updatedRecognitions == null) continue;
+            int size=0;
+            if (updatedRecognitions==null) {
+                        ; // DO NOTHING
+            } else {
+                size=updatedRecognitions.size();
 
-            telemetry.addData("# Object Detected", updatedRecognitions.size());
-            for (Recognition recognition : updatedRecognitions) {
-                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                    goldMineralX = (int) recognition.getLeft();
-                    telemetry.addData("Gold", goldMineralX);
-                } else if (silverMineral1X == -1) {
-                    silverMineral1X = (int) recognition.getLeft();
-                    telemetry.addData("Silver1", silverMineral1X);
-                } else {
-                    silverMineral2X = (int) recognition.getLeft();
-                    telemetry.addData("Silver2", silverMineral1X);
+                int objNum=0;
+                for (Recognition recognition : updatedRecognitions) {
+                    telemetry.addData("Vision Obj#"+ objNum++, "label="+recognition.getLabel()+
+                            " left="+recognition.getLeft()+
+                            " right="+recognition.getRight()+
+                            " top="+recognition.getTop()+
+                            " confidence="+recognition.getConfidence());
+                    /*
+                    if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                        goldMineralX = (int) recognition.getLeft();
+                        telemetry.addData("Gold", goldMineralX);
+                    } else if (silverMineral1X == -1) {
+                        silverMineral1X = (int) recognition.getLeft();
+                        telemetry.addData("Silver1", silverMineral1X);
+                    } else {
+                        silverMineral2X = (int) recognition.getLeft();
+                        telemetry.addData("Silver2", silverMineral1X);
+                    }*/
+
                 }
             }
+            telemetry.addData("Vision", "objects="+size+"  time elapse="+runTime.seconds());
             telemetry.update();
             sleep(400);
 
@@ -329,32 +360,32 @@ public class RoverAuto extends LinearOpMode {
         telemetry.update();
         // TODO: Write the code for robot drop and back up to lander
 
-//        robot.drive.driveToInches(12,0.3,5);
-//        robot.drive.setRunModeEncoder(false);
-//
-//        telemetry.addData("About to execute rotate "," to 75 left");
-//        telemetry.update();
-//
-//        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
-//        operation.run();
-//        robot.stop();
-//
-//        robot.drive.driveToInches(-12,0.3,5);
-//        robot.drive.setRunModeEncoder(false);
-//
-//        operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
-//        operation.run();
-//        robot.drive.driveFRS(0,0,1,0.3);
-//        sleep(500);
-//        robot.stop();
-//        robot.drive.setRunModeEncoder(false);
-//        operation = robot.getOperationDriveToHeading(5,0.3,0.2,5,10000,15);
-//        operation.run();
-//        robot.stop();
-//
-//        operation = robot.getOperationDriveToHeading(5,0.3,0,5,10000,-15);
-//        operation.run();
-//        robot.stop();
+        robot.drive.driveToInches(12,0.3,5);
+        robot.drive.setRunModeEncoder(false);
+
+        telemetry.addData("About to execute rotate "," to 75 left");
+        telemetry.update();
+
+      //  operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, timeoutMS);
+        operation.run();
+        robot.stop();
+
+        robot.drive.driveToInches(-12,0.3,5);
+        robot.drive.setRunModeEncoder(false);
+
+        //operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, );
+        operation.run();
+        robot.drive.driveFRS(0,0,1,0.3);
+        sleep(500);
+        robot.stop();
+        robot.drive.setRunModeEncoder(false);
+        operation = robot.getOperationDriveToHeading(5,0.3,0.2,5,10000,15);
+        operation.run();
+        robot.stop();
+
+        operation = robot.getOperationDriveToHeading(5,0.3,0,5,10000,-15);
+        operation.run();
+        robot.stop();
 
     }
 
@@ -452,8 +483,8 @@ public class RoverAuto extends LinearOpMode {
             modes+=", Crater Run="+(isEnableCraterRun?"On":"Off");
 
             double liftPower = FaltechUtilities.clipDeadzone( gamepad2.left_stick_y, .1);
-            robot.roverLift.setPower(liftPower);
-
+            robot.roverLift.setPower(-liftPower);
+            // joystick up is negative need to switch
             if (!modes.equals(lastModes)) {
                 telemetry.addData("Alliance (X)", isRedAlliance?"Red":"Blue");
                 telemetry.addData("Facing (Y)", isStartFacingCrater?"Crater":"Depot");
@@ -470,7 +501,7 @@ public class RoverAuto extends LinearOpMode {
             }
 
             sleep(100);
-        } while (!gamepad1.right_bumper);
+        } while (!gamepad1.right_bumper || isStopRequested());
 
         telemetry.addData("ConfigMode" , lastModes);
         telemetry.update();

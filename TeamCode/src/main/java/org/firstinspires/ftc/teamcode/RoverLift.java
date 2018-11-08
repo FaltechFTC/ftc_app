@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,7 +19,7 @@ public class RoverLift {
         this.telemetry = telemetry;
 
         mtrRoverLift = hwMap.get(DcMotor.class, "mtrRoverLift");
-        mtrRoverLift.setDirection(DcMotor.Direction.REVERSE);
+        mtrRoverLift.setDirection(DcMotor.Direction.FORWARD);
         mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mtrRoverLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

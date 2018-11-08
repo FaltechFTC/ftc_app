@@ -135,7 +135,7 @@ public class RoverTeleop extends OpMode{
 
     public void doRobotLift() {
         double liftPower = FaltechUtilities.clipDeadzone(gamepad2.left_stick_y, .1);
-        robot.roverLift.setPower(liftPower);
+        robot.roverLift.setPower(-liftPower);
     }
 
     public void doTeamMarker(){
