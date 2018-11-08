@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+/* all Vuforia/TensorFlow originally from examples provided by First from class ConceptTensorFlowObjectDetection.java */
+
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;

@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 
-/* all TensorFlow originally from examples provided by First from class ConceptTensorFlowObjectDetection.java */
-
 @Autonomous(name="RoverAuto", group="7079")
 public class RoverAuto extends LinearOpMode {
 
