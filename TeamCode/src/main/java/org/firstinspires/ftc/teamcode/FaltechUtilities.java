@@ -85,5 +85,6 @@ public class FaltechUtilities {
     public static boolean isValueChangedAndEqualTo(String key, Object newValue, Object targetValue) {
         return (isValueChanged(key,newValue) && newValue==targetValue);
     }
+
 }
 

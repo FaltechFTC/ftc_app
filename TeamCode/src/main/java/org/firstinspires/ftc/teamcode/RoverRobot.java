@@ -47,6 +47,7 @@ public class RoverRobot {
         drive.setRunModeEncoder(isAutonomous);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
+        teamMarker.setPosition(0);
         initIMU();
     }
 

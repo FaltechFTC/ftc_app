@@ -21,6 +21,7 @@ public abstract class IDrive {
 
     public boolean isMecanum() { return false;}
 
+
     double maxPower =1.0;
 
     public double getMaxPower() { return maxPower;}
@@ -68,6 +69,32 @@ public abstract class IDrive {
         return(0.0);
     }
 
+    int gearValue=1;
+    public void addGearValue(int gear){
+
+        this.gearValue = this.gearValue+gear;
+        if (gearValue > 3){
+            gearValue = 3;
+        }
+
+        if (gearValue < 1) {
+            gearValue = 1;
+        }
+
+    }
+
+    public double getRotateGearMultiplier() {
+        final double multipliers[]= new double[]{ 0.35, 0.45, 1.0};
+        return multipliers[gearValue-1];
+    }
+    public double getForwardGearMultiplier() {
+        final double multipliers[]= new double[]{ 0.3, 0.5, 1.0};
+        return multipliers[gearValue-1];
+    }
+    public double getSidewaysGearMultiplier() {
+        final double multipliers[]= new double[]{ 0.35, 0.5, 1.0};
+        return multipliers[gearValue-1];
+    }
 
 
 }

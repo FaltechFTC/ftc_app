@@ -46,8 +46,8 @@ public class RoverVision {
 
         Recognition bestGold=null; // use this to track the best gold that we find.
 
-        while ((opMode==null || opMode.opModeIsActive()) && runTime.milliseconds()<maxMilliseconds) {
-            sleep(400); // give time to find stuff
+        while ((opMode==null || !opMode.isStopRequested()) && runTime.milliseconds()<maxMilliseconds) {
+            sleep(200); // give time to find stuff
 
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
@@ -70,7 +70,7 @@ public class RoverVision {
                 // if we found gold
                 if (obj.getLabel().equals(LABEL_GOLD_MINERAL)) {
                     // if it isn't too high (in crater) and if it has good confidence
-                    if (obj.getTop() < 600 && obj.getConfidence() > 50) {
+                    if (obj.getTop() > 800 && obj.getConfidence() > 0.50) {
                         // track this one as the best, if we don't have one yet
                         if (bestGold == null)
                             bestGold = obj;
@@ -100,7 +100,7 @@ public class RoverVision {
         // we aim camera to the right 2 positions, so if nothing found, then we're position 1
         if (bestGold==null) goldPosition=1;
             // if the gold is on the left of the screen, then that is the middle of the three
-        else if (bestGold.getLeft()<400) goldPosition=2;
+        else if (bestGold.getLeft()<300) goldPosition=2;
             // else it is on the right
         else goldPosition=3;
 

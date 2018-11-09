@@ -38,6 +38,7 @@ public class DriveMecanum extends IDrive{
     public DcMotor mtrBL = null;
     public DcMotor mtrBR = null;
     public DcMotor[] motors=null;
+    public int gearValue = 1;
 
     HardwareMap hwMap = null;
     public Telemetry telemetry = null;
@@ -320,6 +321,8 @@ public class DriveMecanum extends IDrive{
 
         stop();
     }
+
+
 
 }
 

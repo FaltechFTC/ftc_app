@@ -1,20 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 public class RoverTeleop extends OpMode{
-    @TeleOp(name="RoverMecanumTeleop", group="7079")
-    public static class RoverMecanumTeleop extends RoverTeleop {
-        @Override public void init() {
-            robot = new RoverRobot(new DriveMecanum());
-            driverMode=0;
-            super.init();
-        }
-    }
+//    @TeleOp(name="RoverMecanumTeleop", group="7079")
+//    public static class RoverMecanumTeleop extends RoverTeleop {
+//        @Override public void init() {
+//            robot = new RoverRobot(new DriveMecanum());
+//            driverMode=0;
+//            super.init();
+//        }
+//    }
 
-    @TeleOp(name="RoverMecanumTeleopMode1", group="7079")
+    @TeleOp(name="RoverMecanumTeleOp", group="7079")
     public static class RoverMecanumTeleopMode1 extends RoverTeleop {
         @Override public void init() {
             robot = new RoverRobot(new DriveMecanum());
@@ -24,6 +25,7 @@ public class RoverTeleop extends OpMode{
     }
 
     @TeleOp(name="RoverTankTeleop", group="7079")
+    @Disabled
     public static class RoverTankTeleop extends RoverTeleop {
         @Override public void init() {
             robot = new RoverRobot(new DriveTank());
@@ -60,6 +62,7 @@ public class RoverTeleop extends OpMode{
             doArmExtender();
             doRobotLift();
             doTeamMarker();
+            doGears();
         }
         telemetry.update();
     }
@@ -80,6 +83,10 @@ public class RoverTeleop extends OpMode{
             rotate=leftX;
             sideways=rightX*.7;
         }
+
+        rotate*=robot.drive.getRotateGearMultiplier();
+        forward*=robot.drive.getForwardGearMultiplier();
+        sideways*=robot.drive.getSidewaysGearMultiplier();
 
         double maxPower=Math.max(Math.abs(forward),Math.abs(rotate));
         maxPower=Math.max(maxPower,Math.abs(sideways));
@@ -143,6 +150,13 @@ public class RoverTeleop extends OpMode{
              robot.teamMarker.setPosition(1);
          else if (gamepad2.x)
              robot.teamMarker.setPosition(0);
+    }
+    public void doGears(){
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpd", gamepad1.dpad_down, true))
+            robot.drive.addGearValue(-1);
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dpu", gamepad1.dpad_up, true))
+            robot.drive.addGearValue(1);
+        telemetry.addData("Gear", robot.drive.gearValue);
     }
 
     public void doOperations() {

@@ -15,7 +15,7 @@ public class RoverAuto extends LinearOpMode {
     boolean isEnableDepotRun=false;
     boolean isEnableCraterRun=true;
     boolean isStartFacingCrater=false;
-    boolean isEnableCV=false;
+    boolean isEnableCV=true;
     boolean isStartLatched=false;
     double maxPowerAuto = 0.5;
     double maxTurningPower = 0.3;
@@ -76,10 +76,12 @@ public class RoverAuto extends LinearOpMode {
 
             robot.roverLift.setPower(-.05);   // lower the robot to slowly to ground
             sleep(1000);
+            if (isStopRequested()) return;
             robot.roverLift.setPower(-.2);   // lower more, and release arm higher to clear
             sleep(1000);
             robot.roverLift.setPower(0);  // stop lift
 
+            if (isStopRequested()) return;
 
             // rotate hook out of latch
             robot.drive.driveFRS(0, -.25, 0, 0.3);
@@ -90,10 +92,12 @@ public class RoverAuto extends LinearOpMode {
             robot.roverLift.setPower(0.6);
             sleep(2200);
             robot.roverLift.setPower(0.0);
+            if (isStopRequested()) return;
 
             robot.drive.driveFRS(0, .25, 0, 0.3);
             sleep(200);
             robot.drive.stop();
+            if (isStopRequested()) return;
 
             // back up clean against lander
             robot.drive.driveFRS(-.15, 0, 0, 0.3);
@@ -106,7 +110,7 @@ public class RoverAuto extends LinearOpMode {
     public void doMinerals() {
 
         if (isEnableCV) {
-            goldPosition=vision.doVision(28000, this);
+            goldPosition=vision.doVision(3000, this);
             if (goldPosition==0) goldPosition=1;  // vision failed completely, default to 1
         }
 
@@ -115,13 +119,13 @@ public class RoverAuto extends LinearOpMode {
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             goldDegrees = -30;
-            knockOffDistance = 16;
+            knockOffDistance = 18;
         } else if (goldPosition == 2) { // middle
             goldDegrees = 0;
-            knockOffDistance = 14;
+            knockOffDistance = 22;
         } else {   // right of the robot
             goldDegrees = 30;
-            knockOffDistance = 16;
+            knockOffDistance = 20;
         }
         robot.drive.setRunModeEncoder(false);
 
@@ -134,6 +138,10 @@ public class RoverAuto extends LinearOpMode {
         operation.run();
         robot.stop();
         sleep(1500);
+
+
+
+
     }
 
     public void doDepot() {
@@ -147,25 +155,33 @@ public class RoverAuto extends LinearOpMode {
                 5. Drive back till the crater and park in the crater
          */
         double turnToDepotDegrees;
-        double turnToDepotDistance;
+        double goToDepotDistance;
 
         if (goldPosition == 1) {
             operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 10);
             operation.run();
-            turnToDepotDegrees = 60;
-            turnToDepotDistance = 20;
+            turnToDepotDegrees = 40;
+            goToDepotDistance = 20;
         } else if (goldPosition == 2){
-            turnToDepotDegrees = 0;
-            turnToDepotDistance = 30;
+            turnToDepotDegrees = 30;
+            goToDepotDistance = 20;
         } else {
             turnToDepotDegrees = -50;
-            turnToDepotDistance = 20;
+            goToDepotDistance = 20;
         }
-        operation = robot.getOperationRotateToHeading(60, maxTurningPower, degreesError, 3000);
+        operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
 
-        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 10);
+        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, goToDepotDistance);
         operation.run();
+
+        robot.teamMarker.setPosition(1);
+
+        robot.drive.driveFRS(0, .25, 0, 0.3);
+        sleep(200);
+        robot.drive.stop();
+
+
     }
 
     public void doArmOverCrater() {
@@ -181,7 +197,10 @@ public class RoverAuto extends LinearOpMode {
     public void doCrater() {
 
         if (!isEnableCraterRun) return;
-
+        if (goldPosition == 1){
+            operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, 3000);
+            operation.run();
+        }
         doArmOverCrater();
 
 //
