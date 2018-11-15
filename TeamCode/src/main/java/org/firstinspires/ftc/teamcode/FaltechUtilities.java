@@ -1,6 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Properties;
 
 public class FaltechUtilities {
 
@@ -85,6 +91,65 @@ public class FaltechUtilities {
     public static boolean isValueChangedAndEqualTo(String key, Object newValue, Object targetValue) {
         return (isValueChanged(key,newValue) && newValue==targetValue);
     }
+    static public Properties props = new Properties();
+
+    public static void readProperties(){
+        ;
+        InputStream propertiesFile = null;
+        try {
+            File file = new File("Rover.properties");
+            propertiesFile = new FileInputStream(file);
+            props.load(propertiesFile);
+
+
+           // roverAuto.maxPowerAuto = Double.parseDouble(prop.getProperty("maxPowerAuto", Double.toString(maxPowerAuto)));
+
+            //roverAuto.maxPowerAuto = getDouble(prop.getProperty("maxPowerAuto"), roverAuto.maxPowerAuto);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if(propertiesFile !=null){
+                    propertiesFile.close();
+                }
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+    public static double getPropDouble(String propertyName, Double defaultValue){
+         try{
+                return Double.parseDouble(props.getProperty(propertyName, defaultValue.toString()));
+            } catch (Exception e){
+
+                return defaultValue;
+            }
+
+    }
+    public static int getPropInteger(String propertyName, int defaultValue){
+        try{
+            return Integer.parseInt(props.getProperty(propertyName, Integer.toString(defaultValue)));
+        } catch (Exception e){
+
+            return defaultValue;
+        }
+
+    }
+    public static boolean getPropBoolean(String propertyName, boolean defaultValue){
+        try{
+            return Boolean.parseBoolean(props.getProperty(propertyName, Boolean.toString(defaultValue)));
+        } catch (Exception e){
+
+            return defaultValue;
+        }
+
+    }
+
 
 }
 

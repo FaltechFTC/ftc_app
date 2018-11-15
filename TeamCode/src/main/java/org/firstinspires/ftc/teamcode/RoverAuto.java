@@ -4,6 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+
 @Autonomous(name="RoverAuto", group="7079")
 public class RoverAuto extends LinearOpMode {
 
@@ -11,12 +19,12 @@ public class RoverAuto extends LinearOpMode {
     private RoverRobot robot = null;
     private RoverVision vision = null;
     RoverRobot.Operation operation= null;
-    boolean isRedAlliance=false;
+    boolean isRedAlliance=true;
     boolean isEnableDepotRun=false;
     boolean isEnableCraterRun=true;
-    boolean isStartFacingCrater=false;
+    boolean isStartFacingCrater=true;
     boolean isEnableCV=true;
-    boolean isStartLatched=false;
+    boolean isStartLatched=true;
     double maxPowerAuto = 0.5;
     double maxTurningPower = 0.3;
     double degreesError =3;
@@ -36,7 +44,10 @@ public class RoverAuto extends LinearOpMode {
         telemetry.addData("Status", "Robot Initialized");
         telemetry.update();
 
+        configValues();
         configMode();
+
+
 
         if (isEnableCV &&  !isStopRequested()) {
             vision=new RoverVision(hardwareMap, telemetry);
@@ -133,7 +144,9 @@ public class RoverAuto extends LinearOpMode {
         operation.run();
         robot.stop();
         robot.drive.setRunModeEncoder(false);
-
+        if (isStopRequested()){
+            return;
+        }
         operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, knockOffDistance);
         operation.run();
         robot.stop();
@@ -323,12 +336,42 @@ public class RoverAuto extends LinearOpMode {
             }
 
             sleep(100);
-        } while (!gamepad1.right_bumper || isStopRequested());
+        } while (!gamepad1.right_bumper && !isStopRequested());
 
         telemetry.addData("ConfigMode" , lastModes);
         telemetry.update();
 
         RobotLog.i("configMode() stop");
     }
+    void configValues(){
+        //        boolean isRedAlliance=true;
+//        boolean isEnableDepotRun=false;
+//        boolean isEnableCraterRun=true;
+//        boolean isStartFacingCrater=true;
+//        boolean isEnableCV=true;
+//        boolean isStartLatched=true;
+//        double maxPowerAuto = 0.5;
+//        double maxTurningPower = 0.3;
+//        double degreesError =3;
+//        int goldPosition = 1;
+//        double goldDegrees = 5;
+//        double knockOffDistance =24;
+
+        FaltechUtilities.readProperties();
+        isRedAlliance = FaltechUtilities.getPropBoolean("isRedAlliance", isRedAlliance);
+        isEnableDepotRun = FaltechUtilities.getPropBoolean("isEnableDepotRun", isEnableDepotRun);
+        isEnableCraterRun = FaltechUtilities.getPropBoolean("isEnableCraterRun", isEnableCraterRun);
+        isStartFacingCrater = FaltechUtilities.getPropBoolean("isStartFacingCrater", isStartFacingCrater);
+        isEnableCV = FaltechUtilities.getPropBoolean("isEnableCV", isEnableCV);
+        isStartLatched = FaltechUtilities.getPropBoolean("isStartLatched", isStartLatched);
+        maxPowerAuto = FaltechUtilities.getPropDouble("maxPowerAuto",maxPowerAuto);
+        maxTurningPower = FaltechUtilities.getPropDouble("maxTurningPower", maxTurningPower);
+        degreesError = FaltechUtilities.getPropDouble("degreesError", degreesError);
+        goldPosition = FaltechUtilities.getPropInteger("goldPosition", goldPosition);
+        goldDegrees = FaltechUtilities.getPropDouble("goldDegrees", goldDegrees);
+        knockOffDistance = FaltechUtilities.getPropDouble("knockOffDistance", knockOffDistance);
+
+    }
+
 
 }
