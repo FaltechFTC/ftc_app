@@ -275,6 +275,11 @@ public class RoverRobot {
         }
     }
 
+    public boolean isDistanceWithinRange(double startingEncoder, double targetEncoder){
+        if (Math.abs(startingEncoder - targetEncoder)<= drive.convertInchesToClicks(1)) return true;
+        return false;
+    }
+
     public class DriveToHeading extends Operation {
         double targetDegrees, maxTurnPower, maxDrivePower, targetDegreesAcceptableError, targetDistance;
         long lastTime = System.currentTimeMillis();
@@ -306,7 +311,7 @@ public class RoverRobot {
             double drivePidIntMax = 180.0;
             double drivePidIntMin = -drivePidIntMax;
 
-            if (targetDistance>0.0) {
+            if (targetDistance!=0.0) {
               //  drive.resetEncoders();
                 startingEncoder=drive.getEncoderClicksAbs();
                 targetEncoder=startingEncoder+drive.convertInchesToClicks(targetDistance);
@@ -345,7 +350,7 @@ public class RoverRobot {
             RobotLog.i("DriveToHeading( startingEncoder=%f  targetEncoder=%f  currentEncoder=%f", startingEncoder, targetEncoder, curEncoder);
 
             // problem with this is that it needs to use a pid to scale back power to hit this distance accurately.
-            if (targetDistance!=0.0 && curEncoder>=targetEncoder) {
+            if (targetDistance!=0.0 && isDistanceWithinRange(curEncoder,targetEncoder)) {
                 onTarget = true;
                 RobotLog.i("ON TARGET!");
             } else {

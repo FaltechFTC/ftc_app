@@ -29,8 +29,8 @@ public class RoverAuto extends LinearOpMode {
     double maxTurningPower = 0.3;
     double degreesError =3;
     int goldPosition = 1;
-    double goldDegrees = 5;
-    double knockOffDistance =24;
+    double targetDegrees = 5;
+    double targetDistance =24;
 
 
     @Override
@@ -44,7 +44,7 @@ public class RoverAuto extends LinearOpMode {
         telemetry.addData("Status", "Robot Initialized");
         telemetry.update();
 
-        configValues();
+    //    configValues();
         configMode();
 
 
@@ -129,30 +129,33 @@ public class RoverAuto extends LinearOpMode {
         telemetry.update();
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
-            goldDegrees = -30;
-            knockOffDistance = 18;
+            targetDegrees = -30;
+            targetDistance = 18;
         } else if (goldPosition == 2) { // middle
-            goldDegrees = 0;
-            knockOffDistance = 22;
+            targetDegrees = 0;
+            targetDistance = 22;
         } else {   // right of the robot
-            goldDegrees = 30;
-            knockOffDistance = 20;
+            targetDegrees = 30;
+            targetDistance = 20;
         }
         robot.drive.setRunModeEncoder(false);
 
-        operation = robot.getOperationRotateToHeading(goldDegrees, maxTurningPower, degreesError, 3000);
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
         robot.stop();
         robot.drive.setRunModeEncoder(false);
         if (isStopRequested()){
             return;
         }
-        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, knockOffDistance);
+        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
         operation.run();
         robot.stop();
         sleep(1500);
 
-
+//    public void doWallride(){
+//    if (goldPosition == 1){
+//    robot.driveFRS(-1,0,0,0.5);
+//
 
 
     }
@@ -210,66 +213,35 @@ public class RoverAuto extends LinearOpMode {
     public void doCrater() {
 
         if (!isEnableCraterRun) return;
+        targetDistance = -10;
         if (goldPosition == 1){
-            operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, 3000);
-            operation.run();
-        }
-        doArmOverCrater();
+            targetDegrees = -30;
+            targetDistance = 20;
 
-//
-//        if (!isEnableDepotRun) {
-//            if (isStartFacingCrater) {
-//                // Crater auto
-//                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
-//                operation.run();
-//// rotate in the opposite direction of the 1, 2, 3 turn.
-//
-//                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 6);
-//                operation.run();
-//// move forwards 6 degrees to the crater
-//            }
-//            else {
-//                // Depot Auto
-//
-//
-////                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, -10);
-////                operation.run();
-////                sleep(1000);
-//
-//
-//                robot.drive.driveToInches(-12,0.4,2);
-//
-//                robot.drive.setRunModeEncoder(false);
-//
-//                operation = robot.getOperationRotateToHeading(-goldDegrees, maxTurningPower, degreesError, 3000);
-//                operation.run();
-//                sleep(1000);
-//
-//                // Back up
-//
-////Rotate so in original lander pos
-//                operation = robot.getOperationRotateToHeading(-60, maxTurningPower, degreesError, 3000);
-//                operation.run();
-//                sleep(1000);
-//// turn 90 degrees, so will be facing to left of crater.
-//                operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 20);
-//                operation.run();
-//                sleep(1500);
-////Move forwards to right next to crater
-//                operation = robot.getOperationRotateToHeading(-40, maxTurningPower, degreesError, 3000);
-//                operation.run();
-//                sleep(1500);
-//// rotate so facing crater
-//                operation = robot.getOperationDriveToHeading(-5, maxPowerAuto, 0, degreesError, 10000, 6);
-//                operation.run();
-//                sleep(1500);
-//                // move forwards to crater
-//            }
-////            robot.roverCollector.setPowerToArmExtender(0.4);
-////            sleep(1000);
-////            robot.roverCollector.setPowerToArmExtender(0);
-//            // no matter which route, end with extending arm at crater.
-//        }
+        } else if (goldPosition == 2){
+            targetDegrees = -60;
+            targetDistance = 32;
+        } else {
+            targetDegrees = -90;
+            targetDistance = 44;
+        }
+        //backing up 12 inches
+        telemetry.addData("backUpDistance=", 12);
+        telemetry.update();
+        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -12);
+        operation.run();
+        robot.stop();
+        // turning towards wall
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
+        // driving closer to the wall
+        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation.run();
+        robot.stop();
+//        doArmOverCrater();
+
+
     }
 
     void configMode() {
@@ -344,18 +316,6 @@ public class RoverAuto extends LinearOpMode {
         RobotLog.i("configMode() stop");
     }
     void configValues(){
-        //        boolean isRedAlliance=true;
-//        boolean isEnableDepotRun=false;
-//        boolean isEnableCraterRun=true;
-//        boolean isStartFacingCrater=true;
-//        boolean isEnableCV=true;
-//        boolean isStartLatched=true;
-//        double maxPowerAuto = 0.5;
-//        double maxTurningPower = 0.3;
-//        double degreesError =3;
-//        int goldPosition = 1;
-//        double goldDegrees = 5;
-//        double knockOffDistance =24;
 
         FaltechUtilities.readProperties();
         isRedAlliance = FaltechUtilities.getPropBoolean("isRedAlliance", isRedAlliance);
@@ -368,8 +328,8 @@ public class RoverAuto extends LinearOpMode {
         maxTurningPower = FaltechUtilities.getPropDouble("maxTurningPower", maxTurningPower);
         degreesError = FaltechUtilities.getPropDouble("degreesError", degreesError);
         goldPosition = FaltechUtilities.getPropInteger("goldPosition", goldPosition);
-        goldDegrees = FaltechUtilities.getPropDouble("goldDegrees", goldDegrees);
-        knockOffDistance = FaltechUtilities.getPropDouble("knockOffDistance", knockOffDistance);
+        targetDegrees = FaltechUtilities.getPropDouble("targetDegrees", targetDegrees);
+        targetDistance = FaltechUtilities.getPropDouble("targetDistance", targetDistance);
 
     }
 
