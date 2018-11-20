@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.github.pmtischler.control.Pid;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -11,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class RoverRobot {
@@ -29,6 +32,8 @@ public class RoverRobot {
     double globalAngle;
     public Servo teamMarker = null;
     boolean isAutonomous=false;
+    Rev2mDistanceSensor frontDistance;
+    Rev2mDistanceSensor sideDistance;
 
     //Constructor//
     public RoverRobot(IDrive drive) {
@@ -42,6 +47,9 @@ public class RoverRobot {
         this.isAutonomous=isAutonomous;
 
         teamMarker = hwMap.get(Servo.class, "teamMarker");
+
+        frontDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "frontDistance");
+        sideDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "sideDistance");
 
         drive.init(hwMap, telemetry);
         drive.setRunModeEncoder(isAutonomous);
@@ -368,6 +376,12 @@ public class RoverRobot {
         return new DriveToHeading(targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
     }
 
+    public void logSensors()
+    {
+       double fd= frontDistance.getDistance(DistanceUnit.CM);
+       double sd= sideDistance.getDistance(DistanceUnit.CM);
+       telemetry.addData("Distance", "front=" + fd + " side=" + sd);
+    }
 
     protected void sleep(long millis) {
         try {
