@@ -62,6 +62,8 @@ public class RoverAuto extends LinearOpMode {
         telemetry.addData("Status", "Running Autonomous!");
         telemetry.update();
 
+    //    doTempDistance();
+
        if (!isStopRequested()) doLander();
        if (!isStopRequested()) doMinerals();
        if (!isStopRequested()) doDepot();
@@ -225,6 +227,7 @@ public class RoverAuto extends LinearOpMode {
             targetDegrees = -90;
             targetDistance = 44;
         }
+        targetDistance = 15;
         //backing up 12 inches
         telemetry.addData("backUpDistance=", 12);
         telemetry.update();
@@ -236,12 +239,18 @@ public class RoverAuto extends LinearOpMode {
         operation.run();
         robot.stop();
         // driving closer to the wall
-        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation = robot.getOperationDriveToDistance(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
         operation.run();
         robot.stop();
 //        doArmOverCrater();
 
 
+    }
+    public void doTempDistance(){
+        targetDistance = 15;
+        operation = robot.getOperationDriveToDistance(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation.run();
+        robot.stop();
     }
 
     void configMode() {
