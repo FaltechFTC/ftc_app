@@ -485,8 +485,8 @@ public class RoverRobot {
 
     public void logSensors()
     {
-       double fd= frontDistance.getDistance(DistanceUnit.CM);
-       double sd= sideDistance.getDistance(DistanceUnit.CM);
+       double fd= frontDistance.getDistance(DistanceUnit.INCH);
+       double sd= sideDistance.getDistance(DistanceUnit.INCH);
        telemetry.addData("Distance", "front=" + fd + " side=" + sd);
     }
 

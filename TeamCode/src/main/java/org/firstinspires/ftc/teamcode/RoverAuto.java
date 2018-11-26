@@ -215,21 +215,20 @@ public class RoverAuto extends LinearOpMode {
     public void doCrater() {
 
         if (!isEnableCraterRun) return;
-        targetDistance = -10;
         if (goldPosition == 1){
             targetDegrees = -30;
-            targetDistance = 20;
+            targetDistance = 30;
 
         } else if (goldPosition == 2){
             targetDegrees = -60;
-            targetDistance = 32;
+            targetDistance = 50 ;
         } else {
             targetDegrees = -90;
-            targetDistance = 44;
+            targetDistance = 70;
         }
-        targetDistance = 15;
+        //targetDistance = 20;
         //backing up 12 inches
-        telemetry.addData("backUpDistance=", 12);
+        telemetry.addData("backUpDistance=", 9);
         telemetry.update();
         operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -12);
         operation.run();
@@ -239,7 +238,7 @@ public class RoverAuto extends LinearOpMode {
         operation.run();
         robot.stop();
         // driving closer to the wall
-        operation = robot.getOperationDriveToDistance(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
         operation.run();
         robot.stop();
 //        doArmOverCrater();
