@@ -34,7 +34,7 @@ public class RoverTeleop extends OpMode{
     }
 
     RoverRobot robot = null;
-    RoverRobot.Operation operation= null;
+    Operation operation= null;
     int driverMode =0;
 
     @Override
