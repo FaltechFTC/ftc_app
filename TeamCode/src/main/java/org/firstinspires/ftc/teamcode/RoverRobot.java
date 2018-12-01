@@ -55,11 +55,12 @@ public class RoverRobot {
         drive.setRunModeEncoder(isAutonomous);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
-        teamMarker.setPosition(0);
-        initIMU();
+       // teamMarker.setPosition(0);
+        if(isAutonomous) initIMU();
     }
 
     private void initIMU() {
+
         RobotLog.i("initIMU() start");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

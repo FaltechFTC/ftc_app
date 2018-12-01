@@ -54,7 +54,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-        doOperations();
+       // doOperations();
         if (operation==null) {
             doDrive();
             doArmLift();

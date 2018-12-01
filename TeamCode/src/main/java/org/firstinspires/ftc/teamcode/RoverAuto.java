@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import java.io.File;
@@ -18,7 +19,7 @@ public class RoverAuto extends LinearOpMode {
     // Update from 10/13/18
     private RoverRobot robot = null;
     private RoverVision vision = null;
-    RoverRobot.Operation operation= null;
+    Operation operation= null;
     boolean isRedAlliance=true;
     boolean isEnableDepotRun=false;
     boolean isEnableCraterRun=true;
@@ -33,26 +34,26 @@ public class RoverAuto extends LinearOpMode {
     double targetDistance =24;
 
 
+
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
         telemetry.addData("Status", "Begin Robot Initialization");
         telemetry.update();
         robot = new RoverRobot(new DriveMecanum());
+//        msStuckDetectInit = 999000;
+//        msStuckDetectInitLoop = 999000;
+//        msStuckDetectLoop = 999000;
+//        msStuckDetectStart = 999000;
+//        msStuckDetectStop = 999000;
 
         robot.init(hardwareMap, telemetry, true);
 
         telemetry.addData("Status", "Robot Initialized");
         telemetry.update();
 
-    //    configValues();
+        configValues();
         configMode();
 
-
-
-        if (isEnableCV &&  !isStopRequested()) {
-            vision=new RoverVision(hardwareMap, telemetry);
-            vision.initVision();
-        }
 
         telemetry.addData("Status", "Configured. Waiting for Start");
         telemetry.update();
@@ -63,6 +64,10 @@ public class RoverAuto extends LinearOpMode {
         telemetry.update();
 
     //    doTempDistance();
+        if (isEnableCV &&  !isStopRequested()) {
+            vision=new RoverVision(hardwareMap, telemetry);
+            vision.initVision();
+        }
 
        if (!isStopRequested()) doLander();
        if (!isStopRequested()) doMinerals();
@@ -135,7 +140,7 @@ public class RoverAuto extends LinearOpMode {
             targetDistance = 18;
         } else if (goldPosition == 2) { // middle
             targetDegrees = 0;
-            targetDistance = 22;
+            targetDistance = 20;
         } else {   // right of the robot
             targetDegrees = 30;
             targetDistance = 20;
@@ -145,6 +150,7 @@ public class RoverAuto extends LinearOpMode {
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
         robot.stop();
+        sleep(1500);
         robot.drive.setRunModeEncoder(false);
         if (isStopRequested()){
             return;
@@ -176,24 +182,27 @@ public class RoverAuto extends LinearOpMode {
         double goToDepotDistance;
 
         if (goldPosition == 1) {
-            operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, 10);
-            operation.run();
-            turnToDepotDegrees = 40;
-            goToDepotDistance = 20;
+            turnToDepotDegrees = 75;
+            goToDepotDistance = 40;
         } else if (goldPosition == 2){
-            turnToDepotDegrees = 30;
-            goToDepotDistance = 20;
+            turnToDepotDegrees = 0;
+            goToDepotDistance = 25;
         } else {
-            turnToDepotDegrees = -50;
-            goToDepotDistance = 20;
+            turnToDepotDegrees = -40;
+            goToDepotDistance = 30;
         }
         operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
+        robot.sleep(1000);
 
         operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, goToDepotDistance);
         operation.run();
-
+        telemetry.addData("Team Marker Value:", "1");
+        telemetry.update();
+        robot.sleep(3000);
+        robot.teamMarker.setPosition(0);
         robot.teamMarker.setPosition(1);
+
 
         robot.drive.driveFRS(0, .25, 0, 0.3);
         sleep(200);
@@ -221,16 +230,16 @@ public class RoverAuto extends LinearOpMode {
 
         } else if (goldPosition == 2){
             targetDegrees = -60;
-            targetDistance = 50 ;
+            targetDistance = 45 ;
         } else {
             targetDegrees = -90;
-            targetDistance = 70;
+            targetDistance = 50;
         }
         //targetDistance = 20;
         //backing up 12 inches
         telemetry.addData("backUpDistance=", 9);
         telemetry.update();
-        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -12);
+        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -9);
         operation.run();
         robot.stop();
         // turning towards wall
@@ -241,6 +250,24 @@ public class RoverAuto extends LinearOpMode {
         operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
         operation.run();
         robot.stop();
+        robot.sleep(2000);
+
+        targetDegrees = -20;
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
+
+        targetDistance = 22;
+        operation = robot.getOperationDriveToDistance(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation.run();
+        robot.stop();
+
+        robot.teamMarker.setPosition(1);
+
+        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -70);
+        operation.run();
+        robot.stop();
+
 //        doArmOverCrater();
 
 
@@ -258,6 +285,7 @@ public class RoverAuto extends LinearOpMode {
         RobotLog.i("configMode() start");
         telemetry.addData("ConfigMode" , "Press right bumper to leave config mode.");
         telemetry.update();
+         ElapsedTime timer = new ElapsedTime();
 
         do {
 
@@ -316,7 +344,7 @@ public class RoverAuto extends LinearOpMode {
             }
 
             sleep(100);
-        } while (!gamepad1.right_bumper && !isStopRequested());
+        } while (!gamepad1.right_bumper && !isStopRequested() && (timer.seconds() <= 5));
 
         telemetry.addData("ConfigMode" , lastModes);
         telemetry.update();
