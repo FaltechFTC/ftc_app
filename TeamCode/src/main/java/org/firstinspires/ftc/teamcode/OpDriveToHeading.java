@@ -5,14 +5,12 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 public class OpDriveToHeading extends Operation {
     double targetDegrees, maxTurnPower, maxDrivePower, targetDegreesAcceptableError, targetDistance;
-    long lastTime = System.currentTimeMillis();
     Pid pidR, pidDrive;
     double startingEncoder=0.0;
     double targetEncoder;
 
     Boolean onTarget = false;
     Boolean halt = false;
-    double deltaTime = .001;
 
     public OpDriveToHeading(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
        super(robot);
@@ -58,16 +56,12 @@ public class OpDriveToHeading extends Operation {
         RobotLog.i("begin loop %d : %s", numLoops, pidR.toString());
 
         double relativeAngle = -robot.getRelativeAngle();
-        double deltaTime = ((double) (curMS - lastTime)) / 1000.0;
-
         RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
 
         double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
         RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
 
         robot.drive.driveFRS(maxDrivePower, rotatePower, 0.0);
-
-        lastTime = curMS;
 
         double curEncoder= robot.drive.getEncoderClicksAbs();
 

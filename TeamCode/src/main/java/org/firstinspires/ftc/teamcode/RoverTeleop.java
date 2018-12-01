@@ -54,7 +54,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-       // doOperations();
+       doOperations();
         if (operation==null) {
             doDrive();
             doArmLift();
@@ -170,8 +170,9 @@ public class RoverTeleop extends OpMode{
             double degreesError=2.0;
             long timeoutMS=4000;
 
-            if (gamepad2.dpad_right) operation = robot.getOperationRotateToHeading(45, maxTurningPower, degreesError, timeoutMS);
-            else if (gamepad2.dpad_left) operation = robot.getOperationRotateToHeading(-45, maxTurningPower, degreesError, timeoutMS);
+            // getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
+            if (gamepad2.dpad_right) operation = robot.getOperationWallDrive(0, maxDrivePower, .2,10000,15,10);
+            else if (gamepad2.dpad_left) operation = robot.getOperationWallDrive(0, maxDrivePower, .2,10000,15,20);
             else if (gamepad2.dpad_up) {
                 if (operation!=null) {operation.done(); operation=null;}
                 robot.resetRelativeAngleToZero();

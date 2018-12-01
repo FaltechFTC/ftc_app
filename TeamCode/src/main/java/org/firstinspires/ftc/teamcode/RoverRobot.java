@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.github.pmtischler.control.Pid;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -176,23 +175,28 @@ public class RoverRobot {
         return false;
     }
 
-    org.firstinspires.ftc.teamcode.Operation getOperationRotateToHeading(double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
+    Operation getOperationRotateToHeading(double targetDegrees, double maxPower, double targetDegreesAcceptableError, long timeoutMS) {
         return new OpRotateToHeading(this, targetDegrees, maxPower, targetDegreesAcceptableError, timeoutMS);
     }
 
-    org.firstinspires.ftc.teamcode.Operation getOperationDriveToHeading(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
+    Operation getOperationDriveToHeading(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
         return new OpDriveToHeading(this, targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
     }
 
-    org.firstinspires.ftc.teamcode.Operation getOperationDriveToDistance(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
+    Operation getOperationDriveToDistance(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
         return new OpDriveToDistance(this, targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
     }
+    Operation getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
+        return new OpWallride(this,    targetDegrees, maxDrivePower, maxTurnPower, timeoutMS,  targetDistance, targetDistanceToWall);
 
+    }
+
+    // OpWallride(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall)
     public void logSensors()
     {
        double fd= frontDistance.getDistance(DistanceUnit.INCH);
        double sd= sideDistance.getDistance(DistanceUnit.INCH);
-       telemetry.addData("Distance", "front=" + fd + " side=" + sd);
+       telemetry.addData("Distance", "(inches) front=" + fd + " side=" + sd);
     }
 
     protected void sleep(long millis) {

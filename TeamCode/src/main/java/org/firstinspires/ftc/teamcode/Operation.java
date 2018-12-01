@@ -4,7 +4,9 @@ public class Operation {
     protected RoverRobot robot;
     public long timeoutMS=9999;
     public long startMS=System.currentTimeMillis();
-    public long curMS=0;
+    public long curMS=startMS, lastTime=startMS;
+    double deltaTime =0;
+
     public boolean done=false;
     public boolean timeout=false;
     public long numLoops=0;
@@ -26,6 +28,8 @@ public class Operation {
         if (done) return false;
         numLoops++;
         curMS=System.currentTimeMillis();
+        deltaTime= ((double) (curMS - lastTime)) / 1000.0;
+        lastTime = curMS;
         if (curMS-startMS > timeoutMS) {timeout=true; done(); return false;}
         return true;
         // keep looping ...
