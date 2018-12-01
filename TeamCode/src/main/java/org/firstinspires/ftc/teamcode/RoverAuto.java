@@ -5,16 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
-
-@Autonomous(name="RoverAuto", group="7079")
-public class RoverAuto extends LinearOpMode {
+public abstract class RoverAuto extends LinearOpMode {
 
     // Update from 10/13/18
     private RoverRobot robot = null;
@@ -33,47 +24,67 @@ public class RoverAuto extends LinearOpMode {
     double targetDegrees = 5;
     double targetDistance =24;
 
+    boolean configOnly=false;
 
+    @Autonomous(name="RoverAuto Configure", group="7079")
+    public static class RoverAutoConfig extends RoverAuto {
+        public RoverAutoConfig () {
+            configOnly=true;
+        }
+    }
+
+    @Autonomous(name="RoverAuto Run", group="7079")
+    public static class RoverAutoRun extends RoverAuto {
+        public RoverAutoRun () {
+            configOnly=false;
+        }
+    }
 
     @Override
     public void runOpMode() throws InterruptedException{
+        telemetry.addData("Status", "Started");
+        telemetry.update();
+        initRobot(!configOnly);
+
+        if (configOnly) {
+            readConfigValues();
+            configMode();
+            writeConfigValues();
+            telemetry.addData("Status", "Configuration SAVED.");
+            telemetry.update();
+        } else {
+            readConfigValues();
+            logConfigModes(false);
+            telemetry.addData("Status", "Configuration LOADED. Waiting for Start");
+            telemetry.update();
+
+            waitForStart();
+
+            telemetry.addData("Status", "Running Autonomous!");
+            telemetry.update();
+
+            //    doTempDistance();
+            if (isEnableCV && !isStopRequested()) {
+                vision = new RoverVision(hardwareMap, telemetry);
+                vision.initVision();
+            }
+
+            if (!isStopRequested()) doLander();
+            if (!isStopRequested()) doMinerals();
+            if (!isStopRequested()) doDepot();
+            if (!isStopRequested()) doCrater();
+        }
+        robot.stop();
+    }
+
+    public void initRobot(boolean isAutonomous) {
         telemetry.addData("Status", "Begin Robot Initialization");
         telemetry.update();
         robot = new RoverRobot(new DriveMecanum());
-//        msStuckDetectInit = 999000;
-//        msStuckDetectInitLoop = 999000;
-//        msStuckDetectLoop = 999000;
-//        msStuckDetectStart = 999000;
-//        msStuckDetectStop = 999000;
-
-        robot.init(hardwareMap, telemetry, true);
+        robot.init(hardwareMap, telemetry, isAutonomous);
 
         telemetry.addData("Status", "Robot Initialized");
         telemetry.update();
-
-        configValues();
-        configMode();
-
-
-        telemetry.addData("Status", "Configured. Waiting for Start");
-        telemetry.update();
-
-        waitForStart();
-
-        telemetry.addData("Status", "Running Autonomous!");
-        telemetry.update();
-
-    //    doTempDistance();
-        if (isEnableCV &&  !isStopRequested()) {
-            vision=new RoverVision(hardwareMap, telemetry);
-            vision.initVision();
-        }
-
-       if (!isStopRequested()) doLander();
-       if (!isStopRequested()) doMinerals();
-       if (!isStopRequested()) doDepot();
-       if (!isStopRequested()) doCrater();
-       robot.stop();
     }
 
     public void doLander() {
@@ -89,8 +100,6 @@ public class RoverAuto extends LinearOpMode {
             // lift to disengage holding pin
             robot.roverLift.setPower(1.0);
             sleep(600);
-
-
 
             robot.roverLift.setPower(-.05);   // lower the robot to slowly to ground
             sleep(1000);
@@ -302,56 +311,53 @@ public class RoverAuto extends LinearOpMode {
             if (FaltechUtilities.isValueChangedAndEqualTo("1.dr",gamepad1.dpad_right,true))
                 isEnableCraterRun= !isEnableCraterRun;
 
-
-
             if (FaltechUtilities.isValueChangedAndEqualTo("1.dd",gamepad1.dpad_down,true)) {
                 goldPosition++;
                 if (goldPosition > 3) goldPosition = 1;
 
             }
 
-/*            // just a test...  to be reworked...  can we do this at start?
-            double liftPower=FaltechUtilities.clipDeadzone(gamepad1.right_trigger-gamepad1.left_trigger,.2);
-            if (liftPower>0) robot.roverLift.mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // TODO: remove this...
-            robot.roverLift.setPower(liftPower);
-*/
-
-            String modes="";
-            modes+="Alliance="+(isRedAlliance?"Red":"Blue");
-            modes+=", Facing="+(isStartFacingCrater?"Crater":"Depot");
-            modes+=", CV="+(isEnableCV?"Enabled":"Disabled");
-            modes+=", Hanging="+(isStartLatched?"Latched":"On The Ground");
-            modes+=", Gold = "+goldPosition;
-            modes+=", Depot Run="+(isEnableDepotRun?"On":"Off");
-            modes+=", Crater Run="+(isEnableCraterRun?"On":"Off");
-
             double liftPower = FaltechUtilities.clipDeadzone( gamepad2.left_stick_y, .1);
             robot.roverLift.setPower(-liftPower);
-            // joystick up is negative need to switch
-            if (!modes.equals(lastModes)) {
-                telemetry.addData("Alliance (X)", isRedAlliance?"Red":"Blue");
-                telemetry.addData("Facing (Y)", isStartFacingCrater?"Crater":"Depot");
-                telemetry.addData("Vision(A)", isEnableCV?"Enabled":"Disabled");
-                telemetry.addData("Hanging(B)", isStartLatched?"Latched":"On The Ground");
-                telemetry.addData("Gold Position(Dpad_Down) = ", goldPosition);
-                telemetry.addData("Depot(Dpad_Left) = ", isEnableDepotRun?"On":"Off");
-                telemetry.addData("Crater(Dpad_Right) = ", isEnableCraterRun?"On":"Off");
-                telemetry.addData("ConfigMode" , "Press right bumper to leave config mode.");
-                telemetry.update();
-
-                RobotLog.i(modes);
-                lastModes=modes;
-            }
-
+            logConfigModes(true);
             sleep(100);
-        } while (!gamepad1.right_bumper && !isStopRequested() && (timer.seconds() <= 5));
+        } while (!gamepad1.right_bumper && !isStopRequested());
 
         telemetry.addData("ConfigMode" , lastModes);
         telemetry.update();
 
         RobotLog.i("configMode() stop");
     }
-    void configValues(){
+
+    private String lastModes="";
+    void logConfigModes(boolean update) {
+        String modes="";
+        modes+="Alliance="+(isRedAlliance?"Red":"Blue");
+        modes+=", Facing="+(isStartFacingCrater?"Crater":"Depot");
+        modes+=", CV="+(isEnableCV?"Enabled":"Disabled");
+        modes+=", Hanging="+(isStartLatched?"Latched":"On The Ground");
+        modes+=", Gold = "+goldPosition;
+        modes+=", Depot Run="+(isEnableDepotRun?"On":"Off");
+        modes+=", Crater Run="+(isEnableCraterRun?"On":"Off");
+
+        telemetry.addData("Alliance (X)", isRedAlliance?"Red":"Blue");
+        telemetry.addData("Facing (Y)", isStartFacingCrater?"Crater":"Depot");
+        telemetry.addData("Vision(A)", isEnableCV?"Enabled":"Disabled");
+        telemetry.addData("Hanging(B)", isStartLatched?"Latched":"On The Ground");
+        telemetry.addData("Gold Position(Dpad_Down) = ", goldPosition);
+        telemetry.addData("Depot(Dpad_Left) = ", isEnableDepotRun?"On":"Off");
+        telemetry.addData("Crater(Dpad_Right) = ", isEnableCraterRun?"On":"Off");
+        if (configOnly) telemetry.addData("ConfigMode" , "Press right bumper to leave config mode.");
+        if (update) telemetry.update();
+
+        if (!modes.equals(lastModes)) {
+            RobotLog.i(modes);
+            lastModes=modes;
+        }
+
+
+    }
+    void readConfigValues(){
 
         FaltechUtilities.readProperties();
         isRedAlliance = FaltechUtilities.getPropBoolean("isRedAlliance", isRedAlliance);
@@ -366,6 +372,24 @@ public class RoverAuto extends LinearOpMode {
         goldPosition = FaltechUtilities.getPropInteger("goldPosition", goldPosition);
         targetDegrees = FaltechUtilities.getPropDouble("targetDegrees", targetDegrees);
         targetDistance = FaltechUtilities.getPropDouble("targetDistance", targetDistance);
+
+    }
+
+    void writeConfigValues(){
+
+        FaltechUtilities.setPropBoolean("isRedAlliance", isRedAlliance);
+        FaltechUtilities.setPropBoolean("isEnableDepotRun", isEnableDepotRun);
+        FaltechUtilities.setPropBoolean("isEnableCraterRun", isEnableCraterRun);
+        FaltechUtilities.setPropBoolean("isStartFacingCrater", isStartFacingCrater);
+        FaltechUtilities.setPropBoolean("isEnableCV", isEnableCV);
+        FaltechUtilities.setPropBoolean("isStartLatched", isStartLatched);
+        FaltechUtilities.setPropDouble("maxPowerAuto",maxPowerAuto);
+        FaltechUtilities.setPropDouble("maxTurningPower", maxTurningPower);
+        FaltechUtilities.setPropDouble("degreesError", degreesError);
+        FaltechUtilities.setPropInteger("goldPosition", goldPosition);
+        FaltechUtilities.setPropDouble("targetDegrees", targetDegrees);
+        FaltechUtilities.setPropDouble("targetDistance", targetDistance);
+        FaltechUtilities.writeProperties();
 
     }
 
