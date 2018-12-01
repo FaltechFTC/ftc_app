@@ -92,7 +92,7 @@ public abstract class IDrive {
         return multipliers[gearValue-1];
     }
     public double getSidewaysGearMultiplier() {
-        final double multipliers[]= new double[]{ 0.35, 0.5, 1.0};
+        final double multipliers[]= new double[]{ 0.6, 0.75, 1.0};
         return multipliers[gearValue-1];
     }
 

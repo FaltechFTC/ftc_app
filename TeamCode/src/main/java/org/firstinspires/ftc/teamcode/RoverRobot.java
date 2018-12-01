@@ -30,6 +30,7 @@ public class RoverRobot {
     Orientation lastAngles = new Orientation();
     public final AxesOrder axesOrder = AxesOrder.ZYX;
     double globalAngle;
+    double relativeAngleFromStart;
     public Servo teamMarker = null;
     boolean isAutonomous=false;
     Rev2mDistanceSensor frontDistance;
@@ -131,6 +132,7 @@ public class RoverRobot {
     protected void resetRelativeAngleToZero() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.DEGREES);
         globalAngle = 0;
+        relativeAngleFromStart += lastAngles.firstAngle;
     }
 
     /**

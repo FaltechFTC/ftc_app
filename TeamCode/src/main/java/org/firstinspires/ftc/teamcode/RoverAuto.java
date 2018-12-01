@@ -158,13 +158,13 @@ public abstract class RoverAuto extends LinearOpMode {
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             targetDegrees = -30;
-            targetDistance = 18;
+            targetDistance = 22;
         } else if (goldPosition == 2) { // middle
             targetDegrees = 0;
-            targetDistance = 20;
+            targetDistance = 22;
         } else {   // right of the robot
             targetDegrees = 30;
-            targetDistance = 20;
+            targetDistance = 24;
         }
         robot.drive.setRunModeEncoder(false);
 
@@ -207,28 +207,29 @@ public abstract class RoverAuto extends LinearOpMode {
             goToDepotDistance = 40;
         } else if (goldPosition == 2){
             turnToDepotDegrees = 0;
-            goToDepotDistance = 25;
+            goToDepotDistance = 35;
         } else {
             turnToDepotDegrees = -40;
             goToDepotDistance = 30;
         }
         operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
-        robot.sleep(1000);
+        robot.sleep(500);
 
         operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, goToDepotDistance);
         operation.run();
-        telemetry.addData("Team Marker Value:", "1");
-        telemetry.update();
-        robot.sleep(3000);
-        robot.teamMarker.setPosition(0);
-        robot.teamMarker.setPosition(1);
 
+        robot.teamMarker.setPosition(1);
 
         robot.drive.driveFRS(0, .25, 0, 0.3);
         sleep(200);
         robot.drive.stop();
 
+        turnToDepotDegrees = -120 -robot.relativeAngleFromStart;
+
+        operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.sleep(500);
 
     }
 
