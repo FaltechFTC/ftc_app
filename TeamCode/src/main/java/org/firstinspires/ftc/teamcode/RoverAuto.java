@@ -44,21 +44,33 @@ public abstract class RoverAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException{
         telemetry.addData("Status", "Started");
         telemetry.update();
-        initRobot(!configOnly);
 
+        initRobot(!configOnly);
         if (configOnly) {
             readConfigValues();
             configMode();
             writeConfigValues();
+            logConfigModes(false);
             telemetry.addData("Status", "Configuration SAVED.");
             telemetry.update();
         } else {
+            initRobot(!configOnly);
             readConfigValues();
+            configMode();
+            writeConfigValues();
             logConfigModes(false);
             telemetry.addData("Status", "Configuration LOADED. Waiting for Start");
             telemetry.update();
 
-            waitForStart();
+            //waitForStart();
+
+            while (!(isStarted() || isStopRequested())) {
+
+                // Display the light level while we are waiting to start
+                telemetry.addData("Status", "waiting for start");
+                telemetry.update();
+                idle();
+            }
 
             telemetry.addData("Status", "Running Autonomous!");
             telemetry.update();
@@ -316,12 +328,10 @@ public abstract class RoverAuto extends LinearOpMode {
                 if (goldPosition > 3) goldPosition = 1;
 
             }
-
             double liftPower = FaltechUtilities.clipDeadzone( gamepad2.left_stick_y, .1);
-            robot.roverLift.setPower(-liftPower);
+            if (robot!=null) robot.roverLift.setPower(-liftPower);
             logConfigModes(true);
-            sleep(100);
-        } while (!gamepad1.right_bumper && !isStopRequested());
+        } while (!gamepad1.right_bumper && !isStarted() &&  !isStopRequested());
 
         telemetry.addData("ConfigMode" , lastModes);
         telemetry.update();
