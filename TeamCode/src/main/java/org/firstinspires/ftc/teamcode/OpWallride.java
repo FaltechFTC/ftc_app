@@ -7,32 +7,30 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class OpWallride extends Operation {
 
-    double targetDegrees, maxTurnPower, maxDrivePower, targetDistance, targetDistanceToWall;
+    double targetDegrees;
+    double maxTurnPower, maxDrivePower, maxStrafePower;
+    double targetDistance, targetDistanceToWall;
+    Pid pidStrafe, pidDrive, pidRotate;
+
     double fd=0, sd=0;
-    long lastTime = System.currentTimeMillis();
-    Pid pidR, pidDrive;
 
-    Boolean onTarget = false;
-
-    public OpWallride(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
+    public OpWallride(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, double maxStrafePower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
         super(robot);
         this.targetDegrees=targetDegrees;
-        this.maxTurnPower=maxTurnPower;
         this.maxDrivePower=maxDrivePower;
+        this.maxTurnPower=maxTurnPower;
+        this.maxStrafePower=maxStrafePower;
         this.timeoutMS=timeoutMS;
         this.targetDistance=targetDistance;
         this.targetDistanceToWall=targetDistanceToWall;
-
-        double drivePidKp = 0.4;     // Tuning variable for PID.
-        double drivePidTi = 0.05;   // Eliminate integral error in 1 sec.
-        double drivePidTd = 0.2;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
-
-        double drivePidIntMax = 10;
-        double drivePidIntMin = -10;
-        pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxTurnPower, maxTurnPower);
+        this.targetDegrees=targetDegrees;
 
 
-        RobotLog.i(pidR.toString());
+        pidDrive = new Pid(.6, 0.01, 0.2, -100, 100, -maxDrivePower, maxDrivePower);
+        pidRotate = new Pid(.5, 0.04, 0.3, -20, 20, -maxTurnPower, maxTurnPower);
+        pidStrafe = new Pid(.5, .04, .3, -10, 10,  -maxStrafePower, maxStrafePower);
+
+        robot.resetRelativeAngleToZero();
     }
 
     @Override
@@ -44,35 +42,31 @@ public class OpWallride extends Operation {
                 ", fd=" + fd +
                 ", targetDistanceToWall=" + targetDistanceToWall +
                 ", sd=" + sd +
-                ", onTarget=" + onTarget +
                 '}';
-    }
-
-    public void done() {
-        super.done();
-        robot.drive.stop();
     }
 
     public boolean loop() {
         if (!super.loop()) return false;
 
-        RobotLog.i("begin loop %d : %s", numLoops, pidR.toString());
+        RobotLog.i("begin loop %d : %s", numLoops, pidStrafe.toString());
 
         fd= robot.frontDistance.getDistance(DistanceUnit.INCH);
         sd= robot.sideDistance.getDistance(DistanceUnit.INCH);
+        double relativeAngle = -robot.getRelativeAngle();
 
-        double rotatePower = pidR.update(/*desired*/ targetDistanceToWall, /*actual*/ sd, deltaTime);
-        robot.drive.driveFRS(maxDrivePower, -rotatePower, 0.0);
+        double drivePower = -pidDrive.update(/*desired*/targetDistance, /*actual*/fd, deltaTime);
+        double strafePower = pidStrafe.update(/*desired*/ targetDistanceToWall, /*actual*/ sd, deltaTime);
+        double rotatePower = pidRotate.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
+        robot.drive.driveFRS(drivePower, rotatePower, strafePower);
 
-        if (fd<= targetDistance)  onTarget = true;
 
         robot.telemetry.addData("Operation", "WallRide deltaTime="+deltaTime);
-        robot.telemetry.addData("front", "target=" + targetDistance+ " actual=" + fd + " power="+maxDrivePower);
-        robot.telemetry.addData("side", "target=" + targetDistanceToWall+ " actual=" + sd + " power="+rotatePower);
-        robot.telemetry.addData("pidR", pidR.toString());
+        robot.telemetry.addData("forward", "target=" + targetDistance+ " actual=" + fd + " power="+drivePower);
+        robot.telemetry.addData("rotate", "target=" + targetDegrees+ " actual=" + relativeAngle + " power="+rotatePower);
+        robot.telemetry.addData("strafe", "target=" + targetDistanceToWall+ " actual=" + sd + " power="+strafePower);
         robot.telemetry.update();
 
-        if (onTarget) done();
+        if (Math.abs(fd-targetDistance)<5) done();
         return !done;
     }
 }

@@ -170,13 +170,10 @@ public class RoverTeleop extends OpMode{
             double degreesError=2.0;
             long timeoutMS=4000;
 
-            // getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
-            if (gamepad2.dpad_right) operation = robot.getOperationWallDrive(0, maxDrivePower, .2,10000,15,10);
-            else if (gamepad2.dpad_left) operation = robot.getOperationWallDrive(0, maxDrivePower, .2,10000,15,20);
-            else if (gamepad2.dpad_up) {
-                if (operation!=null) {operation.done(); operation=null;}
-                robot.resetRelativeAngleToZero();
-            }
+            if (gamepad2.dpad_right) operation = new OpWallride(robot, 0,.4, .05,.3, 10000,20,5);
+            else if (gamepad2.dpad_left) operation = new OpWallride(robot,0, .7, .05,.3, 10000,20, 5);
+            else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 10);
+            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .7, .00,.3, 10000,70, 10);
         }
     }
 

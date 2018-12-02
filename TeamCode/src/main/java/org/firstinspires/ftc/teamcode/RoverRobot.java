@@ -55,7 +55,8 @@ public class RoverRobot {
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
        // teamMarker.setPosition(0);
-        if(isAutonomous) initIMU();
+        //if(isAutonomous)
+            initIMU();
     }
 
     private void initIMU() {
@@ -186,8 +187,8 @@ public class RoverRobot {
     Operation getOperationDriveToDistance(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
         return new OpDriveToDistance(this, targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
     }
-    Operation getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
-        return new OpWallride(this,    targetDegrees, maxDrivePower, maxTurnPower, timeoutMS,  targetDistance, targetDistanceToWall);
+    Operation getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, double maxStrafePower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
+        return new OpWallride(this,    targetDegrees, maxDrivePower, maxTurnPower, maxStrafePower, timeoutMS,  targetDistance, targetDistanceToWall);
 
     }
 
@@ -203,9 +204,8 @@ public class RoverRobot {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            // eat it
+            Thread.currentThread().interrupt();
         }
-
     }
 }
 

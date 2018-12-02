@@ -32,12 +32,6 @@ public class OpRotateToHeading extends Operation {
         RobotLog.i(pidR.toString());
     }
 
-    public void done() {
-        super.done();
-        robot.drive.stop();
-        RobotLog.i("rotate2() done");
-    }
-
     public boolean loop() {
         if (!super.loop()) return false;
 
