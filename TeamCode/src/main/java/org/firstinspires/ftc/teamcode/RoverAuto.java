@@ -224,7 +224,7 @@ public abstract class RoverAuto extends LinearOpMode {
         robot.drive.driveFRS(0, .25, 0, 0.3);
         sleep(200);
         robot.drive.stop();
-
+       // Turn the robot relative to the initial angle so that we can prepare for the wall ride
         turnToDepotDegrees = -120 -robot.relativeAngleFromStart;
 
         operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
@@ -274,21 +274,17 @@ public abstract class RoverAuto extends LinearOpMode {
         robot.stop();
         robot.sleep(2000);
 
+        // turn towards wall
         targetDegrees = -20;
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
         robot.stop();
 
-        targetDistance = 22;
-        operation = robot.getOperationDriveToDistance(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-        operation.run();
-        robot.stop();
+        // We need to do the wall run here
 
         robot.teamMarker.setPosition(1);
 
-        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -70);
-        operation.run();
-        robot.stop();
+       // Need to do wall run to back to crater
 
 //        doArmOverCrater();
 

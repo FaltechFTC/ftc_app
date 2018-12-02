@@ -91,6 +91,7 @@ public abstract class IDrive {
         final double multipliers[]= new double[]{ 0.3, 0.5, 1.0};
         return multipliers[gearValue-1];
     }
+    // Strafing values changed to have better strafe at lower gear
     public double getSidewaysGearMultiplier() {
         final double multipliers[]= new double[]{ 0.6, 0.75, 1.0};
         return multipliers[gearValue-1];

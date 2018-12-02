@@ -30,6 +30,7 @@ public class RoverRobot {
     Orientation lastAngles = new Orientation();
     public final AxesOrder axesOrder = AxesOrder.ZYX;
     double globalAngle;
+    // Using this variable to track the angle from the start position
     double relativeAngleFromStart;
     public Servo teamMarker = null;
     boolean isAutonomous=false;
