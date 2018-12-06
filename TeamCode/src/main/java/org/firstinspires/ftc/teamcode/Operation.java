@@ -11,6 +11,7 @@ public class Operation {
     public boolean timeout=false;
     public long numLoops=0;
     public boolean stopDriveOnDone=true;
+    public boolean coastOnStop=true;
     public Operation(RoverRobot robot) {
         this.robot = robot;
     }
@@ -39,10 +40,15 @@ public class Operation {
     public void done() {
         done=true;
         if (stopDriveOnDone) {
-            robot.drive.setHaltModeCoast(false);
+            //
+            if(!coastOnStop)
+                robot.drive.setHaltModeCoast(false);
             robot.drive.stop();
-            robot.sleep(500);
-            robot.drive.setHaltModeCoast(true);
+            if(!coastOnStop){
+                robot.sleep(500);
+                robot.drive.setHaltModeCoast(true);
+            }
+
         }
     }
 }

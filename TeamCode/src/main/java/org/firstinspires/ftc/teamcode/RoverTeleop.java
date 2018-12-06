@@ -172,8 +172,8 @@ public class RoverTeleop extends OpMode{
 
             if (gamepad2.dpad_right) operation = new OpWallride(robot, 0,.4, .05,.3, 10000,20,5);
             else if (gamepad2.dpad_left) operation = new OpWallride(robot,0, .7, .05,.3, 10000,20, 5);
-            else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 10);
-            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .7, .00,.3, 10000,70, 10);
+            else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 5);
+            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .7, .00,.3, 10000,30, 5);
         }
     }
 

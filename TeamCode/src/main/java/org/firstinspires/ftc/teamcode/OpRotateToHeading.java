@@ -21,8 +21,8 @@ public class OpRotateToHeading extends Operation {
         // restart imu angle tracking.
         robot.resetRelativeAngleToZero();
 
-        double drivePidKp = 1.0;     // Tuning variable for PID.
-        double drivePidTi = 0.5;   // Eliminate integral error in 1 sec.
+        double drivePidKp = 0.8;     // Tuning variable for PID.
+        double drivePidTi = 0.1;   // Eliminate integral error in 1 sec.
         double drivePidTd = 0.4;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
 
         double drivePidIntMax = 180.0;

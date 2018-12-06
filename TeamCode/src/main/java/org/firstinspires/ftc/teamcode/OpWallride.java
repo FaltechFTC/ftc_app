@@ -25,6 +25,9 @@ public class OpWallride extends Operation {
         this.targetDistanceToWall=targetDistanceToWall;
         this.targetDegrees=targetDegrees;
 
+        // this forces it to halt or brake
+        coastOnStop = false;
+
 
         pidDrive = new Pid(.6, 0.01, 0.2, -100, 100, -maxDrivePower, maxDrivePower);
         pidRotate = new Pid(.5, 0.04, 0.3, -20, 20, -maxTurnPower, maxTurnPower);

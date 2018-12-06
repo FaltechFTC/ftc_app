@@ -40,20 +40,15 @@ public class RoverCollector {
         mtrLeftCollector.setDirection(DcMotor.Direction.FORWARD);
         mtrRightCollector.setDirection(DcMotor.Direction.REVERSE);
 
-        if (newMode) { // TODO fix this name
+
             mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             mtrLeftCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             mtrRightCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } else { // get rid of this after the above stuff is working
-            mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            mtrLeftCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            mtrRightCollector.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
+
 
         leftClaw = hwMap.get(Servo.class, "leftClaw");
         rightClaw = hwMap.get(Servo.class, "rightClaw");
@@ -181,6 +176,12 @@ public class RoverCollector {
 
     int maxArmEncoder=1355;  //convertDegreesToEncoder(110);
 
+    public void setCollectorToCoast(){
+        mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+    }
+
     public void setPowerToArmExtender(double power){
         double curLeft=mtrLeftCollector.getCurrentPosition();
         double curRight=mtrRightCollector.getCurrentPosition();
@@ -199,6 +200,12 @@ public class RoverCollector {
 
         telemetry.addData("Arm Lift", "Left="+curLeft+" Right="+curRight+" easeIn="+easeInDistance+" maxPos="+maxArmEncoder);
         telemetry.addData("Arm Lift Inputs", "power="+power+" Lpower="+leftPower+" Rpower="+rightPower);
+    }
+
+    public void setPowerToArmLift(double power){
+        mtrLeftCollector.setPower(power);
+        mtrRightCollector.setPower(power);
+
     }
 
 
