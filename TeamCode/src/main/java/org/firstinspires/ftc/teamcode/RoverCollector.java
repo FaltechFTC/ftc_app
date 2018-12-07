@@ -184,8 +184,8 @@ public class RoverCollector {
     }
 
     public void setPowerToArmExtender(double power){
-        double curLeft=mtrLeftCollector.getCurrentPosition()-zeroOffset;
-        double curRight=mtrRightCollector.getCurrentPosition()-zeroOffset;
+        double curLeft=mtrLeftCollector.getCurrentPosition();
+        double curRight=mtrRightCollector.getCurrentPosition();
 
 
         double easeInDistance=150;
@@ -206,9 +206,6 @@ public class RoverCollector {
     public void setPowerToArmLift(double power){
         mtrLeftCollector.setPower(power);
         mtrRightCollector.setPower(power);
-        zeroOffset = (mtrLeftCollector.getCurrentPosition()+mtrRightCollector.getCurrentPosition())/2;
-        telemetry.addData("Arm Lift Power=", zeroOffset);
-        telemetry.update();
 
     }
 
