@@ -57,8 +57,8 @@ public class RoverRobot {
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
        // teamMarker.setPosition(0);
-        //if(isAutonomous)
-            initIMU();
+        if(isAutonomous)initIMU();
+
     }
 
     private void initIMU() {

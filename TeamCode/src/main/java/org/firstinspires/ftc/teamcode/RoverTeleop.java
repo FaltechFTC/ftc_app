@@ -54,7 +54,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-       doOperations();
+      // doOperations();
         if (operation==null) {
             doDrive();
             doArmLift();
@@ -135,11 +135,18 @@ public class RoverTeleop extends OpMode{
     }
     public void doArmExtender() {
         double armPower;
-        if (gamepad1.right_bumper || gamepad2.right_bumper) armPower=1.0;
-        else if (gamepad1.left_bumper || gamepad2.left_bumper) armPower=-1.0;
-        else armPower=0.0;
-        robot.roverCollector.mtrArmExtender.setPower(armPower);
+
+        if (gamepad1.right_bumper || gamepad2.right_bumper) armPower = 1.0;
+        else if (gamepad1.left_bumper || gamepad2.left_bumper) armPower = -1.0;
+        else armPower = 0.0;
+         if (!gamepad1.x) robot.roverCollector.mtrArmExtender.setPower(armPower);
+         else robot.roverCollector.setPowerToArmLift(armPower);
+
     }
+
+
+
+
 
     public void doRobotLift() {
         double liftPower = FaltechUtilities.clipDeadzone(gamepad2.left_stick_y, .1);

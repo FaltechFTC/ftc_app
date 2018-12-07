@@ -86,8 +86,8 @@ public abstract class RoverAuto extends LinearOpMode {
 
             if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
-//            if (!isStopRequested()) doDepot();
-//            if (!isStopRequested()) doCrater();
+            if (!isStopRequested()) doDepot();
+            if (!isStopRequested()) doCrater();
         }
         robot.stop();
     }
