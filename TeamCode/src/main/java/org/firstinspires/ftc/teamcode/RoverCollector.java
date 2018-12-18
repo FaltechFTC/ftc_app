@@ -42,13 +42,7 @@ public class RoverCollector {
         mtrRightCollector.setDirection(DcMotor.Direction.REVERSE);
 
 
-            mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            mtrLeftCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            mtrRightCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        initArmLift();
 
 
         leftClaw = hwMap.get(Servo.class, "leftClaw");
@@ -208,6 +202,28 @@ public class RoverCollector {
         mtrRightCollector.setPower(power);
 
     }
+    public void initArmLift() {
+        mtrLeftCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        mtrRightCollector.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        mtrLeftCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        mtrRightCollector.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        mtrRightCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    public void lowerArmLiftReset(double power, long ms){
+        mtrLeftCollector.setPower(power);
+        mtrRightCollector.setPower(power);
+        try {
+            Thread.sleep(ms);
+        } catch (Exception e) {
+            ;
+        }
+        mtrLeftCollector.setPower(0);
+        mtrRightCollector.setPower(0);
+        initArmLift();
+
+    }
+
 
 
 }

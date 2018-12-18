@@ -120,7 +120,7 @@ public abstract class RoverAuto extends LinearOpMode {
             sleep(1000);
             if (isStopRequested()) return;
             robot.roverLift.setPower(-.2);   // lower more, and release arm higher to clear
-            sleep(1000);
+            sleep(1100);
             robot.roverLift.setPower(0);  // stop lift
 
             if (isStopRequested()) return;
@@ -207,14 +207,14 @@ public abstract class RoverAuto extends LinearOpMode {
         double goToDepotDistance;
 
         if (goldPosition == 1) {
-            turnToDepotDegrees = 75;
-            goToDepotDistance = 30;
+            turnToDepotDegrees = 50;
+            goToDepotDistance = 22;
         } else if (goldPosition == 2){
-            turnToDepotDegrees = 0;
-            goToDepotDistance = 25;
+            turnToDepotDegrees = 15;
+            goToDepotDistance = 15;
         } else {
             turnToDepotDegrees = -40;
-            goToDepotDistance = 30;
+            goToDepotDistance = 15;
         }
         operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
@@ -224,8 +224,9 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
         robot.teamMarker.setPosition(1);
+        robot.sleep(1000);
 
-        doArmOverCrater();
+      //  doArmOverCrater();
 
 
 
@@ -284,66 +285,66 @@ public abstract class RoverAuto extends LinearOpMode {
             return;
         }
 
-
-        if (goldPosition == 1){
-            targetDegrees = -30;
-            targetDistance = 30;
-
-        } else if (goldPosition == 2){
-            targetDegrees = -60;
-            targetDistance = 45 ;
-        } else {
-            targetDegrees = -90;
-            targetDistance = 50;
-        }
-    //targetDistance = 20;
+//
+//        if (goldPosition == 1){
+//            targetDegrees = -30;
+//            targetDistance = 30;
+//
+//        } else if (goldPosition == 2){
+//            targetDegrees = -60;
+//            targetDistance = 45 ;
+//        } else {
+//            targetDegrees = -90;
+//            targetDistance = 50;
+//        }
+   //targetDistance = 20;
     //backing up 9 inches
 
-        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -9);
-        operation.run();
+//        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -9);
+//        operation.run();
 
-        robot.stop();
-
-        // turning towards wall
-        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
-        operation.run();
-
-        robot.stop();
-        // driving closer to the wall
-        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-        operation.run();
-        robot.stop();
-
-        // turn towards wall
-        targetDegrees = -20;
-        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
-        operation.run();
-        robot.stop();
-
-        // We need to do the wall run here
-        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 20, 5);
-        operation.run();
-
-        robot.stop();
-
-        robot.teamMarker.setPosition(1);
-
-        robot.sleep(2000);
-
-        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 60, 5);
-        operation.run();
-        robot.stop();
-
-        operation = robot.getOperationRotateToHeading(175, maxTurningPower, degreesError, 3000);
-        operation.run();
-        robot.stop();
-
-        targetDistance = 10;
-        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-        operation.run();
-        robot.stop();
-
-        doArmOverCrater();
+//        robot.stop();
+//
+//        // turning towards wall
+//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//
+//        robot.stop();
+//        // driving closer to the wall
+//        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+//        operation.run();
+//        robot.stop();
+//
+//        // turn towards wall
+//        targetDegrees = -20;
+//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//        robot.stop();
+//
+//        // We need to do the wall run here
+//        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 20, 5);
+//        operation.run();
+//
+//        robot.stop();
+//
+//        robot.teamMarker.setPosition(1);
+//
+//        robot.sleep(2000);
+//
+//        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 60, 5);
+//        operation.run();
+//        robot.stop();
+//
+//        operation = robot.getOperationRotateToHeading(175, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//        robot.stop();
+//
+//        targetDistance = 10;
+//        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+//        operation.run();
+//        robot.stop();
+//
+//        doArmOverCrater();
 
 
     }

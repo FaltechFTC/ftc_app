@@ -239,11 +239,13 @@ public class DriveMecanum extends IDrive{
         double vD = motion.vD;
         double thetaD = motion.thetaD;
         double vTheta = motion.vTheta;
+        final double speedAdjusters[]= new double[]{ 0.9, 1.0, 0, 0};
 
-        double frontLeft = vD * Math.sin(-thetaD + Math.PI / 4) - vTheta;
-        double frontRight  = vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;
-        double backLeft = vD * Math.cos(-thetaD + Math.PI / 4) + vTheta;
-        double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
+
+        double frontLeft = (vD * Math.sin(-thetaD + Math.PI / 4) - vTheta)*speedAdjusters[0];
+        double frontRight  = (vD * Math.cos(-thetaD + Math.PI / 4) - vTheta)*speedAdjusters[1];
+        double backLeft = (vD * Math.cos(-thetaD + Math.PI / 4) + vTheta)*speedAdjusters[2];
+        double backRight = (vD * Math.sin(-thetaD + Math.PI / 4) + vTheta)*speedAdjusters[3];
         return new Wheels(frontLeft, frontRight, backLeft, backRight);
     }
 
