@@ -32,7 +32,7 @@ import java.util.List;
  *    frontLeftMotor.setPower(wheels.frontLeft);
  */
 public class DriveMecanum extends IDrive{
-
+    public double speedAdjusters[] = new double[]{1.0,0.8,1.0,0.8};
     public DcMotor mtrFL = null;
     public DcMotor mtrFR = null;
     public DcMotor mtrBL = null;
@@ -121,10 +121,10 @@ public class DriveMecanum extends IDrive{
     }
 
     public void setPower(Wheels w) {
-        mtrFL.setPower(w.frontLeft);
-        mtrFR.setPower(w.frontRight);
-        mtrBL.setPower(w.backLeft);
-        mtrBR.setPower(w.backRight);
+        mtrFL.setPower(w.frontLeft*speedAdjusters[0]);
+        mtrFR.setPower(w.frontRight*speedAdjusters[1]);
+        mtrBL.setPower(w.backLeft*speedAdjusters[2]);
+        mtrBR.setPower(w.backRight*speedAdjusters[3]);
         telemetry.addData("Wheel Powers", "FL="+w.frontLeft+"FR="+w.frontRight+"BL="+w.backLeft+"BR="+w.backRight);
     }
 
@@ -239,13 +239,11 @@ public class DriveMecanum extends IDrive{
         double vD = motion.vD;
         double thetaD = motion.thetaD;
         double vTheta = motion.vTheta;
-        final double speedAdjusters[]= new double[]{ 0.9, 1.0, 0, 0};
 
-
-        double frontLeft = (vD * Math.sin(-thetaD + Math.PI / 4) - vTheta)*speedAdjusters[0];
-        double frontRight  = (vD * Math.cos(-thetaD + Math.PI / 4) - vTheta)*speedAdjusters[1];
-        double backLeft = (vD * Math.cos(-thetaD + Math.PI / 4) + vTheta)*speedAdjusters[2];
-        double backRight = (vD * Math.sin(-thetaD + Math.PI / 4) + vTheta)*speedAdjusters[3];
+        double frontLeft = (vD * Math.sin(-thetaD + Math.PI / 4) - vTheta);
+        double frontRight  = (vD * Math.cos(-thetaD + Math.PI / 4) - vTheta);
+        double backLeft = (vD * Math.cos(-thetaD + Math.PI / 4) + vTheta);
+        double backRight = (vD * Math.sin(-thetaD + Math.PI / 4) + vTheta);
         return new Wheels(frontLeft, frontRight, backLeft, backRight);
     }
 
@@ -297,32 +295,32 @@ public class DriveMecanum extends IDrive{
 
     }
 
-    public void setPowerToAllMotors (double power) {
-        for (DcMotor m : motors) m.setPower(power);
+//    public void setPowerToAllMotors (double power) {
+//        for (DcMotor m : motors) m.setPower(power);
+//
+//    }
 
-    }
 
-
-    public void driveToInches(double inches, double power, double timeOut){
-        int driveToPosition = (int) ((getClicksPerRevolution()*inches)/getWheelCircumfrence());
-
-       int mtrFLCurrPosition = mtrFL.getCurrentPosition();
-       int mtrFRCurrPosition = mtrFR.getCurrentPosition();
-       int mtrBLCurrPosition = mtrBL.getCurrentPosition();
-       int mtrBRCurrPosition = mtrBR.getCurrentPosition();
-
-        boolean isTargetReached = false;
-        //set the motors to run to position
-        setEncoderToRunToPosition();
-        setTargetPosition(driveToPosition);
-        runtime.reset();
-        //apply the power
-        setPowerToAllMotors(power);
-
-        timeOutExit(timeOut);
-
-        stop();
-    }
+//    public void driveToInches(double inches, double power, double timeOut){
+//        int driveToPosition = (int) ((getClicksPerRevolution()*inches)/getWheelCircumfrence());
+//
+//       int mtrFLCurrPosition = mtrFL.getCurrentPosition();
+//       int mtrFRCurrPosition = mtrFR.getCurrentPosition();
+//       int mtrBLCurrPosition = mtrBL.getCurrentPosition();
+//       int mtrBRCurrPosition = mtrBR.getCurrentPosition();
+//
+//        boolean isTargetReached = false;
+//        //set the motors to run to position
+//        setEncoderToRunToPosition();
+//        setTargetPosition(driveToPosition);
+//        runtime.reset();
+//        //apply the power
+//        setPowerToAllMotors(power);
+//
+//        timeOutExit(timeOut);
+//
+//        stop();
+//    }
 
 
 

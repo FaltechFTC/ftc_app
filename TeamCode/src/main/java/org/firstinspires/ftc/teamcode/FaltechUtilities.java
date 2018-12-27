@@ -98,7 +98,7 @@ public class FaltechUtilities {
     public static void readProperties(){
         InputStream propertiesFile = null;
         try {
-            File file = new File("Rover.properties");
+            File file = new File("Moto E (4)\\Internal shared storage\\properties\\Rover.properties");
             propertiesFile = new FileInputStream(file);
             props.load(propertiesFile);
         } catch (FileNotFoundException e) {
@@ -119,7 +119,7 @@ public class FaltechUtilities {
     public static void writeProperties(){
         OutputStream propertiesFile = null;
         try {
-            File file = new File("Rover.properties");
+            File file = new File("Moto E (4)\\Internal shared storage\\properties\\Rover.properties");
             propertiesFile = new FileOutputStream(file);
             props.store(propertiesFile,"Faltech 7079");
         } catch (FileNotFoundException e) {
