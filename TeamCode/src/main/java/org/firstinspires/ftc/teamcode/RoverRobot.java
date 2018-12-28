@@ -191,8 +191,8 @@ public class RoverRobot {
         return new OpDriveToHeading(this, targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
     }
 
-    Operation getOperationDriveToDistance(double targetDegrees, double maxDrivePower, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS, double targetDistance) {
-        return new OpDriveToDistance(this, targetDegrees, maxDrivePower, maxTurnPower, targetDegreesAcceptableError, timeoutMS, targetDistance);
+    Operation getOperationDriveToDistance(double maxDrivePower, long timeoutMS, double targetDistance, double targetTolerance) {
+        return new OpDriveToDistance(this,  maxDrivePower, timeoutMS, targetDistance, targetTolerance);
     }
     Operation getOperationWallDrive(double targetDegrees, double maxDrivePower, double maxTurnPower, double maxStrafePower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
         return new OpWallride(this,    targetDegrees, maxDrivePower, maxTurnPower, maxStrafePower, timeoutMS,  targetDistance, targetDistanceToWall);
