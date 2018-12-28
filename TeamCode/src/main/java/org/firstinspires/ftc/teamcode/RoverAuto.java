@@ -179,7 +179,7 @@ public abstract class RoverAuto extends LinearOpMode {
         if (isStopRequested()){
             return;
         }
-        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
         operation.run();
         robot.stop();
         //sleep(1500);

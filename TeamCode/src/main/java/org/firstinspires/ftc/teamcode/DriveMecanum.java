@@ -160,6 +160,13 @@ public class DriveMecanum extends IDrive{
         return (Math.abs(mtrBR.getCurrentPosition()) + Math.abs(mtrFR.getCurrentPosition()))/2.0;
     }
 
+    public double getEncoderClicksFront() {
+        return (mtrFL.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
+    }
+    public double getEncoderClicksBack() {
+        return (mtrBL.getCurrentPosition() + mtrBR.getCurrentPosition())/2.0;
+    }
+
     /**
      * Mecanum motion vector.
      */

@@ -21,6 +21,7 @@ public class Operation {
     }
     public boolean run(long timeBetweenLoopsMS) {
         while(loop()) {
+            robot.telemetry.update();
             robot.sleep(timeBetweenLoopsMS);
         }
         return !timeout; // true if we ran to completion, else false means we timed out
@@ -32,7 +33,7 @@ public class Operation {
         curMS=System.currentTimeMillis();
         deltaTime= ((double) (curMS - lastTime)) / 1000.0;
         lastTime = curMS;
-        if (curMS-startMS > timeoutMS) {timeout=true; done(); return false;}
+        if (curMS-startMS > timeoutMS) { timeout=true; done(); return false;}
         return true;
         // keep looping ...
     }

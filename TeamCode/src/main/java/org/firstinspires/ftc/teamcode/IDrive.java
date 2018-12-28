@@ -35,6 +35,8 @@ public abstract class IDrive {
     abstract public void resetEncoders();
     abstract public double getEncoderClicksLeft();
     abstract public double getEncoderClicksRight();
+    abstract public double getEncoderClicksFront();
+    abstract public double getEncoderClicksBack();
 
 
     public double getEncoderClicksLeftAbs() {

@@ -127,5 +127,12 @@ public class DriveTank extends IDrive{
 
     }
 
+    public double getEncoderClicksFront() {
+        return (mtrFL.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;  // kinda fake
+    }
+    public double getEncoderClicksBack() {
+        return getEncoderClicksFront(); // fake
+    }
+
 
 }
