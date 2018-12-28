@@ -32,7 +32,7 @@ import java.util.List;
  *    frontLeftMotor.setPower(wheels.frontLeft);
  */
 public class DriveMecanum extends IDrive{
-    public double speedAdjusters[] = new double[]{1.0,0.8,1.0,0.8};
+    public double speedAdjusters[] = new double[]{0.86,0.75,1.0,0.76};
     public DcMotor mtrFL = null;
     public DcMotor mtrFR = null;
     public DcMotor mtrBL = null;

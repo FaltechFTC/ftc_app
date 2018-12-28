@@ -84,7 +84,7 @@ public abstract class RoverAuto extends LinearOpMode {
                 vision.initVision();
             }
 
-            if (!isStopRequested()) doLander();
+         //   if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
 //            if (!isStopRequested()) doDepot();
 //            if (!isStopRequested()) doCrater();
@@ -285,35 +285,35 @@ public abstract class RoverAuto extends LinearOpMode {
             return;
         }
 
-//
-//        if (goldPosition == 1){
-//            targetDegrees = -30;
-//            targetDistance = 30;
-//
-//        } else if (goldPosition == 2){
-//            targetDegrees = -60;
-//            targetDistance = 45 ;
-//        } else {
-//            targetDegrees = -90;
-//            targetDistance = 50;
-//        }
-   //targetDistance = 20;
+
+        if (goldPosition == 1){
+            targetDegrees = -30;
+
+
+        } else if (goldPosition == 2){
+            targetDegrees = -60;
+
+        } else {
+            targetDegrees = -90;
+
+        }
+        targetDistance = 20;
     //backing up 9 inches
 
-//        operation = robot.getOperationDriveToHeading(5, -maxPowerAuto, 0, degreesError, 10000, -9);
-//        operation.run();
+        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
+        operation.run();
 
-//        robot.stop();
-//
-//        // turning towards wall
-//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
-//        operation.run();
-//
-//        robot.stop();
-//        // driving closer to the wall
-//        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-//        operation.run();
-//        robot.stop();
+        robot.stop();
+
+        // turning towards wall
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+
+        robot.stop();
+        // driving closer to the wall
+        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation.run();
+        robot.stop();
 //
 //        // turn towards wall
 //        targetDegrees = -20;
