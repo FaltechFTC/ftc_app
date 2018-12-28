@@ -84,10 +84,10 @@ public abstract class RoverAuto extends LinearOpMode {
                 vision.initVision();
             }
 
-         //   if (!isStopRequested()) doLander();
+            if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
 //            if (!isStopRequested()) doDepot();
-//            if (!isStopRequested()) doCrater();
+            if (!isStopRequested()) doCrater();
         }
         robot.stop();
     }
@@ -161,7 +161,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
             targetDegrees = -24;
-            targetDistance = 20;
+            targetDistance = 22;
         } else if (goldPosition == 2) { // middle
             targetDegrees = 0;
             targetDistance = 22;
@@ -287,17 +287,20 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
         if (goldPosition == 1){
-            targetDegrees = -30;
+            targetDegrees = -45;
+            targetDistance = 26;
 
 
         } else if (goldPosition == 2){
             targetDegrees = -60;
+            targetDistance = 30;
 
         } else {
             targetDegrees = -90;
+            targetDistance = 40;
 
         }
-        targetDistance = 20;
+
     //backing up 9 inches
 
         operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
@@ -316,10 +319,10 @@ public abstract class RoverAuto extends LinearOpMode {
         robot.stop();
 //
 //        // turn towards wall
-//        targetDegrees = -20;
-//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
-//        operation.run();
-//        robot.stop();
+        targetDegrees = -40;
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        robot.stop();
 //
 //        // We need to do the wall run here
 //        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 20, 5);

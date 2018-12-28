@@ -11,7 +11,7 @@ public class Operation {
     public boolean timeout=false;
     public long numLoops=0;
     public boolean stopDriveOnDone=true;
-    public boolean coastOnStop=true;
+    public boolean coastOnStop=false;
     public Operation(RoverRobot robot) {
         this.robot = robot;
     }
