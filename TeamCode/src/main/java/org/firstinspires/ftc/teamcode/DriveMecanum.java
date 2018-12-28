@@ -161,7 +161,8 @@ public class DriveMecanum extends IDrive{
     }
 
     public double getEncoderClicksFront() {
-        return (mtrFL.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
+        return mtrFL.getCurrentPosition();
+//        return (mtrFL.getCurrentPosition() + mtrFR.getCurrentPosition())/2.0;
     }
     public double getEncoderClicksBack() {
         return (mtrBL.getCurrentPosition() + mtrBR.getCurrentPosition())/2.0;

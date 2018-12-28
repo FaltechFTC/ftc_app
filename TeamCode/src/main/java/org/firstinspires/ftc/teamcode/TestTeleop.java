@@ -108,7 +108,7 @@ public class TestTeleop extends OpMode{
             }
             else if (gamepad2.dpad_left) operation = new OpWallride(robot,0, .7, .05,.3, 10000,20, 5);
             else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 5);
-            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .7, .00,.3, 10000,30, 5);
+            else if (gamepad2.dpad_down) operation = robot.getOperationDriveToDistance(0.4,4000,2,1);
         }
     }
 

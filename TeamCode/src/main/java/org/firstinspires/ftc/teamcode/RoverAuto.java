@@ -351,12 +351,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
     }
-    public void doTempDistance(){
-        targetDistance = 15;
-        operation = robot.getOperationDriveToDistance(5, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-        operation.run();
-        robot.stop();
-    }
+
 
     void configMode() {
         String lastModes="";
