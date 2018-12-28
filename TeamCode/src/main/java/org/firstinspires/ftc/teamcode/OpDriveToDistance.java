@@ -27,7 +27,7 @@ public class OpDriveToDistance extends Operation {
 
         startingEncoder= robot.drive.getEncoderClicksFront();
         targetEncoder=startingEncoder+ robot.drive.convertInchesToClicks(targetDistance);
-        this.targetTolerance=robot.drive.convertInchesToClicks(targetTolerance);
+        this.targetTolerance=Math.abs(robot.drive.convertInchesToClicks(targetTolerance));
     }
 
     @Override
@@ -43,13 +43,13 @@ public class OpDriveToDistance extends Operation {
     public boolean loop() {
         if (!super.loop()) return false;
 
-        curEncoder= robot.drive.getEncoderClicksAbs();
+        curEncoder= robot.drive.getEncoderClicksFront();
         robot.telemetry.addData("encoders", "start=%f  target=%f  current=%f", startingEncoder, targetEncoder, curEncoder);
 
         if (Math.abs(targetEncoder - curEncoder)<= targetTolerance) {
             done();
         } else {
-            double drivePower = pidDrive.update(/*desired*/targetDistance, /*actual*/curEncoder, deltaTime);
+            double drivePower = pidDrive.update(/*desired*/targetEncoder, /*actual*/curEncoder, deltaTime);
             robot.drive.driveFRS(drivePower, 0, 0);
             robot.telemetry.addData("forwardPower", drivePower);
         }
