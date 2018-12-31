@@ -62,7 +62,9 @@ public class RoverCollector {
     double armSpeed;
     double encoderClicksPerRevolution=1120.0;
     double motorGearBoxRatio=40.0;
-    double armGearRatio=125.0/45.0;   //45 tooth driving 125 tooth gear
+    //double armGearRatio=125.0/45.0;   //45 tooth driving 125 tooth gear
+    double armGearRatio=86.0/12.0;   //45 tooth driving 125 tooth gear
+
     double clicksPerDegree=encoderClicksPerRevolution*motorGearBoxRatio*armGearRatio/360.0;
 
     public int convertDegreesToEncoder(double inputDegrees){
@@ -169,7 +171,7 @@ public class RoverCollector {
     }
 
 
-    int maxArmEncoder=1355;  //convertDegreesToEncoder(110);
+    int maxArmEncoder=3355;  //convertDegreesToEncoder(110); // was 1355
 
     public void setCollectorToCoast(){
         mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -182,7 +184,7 @@ public class RoverCollector {
         double curRight=mtrRightCollector.getCurrentPosition();
 
 
-        double easeInDistance=150;
+        double easeInDistance=250; // was 150
         double leftPower=power, rightPower=power;
         if (leftPower>0 && curLeft>maxArmEncoder-easeInDistance)  leftPower*=(maxArmEncoder-curLeft)/easeInDistance;
         else if (leftPower<0 && curLeft<easeInDistance)  leftPower*=curLeft/easeInDistance;

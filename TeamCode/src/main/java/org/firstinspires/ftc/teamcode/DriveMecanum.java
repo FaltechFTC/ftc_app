@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -71,11 +72,10 @@ public class DriveMecanum extends IDrive{
         motors = new DcMotor[] {mtrFL, mtrFR, mtrBL, mtrBR};
 
         // set motor direction based on installed orientation.
-        mtrFR.setDirection(DcMotor.Direction.FORWARD);
-        mtrBR.setDirection(DcMotor.Direction.REVERSE);
         mtrFL.setDirection(DcMotor.Direction.FORWARD);
-        mtrBL.setDirection(DcMotor.Direction.REVERSE);
-
+        mtrFR.setDirection(DcMotor.Direction.REVERSE); // was FORWARD
+        mtrBL.setDirection(DcMotor.Direction.FORWARD); // was REVERSE
+        mtrBR.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -87,7 +87,9 @@ public class DriveMecanum extends IDrive{
 
     @Override
     public void driveFRS(double forward, double rotate, double sideways, double maxPower) {
+        RobotLog.i("driveFRS(F=%3.2f  R=%3.2f  S=%3.2f  Power=%3.2f ", forward, rotate, sideways, maxPower);
         Motion motion=createMotionFromFRS(sideways,forward,rotate);
+        RobotLog.i("Motion(vD=%3.2f  thetaD=%3.2f  vTheta=%3.2f ", motion.vD, motion.thetaD, motion.vTheta);
         Wheels wheels = motionToWheels(motion);
         setPower(wheels);
     }
@@ -125,7 +127,10 @@ public class DriveMecanum extends IDrive{
         mtrFR.setPower(w.frontRight*speedAdjusters[1]);
         mtrBL.setPower(w.backLeft*speedAdjusters[2]);
         mtrBR.setPower(w.backRight*speedAdjusters[3]);
-        telemetry.addData("Wheel Powers", "FL="+w.frontLeft+"FR="+w.frontRight+"BL="+w.backLeft+"BR="+w.backRight);
+        String s=w.toString();
+        telemetry.addData("Powers (pre adj)", s);
+        telemetry.addData("Wheel Pos", String.format("FL %5d  FR %5d  BL %5d  BR %5d",mtrFL.getCurrentPosition(),mtrFR.getCurrentPosition(),mtrBL.getCurrentPosition(),mtrBR.getCurrentPosition()));
+        RobotLog.i("Powers (pre adj): "+s);
     }
 
 
@@ -197,6 +202,9 @@ public class DriveMecanum extends IDrive{
      * @return The Mecanum motion vector.
      */
     public static Motion createMotionFromFRS(double forward, double sideways, double rotate) {
+        // V_d = desired robot speed.
+        // theta_d = desired robot velocity angle.
+        // V_theta = desired robot rotational speed.
         double vD = Math.min(Math.sqrt(Math.pow(sideways, 2) + Math.pow(forward, 2)), 1);
         double thetaD = Math.atan2(-sideways, -forward);
         double vTheta = -rotate;
@@ -236,6 +244,10 @@ public class DriveMecanum extends IDrive{
             return new Wheels(frontLeft * scalar, frontRight * scalar,
                               backLeft * scalar, backRight * scalar);
         }
+
+        public String toString() {
+            return String.format("Wheels(FL=%3.2f FR=%3.2f BL=%3.2f BR=%3.2f)",frontLeft,frontRight,backLeft,backRight);
+        }
     }
 
     /**
@@ -248,10 +260,10 @@ public class DriveMecanum extends IDrive{
         double thetaD = motion.thetaD;
         double vTheta = motion.vTheta;
 
-        double frontLeft = (vD * Math.sin(-thetaD + Math.PI / 4) - vTheta);
-        double frontRight  = (vD * Math.cos(-thetaD + Math.PI / 4) - vTheta);
-        double backLeft = (vD * Math.cos(-thetaD + Math.PI / 4) + vTheta);
-        double backRight = (vD * Math.sin(-thetaD + Math.PI / 4) + vTheta);
+        double frontLeft = vD * Math.sin(-thetaD + Math.PI / 4) - vTheta;
+        double frontRight  = -vD * Math.cos(-thetaD + Math.PI / 4) + vTheta; // was -vTheta  (and was +vD)
+        double backLeft = -vD * Math.cos(-thetaD + Math.PI / 4) - vTheta;  // was +vTheta (and was +vD)
+        double backRight = vD * Math.sin(-thetaD + Math.PI / 4) + vTheta;
         return new Wheels(frontLeft, frontRight, backLeft, backRight);
     }
 
@@ -302,35 +314,6 @@ public class DriveMecanum extends IDrive{
         }
 
     }
-
-//    public void setPowerToAllMotors (double power) {
-//        for (DcMotor m : motors) m.setPower(power);
-//
-//    }
-
-
-//    public void driveToInches(double inches, double power, double timeOut){
-//        int driveToPosition = (int) ((getClicksPerRevolution()*inches)/getWheelCircumfrence());
-//
-//       int mtrFLCurrPosition = mtrFL.getCurrentPosition();
-//       int mtrFRCurrPosition = mtrFR.getCurrentPosition();
-//       int mtrBLCurrPosition = mtrBL.getCurrentPosition();
-//       int mtrBRCurrPosition = mtrBR.getCurrentPosition();
-//
-//        boolean isTargetReached = false;
-//        //set the motors to run to position
-//        setEncoderToRunToPosition();
-//        setTargetPosition(driveToPosition);
-//        runtime.reset();
-//        //apply the power
-//        setPowerToAllMotors(power);
-//
-//        timeOutExit(timeOut);
-//
-//        stop();
-//    }
-
-
 
 }
 
