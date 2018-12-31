@@ -306,45 +306,44 @@ public abstract class RoverAuto extends LinearOpMode {
         operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
         operation.run();
 
-        robot.stop();
+
 
         // turning towards wall
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
 
-        robot.stop();
-        // driving closer to the wall
-        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+      // driving closer to the wall
+        operation = robot.getOperationWallDrive(0, maxPowerAuto, .05,0, 10000,9, 5);
         operation.run();
-        robot.stop();
-//
-//        // turn towards wall
-        targetDegrees = -40;
+
+        // turn towards wall
+        targetDegrees = -45;
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
-        robot.stop();
+
+        //        // We need to do the wall run here
+        operation = robot.getOperationWallDrive(0, maxPowerAuto, .05,.1, 10000,13, 5);
+        operation.run();
+
+        robot.teamMarker.setPosition(1);
 //
-//        // We need to do the wall run here
-//        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 20, 5);
-//        operation.run();
-//
-//        robot.stop();
-//
-//        robot.teamMarker.setPosition(1);
-//
-//        robot.sleep(2000);
+       robot.sleep(2000);
+
+        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -48);
+        operation.run();
+
 //
 //        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 60, 5);
 //        operation.run();
 //        robot.stop();
 //
-//        operation = robot.getOperationRotateToHeading(175, maxTurningPower, degreesError, 3000);
-//        operation.run();
+        operation = robot.getOperationRotateToHeading(175, maxTurningPower, degreesError, 3000);
+        operation.run();
 //        robot.stop();
 //
-//        targetDistance = 10;
-//        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
-//        operation.run();
+        targetDistance = 10;
+        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
+        operation.run();
 //        robot.stop();
 //
 //        doArmOverCrater();

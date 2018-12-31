@@ -39,7 +39,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, false);
+        robot.init(hardwareMap, telemetry, true);
         telemetry.addData("Robot" , "Initialized");
         telemetry.update();
     }
@@ -54,7 +54,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-      // doOperations();
+       doOperations();
         if (operation==null) {
             doDrive();
             doArmLift();
@@ -177,10 +177,11 @@ public class RoverTeleop extends OpMode{
             double degreesError=2.0;
             long timeoutMS=4000;
 
-            if (gamepad2.dpad_right) operation = new OpWallride(robot, 0,.4, .05,.3, 10000,20,5);
-            else if (gamepad2.dpad_left) operation = new OpWallride(robot,0, .7, .05,.3, 10000,20, 5);
-            else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 5);
-            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .7, .00,.3, 10000,30, 5);
+            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,0.5);
+            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToDistance(0.4,5000,18,0.5);
+            else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
+            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
+
         }
     }
 

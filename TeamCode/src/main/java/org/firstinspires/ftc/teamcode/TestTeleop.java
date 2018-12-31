@@ -39,7 +39,7 @@ public class TestTeleop extends OpMode{
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, false);
+        robot.init(hardwareMap, telemetry, true);
         telemetry.addData("Robot" , "Initialized");
         telemetry.update();
 
@@ -57,12 +57,12 @@ public class TestTeleop extends OpMode{
     public void loop() {
         doOperations();
         if (operation==null) {
-            doTestDrive();
+            doDrive();
         }
         telemetry.update();
     }
 
-    void doTestDrive() {
+    void doDrive() {
         double leftX = FaltechUtilities.scaleSpeedFunction(gamepad1.left_stick_x);
         double leftY = FaltechUtilities.scaleSpeedFunction(-gamepad1.left_stick_y);
         double rightX = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_x);
@@ -97,7 +97,7 @@ public class TestTeleop extends OpMode{
                 operation=null;     // and throw it away if it finished
         } else {
             double maxTurningPower=.3;
-            double maxDrivePower=.5;
+            double maxDrivePower=.3;
             double degreesError=2.0;
             long timeoutMS=4000;
 
@@ -106,7 +106,7 @@ public class TestTeleop extends OpMode{
                 robot.sleep(1500);
                 robot.stop();
             }
-            else if (gamepad2.dpad_left) operation = new OpWallride(robot,0, .7, .05,.3, 10000,20, 5);
+            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToHeading(0,0.5,0.1,0,6000, 48);
             else if (gamepad2.dpad_up) operation = new OpWallride(robot,0, .7, .05,.3, 10000,70, 5);
             else if (gamepad2.dpad_down) operation = robot.getOperationDriveToDistance(0.4,4000,2,1);
         }

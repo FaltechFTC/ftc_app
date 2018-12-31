@@ -52,7 +52,7 @@ public class OpDriveToHeading extends Operation {
         double relativeAngle = -robot.getRelativeAngle();
         RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
 
-        double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
+        double rotatePower = 0.0; //pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
         RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
 
         robot.drive.driveFRS(maxDrivePower, rotatePower, 0.0);
