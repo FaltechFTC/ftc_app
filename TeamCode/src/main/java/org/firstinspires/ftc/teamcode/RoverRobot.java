@@ -136,8 +136,10 @@ public class RoverRobot {
         //relativeAngleFromStart += lastAngles.firstAngle;
     }
 
-    public double getRelativeAngleFromStart() {
-        return imu.getAngularOrientation(AxesReference.INTRINSIC, axesOrder, AngleUnit.DEGREES).firstAngle;
+    public double convertAbsoluteToRelativeAngle(double degrees) {
+
+        RobotLog.i("Absolute Angle=%f, Relative Angle=%f",getCurrentAbsoluteAngle(),getRelativeAngle());
+        return mapDegreesTo180(degrees-getCurrentAbsoluteAngle());
     }
 
     /**

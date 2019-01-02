@@ -36,6 +36,7 @@ public class RoverTeleop extends OpMode{
     RoverRobot robot = null;
     Operation operation= null;
     int driverMode =0;
+    double turnDegrees=0;
 
     @Override
     public void init() {
@@ -56,16 +57,21 @@ public class RoverTeleop extends OpMode{
     public void loop() {
        doOperations();
         if (operation==null) {
-            doDrive();
-            doArmLift();
-            doClaw();
-            doArmExtender();
-            doRobotLift();
-            doTeamMarker();
-            doGears();
-            robot.logSensors();
+//            doDrive();
+//            doArmLift();
+//            doClaw();
+//            doArmExtender();
+//            doRobotLift();
+//            doTeamMarker();
+//            doGears();
+//            robot.logSensors();
+            doTestAngles();
+
         }
         telemetry.update();
+    }
+    void doTestAngles(){
+        telemetry.addData("Absolute Angle =", robot.getCurrentAbsoluteAngle());
     }
 
     void doDrive() {
@@ -177,11 +183,23 @@ public class RoverTeleop extends OpMode{
             double degreesError=2.0;
             long timeoutMS=4000;
 
-            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,0.5);
-            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToDistance(0.4,5000,18,0.5);
+//            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,2);
+//            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToDistance(0.3,5000,-9,0.5);
+//            else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
+//            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
+
+            if (gamepad2.dpad_right) operation = robot.getOperationRotateToHeading(30,0.15,1.5,2000);
+            else if (gamepad2.dpad_left) {
+                turnDegrees = robot.mapDegreesTo180(turnDegrees+30);
+
+                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),0.15,1.5,9000);
+
+            }
             else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
             else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
 
+            telemetry.addData("Turn Test", "Absolute  = "+ robot.getCurrentAbsoluteAngle() +" target turnDegrees="+turnDegrees);
+            telemetry.update();
         }
     }
 

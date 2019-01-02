@@ -14,7 +14,7 @@ public class OpDriveToDistance extends Operation {
     Pid pidDrive, pidRotate;
 
     double curEncoder=0;
-    public int onTargetLoopCount=0, maxTargetLoopCount=3;
+    public int onTargetLoopCount=0, maxTargetLoopCount=1;
 
 
     public OpDriveToDistance(RoverRobot robot, double maxDrivePower, long timeoutMS, double targetDistance, double targetTolerance) {
