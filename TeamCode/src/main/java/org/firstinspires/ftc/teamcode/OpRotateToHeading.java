@@ -7,11 +7,13 @@ public class OpRotateToHeading extends Operation {
     double targetDegrees, maxPower, targetDegreesAcceptableError;
     Pid pidR;
 
-    public int onTargetLoopCount=0, maxTargetLoopCount=1;
+    public int onTargetLoopCount=0, maxTargetLoopCount=6;
 
-    public static double drivePidKp = 0.6;
-    public static double drivePidTi = 0.05;
-    public static double drivePidTd = 0.6;
+    public static double drivePidKp = 0.47;
+    public static double drivePidTi = 0.4;
+    public static double drivePidTd = 0.25;
+    public static double drivePidIntMax = 4.0;
+
 
 
     public OpRotateToHeading(RoverRobot robot, double targetDegrees, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS) {
@@ -25,7 +27,6 @@ public class OpRotateToHeading extends Operation {
         // restart imu angle tracking.
         robot.resetRelativeAngleToZero();
 
-        double drivePidIntMax = 180.0;
         double drivePidIntMin = -drivePidIntMax;
 
         pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxTurnPower, maxTurnPower);
@@ -46,10 +47,18 @@ public class OpRotateToHeading extends Operation {
 
         if (onTargetLoopCount>=maxTargetLoopCount)
             done();
-        else
-            robot.drive.driveFRS(0.0, rotatePower, 0.0);
+        else {
+            if(onTargetLoopCount == 0 && Math.abs(rotatePower) < .02) {
+                if(rotatePower < 0) rotatePower = -.02;
+                else rotatePower = .02;
 
-        String s= String.format("RotateToHeading curD=%3.1f targetD=%3.1f rPower=%3.2f deltaT=%d totalT=%d onTarget=%d",curDegrees, targetDegrees, rotatePower, deltaTime,(lastTime-startMS), onTargetLoopCount);
+            }
+            else if (onTargetLoopCount > 0) rotatePower = 0;
+            robot.drive.driveFRS(0.0, rotatePower, 0.0);
+        }
+
+
+        String s= String.format("RotateToHeading curD=%3.1f targetD=%3.1f rPower=%3.2f deltaT=%3.2f totalT=%d onTarget=%d",curDegrees, targetDegrees, rotatePower, deltaTime,(lastTime-startMS), onTargetLoopCount);
         RobotLog.i(s);
         robot.telemetry.addData("Op",s);
         RobotLog.i("loop#"+numLoops+"  pidR = "+pidR.toString());

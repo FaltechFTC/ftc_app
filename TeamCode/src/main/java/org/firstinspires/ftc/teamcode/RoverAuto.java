@@ -18,7 +18,7 @@ public abstract class RoverAuto extends LinearOpMode {
     boolean isEnableCV=true;
     boolean isStartLatched=true;
     double maxPowerAuto = 0.45;
-    double maxTurningPower = 0.25;
+    double maxTurningPower = 0.15;
     double degreesError =1.5;
     int goldPosition = 1;
     double targetDegrees = 5;
@@ -166,7 +166,7 @@ public abstract class RoverAuto extends LinearOpMode {
         }
         robot.drive.setRunModeEncoder(false);
 
-        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation = robot.getOperationRotateToHeading(targetDegrees, 0.15, degreesError, 9000);
         operation.run();
         //robot.stop();
         //sleep(1500);

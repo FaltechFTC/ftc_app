@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class RoverTeleop extends OpMode{
@@ -37,7 +38,8 @@ public class RoverTeleop extends OpMode{
     Operation operation= null;
     double turnDegrees=0;
     boolean operationsOnly=false;
-
+    ElapsedTime timer = new ElapsedTime();
+    double lastOperationTime = 0;
     @Override
     public void init() {
         robot.init(hardwareMap, telemetry, true);
@@ -161,7 +163,9 @@ public class RoverTeleop extends OpMode{
     public void doOperations() {
         if (operation!=null) {      // if we have an existing operation
             if (!operation.loop())  // loop the operation
-                operation=null;     // and throw it away if it finished
+            {operation=null;
+              lastOperationTime = timer.seconds();
+            }    // and throw it away if it finished
         } else {
 
             if (gamepad2.right_bumper && gamepad2.left_bumper) {
@@ -169,30 +173,42 @@ public class RoverTeleop extends OpMode{
                 if (gamepad2.b) OpRotateToHeading.drivePidKp -= .01;
                 if (gamepad2.x) OpRotateToHeading.drivePidTd += .01;
                 if (gamepad2.y) OpRotateToHeading.drivePidTd -= .01;
-                telemetry.addData("RotatePID", String.format("p=%3.2f i=%3.2f d=%3.2f",OpRotateToHeading.drivePidKp,OpRotateToHeading.drivePidTi,OpRotateToHeading.drivePidTd));
+                if (gamepad2.dpad_right) OpRotateToHeading.drivePidTi += .01;
+                if (gamepad2.dpad_left) OpRotateToHeading.drivePidTi -= .01;
+                if (gamepad2.dpad_up) OpRotateToHeading.drivePidIntMax += 1;
+                if (gamepad2.dpad_down) OpRotateToHeading.drivePidIntMax -= 1;
+                telemetry.addData("RotatePID", String.format("p=%3.2f i=%3.2f d=%3.2f max=%3.2f", OpRotateToHeading.drivePidKp, OpRotateToHeading.drivePidTi, OpRotateToHeading.drivePidTd, OpRotateToHeading.drivePidIntMax));
                 robot.sleep(300);
+                return;
             }
 
 
-            double maxTurningPower=.3;
-            double maxDrivePower=.5;
-            double degreesError=1.0;
-            long timeoutMS=4000;
+            double maxTurningPower = .3;
+            double maxDrivePower = .5;
+            double degreesError = 1.0;
+            long timeoutMS = 4000;
 
 //            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,2);
 //            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToDistance(0.3,5000,-9,0.5);
 //            else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
 //            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
 
-            if (gamepad2.dpad_right) operation = robot.getOperationRotateToHeading(30,0.15,1.5,2000);
-            else if (gamepad2.dpad_left) {
-                turnDegrees = robot.mapDegreesTo180(turnDegrees+30);
-                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),0.15,1.5,9000);
+            if (gamepad2.dpad_right) {
+                turnDegrees = robot.mapDegreesTo180( -30);
+                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees), 0.15, 1.5, 9000);
+                timer.reset();
+                lastOperationTime = 0;
 
+            } else if (gamepad2.dpad_left) {
+                turnDegrees = robot.mapDegreesTo180(0);
+                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),0.15,1.5,9000);
+                timer.reset();
+                lastOperationTime = 0;
             } else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
             else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
 
             telemetry.addData("Turn Test", "actual = "+ robot.getCurrentAbsoluteAngle() +" target="+turnDegrees);
+            telemetry.addData("Timer =", lastOperationTime);
         }
     }
 
