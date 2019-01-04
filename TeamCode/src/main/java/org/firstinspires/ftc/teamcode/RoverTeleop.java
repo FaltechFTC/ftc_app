@@ -6,21 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 public class RoverTeleop extends OpMode{
-//    @TeleOp(name="RoverMecanumTeleop", group="7079")
-//    public static class RoverMecanumTeleop extends RoverTeleop {
-//        @Override public void init() {
-//            robot = new RoverRobot(new DriveMecanum());
-//            driverMode=0;
-//            super.init();
-//        }
-//    }
 
-    @TeleOp(name="RoverMecanumTeleOp", group="7079")
-    public static class RoverMecanumTeleopMode1 extends RoverTeleop {
+    @TeleOp(name="Rover TeleOp", group="7079")
+    public static class RoverMecanumTeleop extends RoverTeleop {
         @Override public void init() {
             robot = new RoverRobot(new DriveMecanum());
-            driverMode=1;
             super.init();
+        }
+    }
+
+    @TeleOp(name="Rover OperationsOnly Tele", group="7079")
+    public static class RoverMecanumOpsOnly extends RoverTeleop {
+        @Override public void init() {
+            robot = new RoverRobot(new DriveMecanum());
+            super.init();
+            operationsOnly=true;
         }
     }
 
@@ -35,8 +35,8 @@ public class RoverTeleop extends OpMode{
 
     RoverRobot robot = null;
     Operation operation= null;
-    int driverMode =0;
     double turnDegrees=0;
+    boolean operationsOnly=false;
 
     @Override
     public void init() {
@@ -55,23 +55,24 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
-       doOperations();
-        if (operation==null) {
-//            doDrive();
-//            doArmLift();
-//            doClaw();
-//            doArmExtender();
-//            doRobotLift();
-//            doTeamMarker();
-//            doGears();
+        if (operationsOnly || operation!=null)
+            doOperations();
+        else if (operation==null) {
+            doDrive();
+            doArmLift();
+            doClaw();
+            doArmExtender();
+            doRobotLift();
+            doTeamMarker();
+            doGears();
 //            robot.logSensors();
-            doTestAngles();
-
         }
+        doTestAngles();
         telemetry.update();
     }
+
     void doTestAngles(){
-        telemetry.addData("Absolute Angle =", robot.getCurrentAbsoluteAngle());
+        telemetry.addData("Absolute Angle", robot.getCurrentAbsoluteAngle());
     }
 
     void doDrive() {
@@ -81,26 +82,12 @@ public class RoverTeleop extends OpMode{
         double rightY = FaltechUtilities.scaleSpeedFunction(-gamepad1.right_stick_y);
 
         double forward, rotate, sideways;
-        if (driverMode==0) {
-            forward=leftY;
-            rotate=rightX;
-            sideways=leftX*.5;
-        } else {
-            forward=rightY;
-            rotate=leftX;
-            sideways=rightX*.7;
-        }
-
-        rotate*=robot.drive.getRotateGearMultiplier();
-        forward*=robot.drive.getForwardGearMultiplier();
-        sideways*=robot.drive.getSidewaysGearMultiplier();
-
-        double maxPower=Math.max(Math.abs(forward),Math.abs(rotate));
-        maxPower=Math.max(maxPower,Math.abs(sideways));
-        maxPower=Math.max(maxPower,0.7);
+        forward=rightY*robot.drive.getForwardGearMultiplier();;
+        rotate=leftX*robot.drive.getRotateGearMultiplier();
+        sideways=rightX*robot.drive.getSidewaysGearMultiplier();
 
         telemetry.addData("Drive:" , "F="+forward+" S="+sideways+" R="+rotate);
-        robot.drive.driveFRS(forward,rotate,sideways,maxPower);
+        robot.drive.driveFRS(forward,rotate,sideways);
     }
 
 
@@ -116,15 +103,13 @@ public class RoverTeleop extends OpMode{
             armSpeed=FaltechUtilities.clipDeadzone((gamepad2.right_trigger - gamepad2.left_trigger), .10);
         if( gamepad2.dpad_down) robot.roverCollector.lowerArmLiftReset(-0.15, 500);
         else robot.roverCollector.setPowerToArmExtender(armSpeed/1.5);
-
-
     }
 
 
     double clawLeft=0.0;
     double clawRight = 0.0;
-    public void doClaw() {
 
+    public void doClaw() {
 
         if (FaltechUtilities.isValueChangedAndEqualTo("1.a", gamepad1.a, true)
                 || FaltechUtilities.isValueChangedAndEqualTo("2.a", gamepad2.a, true)
@@ -178,9 +163,20 @@ public class RoverTeleop extends OpMode{
             if (!operation.loop())  // loop the operation
                 operation=null;     // and throw it away if it finished
         } else {
+
+            if (gamepad2.right_bumper && gamepad2.left_bumper) {
+                if (gamepad2.a) OpRotateToHeading.drivePidKp += .01;
+                if (gamepad2.b) OpRotateToHeading.drivePidKp -= .01;
+                if (gamepad2.x) OpRotateToHeading.drivePidTd += .01;
+                if (gamepad2.y) OpRotateToHeading.drivePidTd -= .01;
+                telemetry.addData("RotatePID", String.format("p=%3.2f i=%3.2f d=%3.2f",OpRotateToHeading.drivePidKp,OpRotateToHeading.drivePidTi,OpRotateToHeading.drivePidTd));
+                robot.sleep(300);
+            }
+
+
             double maxTurningPower=.3;
             double maxDrivePower=.5;
-            double degreesError=2.0;
+            double degreesError=1.0;
             long timeoutMS=4000;
 
 //            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,2);
@@ -191,15 +187,12 @@ public class RoverTeleop extends OpMode{
             if (gamepad2.dpad_right) operation = robot.getOperationRotateToHeading(30,0.15,1.5,2000);
             else if (gamepad2.dpad_left) {
                 turnDegrees = robot.mapDegreesTo180(turnDegrees+30);
-
                 operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),0.15,1.5,9000);
 
-            }
-            else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
+            } else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
             else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
 
-            telemetry.addData("Turn Test", "Absolute  = "+ robot.getCurrentAbsoluteAngle() +" target turnDegrees="+turnDegrees);
-            telemetry.update();
+            telemetry.addData("Turn Test", "actual = "+ robot.getCurrentAbsoluteAngle() +" target="+turnDegrees);
         }
     }
 

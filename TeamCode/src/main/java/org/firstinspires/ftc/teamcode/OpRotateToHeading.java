@@ -7,8 +7,12 @@ public class OpRotateToHeading extends Operation {
     double targetDegrees, maxPower, targetDegreesAcceptableError;
     Pid pidR;
 
-    Boolean onTarget = false;
-    Boolean halt = false;
+    public int onTargetLoopCount=0, maxTargetLoopCount=1;
+
+    public static double drivePidKp = 0.6;
+    public static double drivePidTi = 0.05;
+    public static double drivePidTd = 0.6;
+
 
     public OpRotateToHeading(RoverRobot robot, double targetDegrees, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS) {
         super(robot);
@@ -21,10 +25,6 @@ public class OpRotateToHeading extends Operation {
         // restart imu angle tracking.
         robot.resetRelativeAngleToZero();
 
-        double drivePidKp = 0.6;     // Tuning variable for PID.
-        double drivePidTi = 0.05;   // Eliminate integral error in 1 sec.
-        double drivePidTd = 0.3;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
-
         double drivePidIntMax = 180.0;
         double drivePidIntMin = -drivePidIntMax;
 
@@ -35,28 +35,25 @@ public class OpRotateToHeading extends Operation {
     public boolean loop() {
         if (!super.loop()) return false;
 
-        RobotLog.i("begin loop %d : %s", numLoops, pidR.toString());
+        double curDegrees = -robot.getRelativeAngle();
+        double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/curDegrees, deltaTime);
 
-        double relativeAngle = -robot.getRelativeAngle();
-        RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
 
-        double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
-        RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
+        if (Math.abs(curDegrees - targetDegrees) < targetDegreesAcceptableError)
+            onTargetLoopCount++;
+        else
+            onTargetLoopCount=0;
 
-        robot.drive.driveFRS(0.0, rotatePower, 0.0);
+        if (onTargetLoopCount>=maxTargetLoopCount)
+            done();
+        else
+            robot.drive.driveFRS(0.0, rotatePower, 0.0);
 
-        if (Math.abs(relativeAngle - targetDegrees) < targetDegreesAcceptableError)
-            onTarget = true;
+        String s= String.format("RotateToHeading curD=%3.1f targetD=%3.1f rPower=%3.2f deltaT=%d totalT=%d onTarget=%d",curDegrees, targetDegrees, rotatePower, deltaTime,(lastTime-startMS), onTargetLoopCount);
+        RobotLog.i(s);
+        robot.telemetry.addData("Op",s);
+        RobotLog.i("loop#"+numLoops+"  pidR = "+pidR.toString());
 
-        robot.telemetry.addData("angles", "target=" + targetDegrees + " relative=" + relativeAngle);
-        robot.telemetry.addData("power", rotatePower);
-        robot.telemetry.addData("time", "Delta=" + deltaTime + " total=" + (lastTime - startMS));
-        robot.telemetry.addData("pidR", pidR.toString());
-        robot.telemetry.addData("status", onTarget ? "On TARGET" : (halt ? "HALT" : "running"));
-        RobotLog.i("onTarget=%s Halt=%s", onTarget.toString(), halt.toString());
-        robot.telemetry.update();
-
-        if (onTarget) done();
         return !done;
     }
 }

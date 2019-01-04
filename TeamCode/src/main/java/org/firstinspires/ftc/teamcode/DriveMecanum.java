@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  *
- * Borrowed heavily from original author and source from https://github.com/pmtischler/ftc_app/blob/master/SharedCode/src/main/java/com/github/pmtischler/control/Mecanum.java
+ * Borrowed heavily (motion and wheels portions) from original author and source from https://github.com/pmtischler/ftc_app/blob/master/SharedCode/src/main/java/com/github/pmtischler/control/Mecanum.java
  *
  *  Modified by Faltech 7079 ...
  *
@@ -40,7 +40,7 @@ public class DriveMecanum extends IDrive{
     public DcMotor mtrBR = null;
     public DcMotor[] motors=null;
     public int gearValue = 1;
-
+    public int debugLevel=1;
     HardwareMap hwMap = null;
     public Telemetry telemetry = null;
 
@@ -87,9 +87,10 @@ public class DriveMecanum extends IDrive{
 
     @Override
     public void driveFRS(double forward, double rotate, double sideways, double maxPower) {
-        RobotLog.i("driveFRS(F=%3.2f  R=%3.2f  S=%3.2f  Power=%3.2f ", forward, rotate, sideways, maxPower);
+        // TODO: maxPower is never used... remove, or impliment version that doesn't ask for it.
+        RobotLog.i("driveFRS(F=%3.2f  R=%3.2f  S=%3.2f ", forward, rotate, sideways);
         Motion motion=createMotionFromFRS(sideways,forward,rotate);
-        RobotLog.i("Motion(vD=%3.2f  thetaD=%3.2f  vTheta=%3.2f ", motion.vD, motion.thetaD, motion.vTheta);
+        if (debugLevel>1) RobotLog.i("Motion(vD=%3.2f  thetaD=%3.2f  vTheta=%3.2f ", motion.vD, motion.thetaD, motion.vTheta);
         Wheels wheels = motionToWheels(motion);
         setPower(wheels);
     }
@@ -127,10 +128,12 @@ public class DriveMecanum extends IDrive{
         mtrFR.setPower(w.frontRight*speedAdjusters[1]);
         mtrBL.setPower(w.backLeft*speedAdjusters[2]);
         mtrBR.setPower(w.backRight*speedAdjusters[3]);
-        String s=w.toString();
-        telemetry.addData("Powers (pre adj)", s);
-        telemetry.addData("Wheel Pos", String.format("FL %5d  FR %5d  BL %5d  BR %5d",mtrFL.getCurrentPosition(),mtrFR.getCurrentPosition(),mtrBL.getCurrentPosition(),mtrBR.getCurrentPosition()));
-        RobotLog.i("Powers (pre adj): "+s);
+        if (debugLevel>1) {
+            String s = w.toString();
+            telemetry.addData("Powers (pre adj)", s);
+            telemetry.addData("Wheel Pos", String.format("FL %5d  FR %5d  BL %5d  BR %5d", mtrFL.getCurrentPosition(), mtrFR.getCurrentPosition(), mtrBL.getCurrentPosition(), mtrBR.getCurrentPosition()));
+            RobotLog.i("Powers (pre adj): " + s);
+        }
     }
 
 
@@ -305,10 +308,10 @@ public class DriveMecanum extends IDrive{
             // Display it for the driver.
             telemetry.addData("Path1",  "Running to target position");
             telemetry.addData("Path2",  "Running at:",
-                    mtrBL.getCurrentPosition(),
-                    mtrBR.getCurrentPosition(),
-                    mtrFL.getCurrentPosition(),
-                    mtrFR.getCurrentPosition());
+            mtrBL.getCurrentPosition(),
+            mtrBR.getCurrentPosition(),
+            mtrFL.getCurrentPosition(),
+            mtrFR.getCurrentPosition());
             telemetry.update();
         }
 

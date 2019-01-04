@@ -48,7 +48,6 @@ public abstract class RoverAuto extends LinearOpMode {
         telemetry.addData("Status", "Started");
         telemetry.update();
 
-        initRobot(!configOnly);
         if (configOnly) {
             readConfigValues();
             configMode();
@@ -65,11 +64,12 @@ public abstract class RoverAuto extends LinearOpMode {
             telemetry.addData("Status", "Configuration LOADED. Waiting for Start");
             telemetry.update();
 
-            //waitForStart();
+            if (isEnableCV && !isStopRequested()) {
+                vision = new RoverVision(hardwareMap, telemetry);
+                vision.initVision();
+            }
 
-            while (!(isStarted() || isStopRequested())) {
-
-                // Display the light level while we are waiting to start
+            while (!(isStarted() || isStopRequested())) { // equivalent to waitForStart();
                 telemetry.addData("Status", "waiting for start");
                 telemetry.update();
                 idle();
@@ -79,14 +79,10 @@ public abstract class RoverAuto extends LinearOpMode {
             telemetry.update();
 
             //    doTempDistance();
-            if (isEnableCV && !isStopRequested()) {
-                vision = new RoverVision(hardwareMap, telemetry);
-                vision.initVision();
-            }
 
             if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
-//            if (!isStopRequested()) doDepot();
+            if (!isStopRequested()) doDepot();
             if (!isStopRequested()) doCrater();
         }
         robot.stop();
@@ -104,7 +100,6 @@ public abstract class RoverAuto extends LinearOpMode {
 
     public void doLander() {
         // Rover Lift Code
-        // TODO : Check if there is need to go up before going down, if so we need to add that code
 
         if (isStartLatched) {
 
@@ -352,8 +347,7 @@ public abstract class RoverAuto extends LinearOpMode {
         targetDegrees = -robot.convertAbsoluteToRelativeAngle(-45);
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
         operation.run();
-//        robot.stop();
-//
+
         targetDistance = 20;
 //        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
 //        operation.run();
