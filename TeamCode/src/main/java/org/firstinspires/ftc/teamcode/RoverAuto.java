@@ -79,7 +79,8 @@ public abstract class RoverAuto extends LinearOpMode {
             telemetry.update();
 
             //    doTempDistance();
-
+//            doArmOverCrater();
+//            sleep(30000);
             if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
             if (!isStopRequested()) doDepot();
@@ -126,9 +127,8 @@ public abstract class RoverAuto extends LinearOpMode {
             robot.drive.stop();
 
             // put the lift arm away
-            robot.roverLift.setPower(0.6);
-            sleep(2200);
-            robot.roverLift.setPower(0.0);
+            robot.roverLift.setPower(0.9);  // need to sleep for 2200 to get arm down, but going to drive
+            sleep(600);    // normally 2200 minus the time spent driving last 2 steps
             if (isStopRequested()) return;
 
             robot.drive.driveFRS(0, .25, 0, 0.3);
@@ -138,13 +138,18 @@ public abstract class RoverAuto extends LinearOpMode {
 
             // back up clean against lander
             robot.drive.driveFRS(-.15, 0, 0, 0.3);
-            sleep(600);
+            sleep(500);
             robot.drive.stop();
 
+            robot.roverLift.setPower(0.5);
+            sleep(200);
+            robot.roverLift.setPower(0.0);
         }
     }
 
     public void doMinerals() {
+
+
 
         if (isEnableCV) {
             goldPosition=vision.doVision(3000, this);
@@ -155,8 +160,8 @@ public abstract class RoverAuto extends LinearOpMode {
         telemetry.update();
 
         if (goldPosition == 1) {  // LEFT of Robot   (as the robot faces forward)
-            targetDegrees = -24;
-            targetDistance = 22;
+            targetDegrees = -30;
+            targetDistance = 24;
         } else if (goldPosition == 2) { // middle
             targetDegrees = 0;
             targetDistance = 22;
@@ -179,6 +184,7 @@ public abstract class RoverAuto extends LinearOpMode {
 //        robot.stop();
         operation = robot.getOperationDriveToDistance(maxPowerAuto,3000,targetDistance,0.5);
         operation.run();
+
         //sleep(1500);
 
 //    public void doWallride(){
@@ -203,27 +209,71 @@ public abstract class RoverAuto extends LinearOpMode {
         double turnToDepotDegrees;
         double goToDepotDistance;
 
-        if (goldPosition == 1) {
-            turnToDepotDegrees = 50;
-            goToDepotDistance = 22;
-        } else if (goldPosition == 2){
-            turnToDepotDegrees = 15;
-            goToDepotDistance = 15;
-        } else {
-            turnToDepotDegrees = -40;
-            goToDepotDistance = 15;
-        }
-        operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
-        operation.run();
-       // robot.sleep(500);
+//        if (goldPosition == 1) {
+//            turnToDepotDegrees = 50;
+//            goToDepotDistance = 22;
+//        } else if (goldPosition == 2){
+//            turnToDepotDegrees = 15;
+//            goToDepotDistance = 15;
+//        } else {
+//            turnToDepotDegrees = -40;
+//            goToDepotDistance = 15;
+//        }
+//        operation = robot.getOperationRotateToHeading(turnToDepotDegrees, maxTurningPower, degreesError, 3000);
+//        operation.run();
+//       // robot.sleep(500);
+//
+//        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, goToDepotDistance);
+//        operation.run();
 
-        operation = robot.getOperationDriveToHeading(5, maxPowerAuto, 0, degreesError, 10000, goToDepotDistance);
+        //backing up 9 inches
+
+//        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
+//        operation.run();
+        operation = robot.getOperationDriveToDistance(0.4,3000,-10,0.5);
         operation.run();
+
+
+
+
+        // turning towards wall
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(70);
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+        operation = robot.getOperationDriveToDistance(0.5,3000,48,0.5);
+        operation.run();
+
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(-40);
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
+        operation.run();
+
+        operation = robot.getOperationDriveToDistance(0.5,3000,45,0.5);
+        operation.run();
+
+
+        // driving closer to the wall
+//        operation = robot.getOperationWallDrive(0, maxPowerAuto, .05,0, 10000,20, 5);
+//        operation.run();
+
 
         robot.teamMarker.setPosition(1);
         robot.sleep(1000);
 
-      //  doArmOverCrater();
+        operation = robot.getOperationDriveToDistance(0.5,3000,-48,0.5);
+        operation.run();
+
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(110);
+        operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, 700);
+        operation.run();
+
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(130);
+        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 9000);
+        operation.run();
+
+        operation = robot.getOperationDriveToDistance(0.5,3000,15,0.5);
+        operation.run();
+
+        doArmOverCrater();
 
 
 
@@ -244,15 +294,16 @@ public abstract class RoverAuto extends LinearOpMode {
     public void doArmOverCrater() {
         robot.roverCollector.setCollectorToCoast();
 
-        //sleep(400);
-        //robot.roverCollector.setPowerToArmExtender(0);
-        // sleep(1000);
-        robot.roverCollector.mtrArmExtender.setPower(0.9);
-        robot.sleep(1500);
-        robot.roverCollector.setPowerToArmLift(-0.1);
-        robot.sleep(800);
-        robot.roverCollector.mtrArmExtender.setPower(0);
+        //Arm goes down
+        robot.roverCollector.setPowerToArmLift(-0.5);
+        robot.sleep(300);
         robot.roverCollector.setPowerToArmLift(0);
+
+        //arm extends
+        robot.roverCollector.mtrArmExtender.setPower(1);
+        robot.sleep(600);
+        robot.roverCollector.mtrArmExtender.setPower(0);
+
     }
 
     public void doCrater() {
@@ -273,36 +324,34 @@ public abstract class RoverAuto extends LinearOpMode {
            // targetDegrees=targetDegrees+robot.getRelativeAngleFromStart();
             telemetry.addData("Desired Relative Angle=", targetDegrees);
             telemetry.update();
-            robot.sleep(2000);
+
             operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
             operation.coastOnStop = false;
             operation.run();
 
+            operation = robot.getOperationDriveToDistance(maxPowerAuto,3000,10,0.5);
+            operation.run();
             doArmOverCrater();
             return;
         }
 
 
-        if (goldPosition == 1){
-            targetDegrees = -45;
-            targetDistance = 26;
-
-
-        } else if (goldPosition == 2){
-            targetDegrees = -60;
-            targetDistance = 30;
-
-        } else {
-            targetDegrees = -90;
-            targetDistance = 40;
-
-        }
+//        if (goldPosition == 1){
+//            targetDistance = 26;
+//
+//        } else if (goldPosition == 2){
+//            targetDistance = 30;
+//
+//        } else {
+//            targetDistance = 40;
+//
+//        }
 
     //backing up 9 inches
 
 //        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
 //        operation.run();
-        operation = robot.getOperationDriveToDistance(0.3,3000,-9,0.5);
+        operation = robot.getOperationDriveToDistance(0.4,3000,-10,0.5);
         operation.run();
 
 
@@ -314,7 +363,7 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
       // driving closer to the wall
-        operation = robot.getOperationWallDrive(0, maxPowerAuto, .05,0, 10000,9, 5);
+        operation = robot.getOperationWallDrive(0, maxPowerAuto, .05,0, 10000,11, 5);
         operation.run();
 
         // turn towards wall
@@ -328,7 +377,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
         robot.teamMarker.setPosition(1);
 //
-       robot.sleep(750);
+       robot.sleep(700);
 
 //        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -48);
 //        operation.run();
@@ -336,13 +385,9 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
 
-//
-//        operation = new OpWallride(robot, 0, .4, .05, .3, 10000, 60, 5);
-//        operation.run();
-//        robot.stop();
-//
+
         targetDegrees = 150;
-        operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, 6000);
+        operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, 3000);
         operation.run();
         targetDegrees = -robot.convertAbsoluteToRelativeAngle(-45);
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 3000);
@@ -356,7 +401,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
 //        robot.stop();
 //
-//        doArmOverCrater();
+        doArmOverCrater();
 
 
     }

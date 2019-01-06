@@ -67,7 +67,7 @@ public class RoverTeleop extends OpMode{
             doRobotLift();
             doTeamMarker();
             doGears();
-//            robot.logSensors();
+            robot.logSensors();
         }
         doTestAngles();
         telemetry.update();
