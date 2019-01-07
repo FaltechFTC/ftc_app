@@ -103,7 +103,7 @@ public class RoverTeleop extends OpMode{
         double armSpeed = FaltechUtilities.clipDeadzone((gamepad1.right_trigger - gamepad1.left_trigger),.10);
         if (armSpeed==0)
             armSpeed=FaltechUtilities.clipDeadzone((gamepad2.right_trigger - gamepad2.left_trigger), .10);
-        if( gamepad2.dpad_down) robot.roverCollector.lowerArmLiftReset(-0.15, 500);
+        if( gamepad2.dpad_down) robot.roverCollector.lowerArmLiftReset(-0.35, 650);
         else robot.roverCollector.setPowerToArmExtender(armSpeed/1.5);
     }
 

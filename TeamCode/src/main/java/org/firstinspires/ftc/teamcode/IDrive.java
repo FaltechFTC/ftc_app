@@ -86,15 +86,15 @@ public abstract class IDrive {
     }
 
     public double getRotateGearMultiplier() {
-        final double multipliers[]= new double[]{ 0.35, 0.45, 1.0};
+        final double multipliers[]= new double[]{ 0.15, 0.30, 1.0};
         return multipliers[gearValue-1];
     }
     public double getForwardGearMultiplier() {
-        final double multipliers[]= new double[]{ 0.3, 0.5, 1.0};
+        final double multipliers[]= new double[]{ 0.2, 0.45, 1.0};
         return multipliers[gearValue-1];
     }
     public double getSidewaysGearMultiplier() {
-        final double multipliers[]= new double[]{ 0.5, 0.60, 1.0};
+        final double multipliers[]= new double[]{ 0.25, 0.50, 1.0};
         return multipliers[gearValue-1];
     }
 
