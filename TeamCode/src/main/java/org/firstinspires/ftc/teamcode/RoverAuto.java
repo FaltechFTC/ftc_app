@@ -230,6 +230,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
 //        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
 //        operation.run();
+
         operation = robot.getOperationDriveToDistance(0.4,3000,-10,0.5);
         operation.run();
 
@@ -261,6 +262,9 @@ public abstract class RoverAuto extends LinearOpMode {
 
         operation = robot.getOperationDriveToDistance(0.5,3000,-48,0.5);
         operation.run();
+
+        if (!isEnableCraterRun) return;
+
 
         targetDegrees = -robot.convertAbsoluteToRelativeAngle(110);
         operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, 700);
