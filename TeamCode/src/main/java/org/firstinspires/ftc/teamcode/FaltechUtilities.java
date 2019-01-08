@@ -175,6 +175,16 @@ public class FaltechUtilities {
         props.setProperty(propertyName, Boolean.toString(value));
     }
 
+    /**
+     * Clamps a value to a given range.
+     * @param value The value to clamp.
+     * @param min The min clamp.
+     * @param max The max clamp.
+     * @return The clamped value.
+     */
+    public static double clampValue(double value, double min, double max) {
+        return Math.min(max, Math.max(min, value));
+    }
 
 }
 
