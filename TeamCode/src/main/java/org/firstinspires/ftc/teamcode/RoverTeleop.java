@@ -160,8 +160,8 @@ public class RoverTeleop extends OpMode{
         telemetry.addData("Gear", robot.drive.gearValue);
     }
 
-    double opRotateTestMaxPower=.15;
-    double opRotateTestDegreesError=2.0;
+    double opRotateTestMaxPower=.3;
+    double opRotateTestDegreesError=1.5;
 
     public void doOperations() {
         if (operation!=null) {      // if we have an existing operation
@@ -219,8 +219,8 @@ public class RoverTeleop extends OpMode{
             } else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
             else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
 
-            telemetry.addData("Turn Test", "actual = "+ robot.getCurrentAbsoluteAngle() +" target="+turnDegrees+" diffDegrees="+Math.abs(robot.getCurrentAbsoluteAngle()-turnDegrees) );
-            telemetry.addData("Timer =", lastOperationTime);
+            //telemetry.addData("Turn Test", "actual = "+ robot.getCurrentAbsoluteAngle() +" target="+turnDegrees+" diffDegrees="+Math.abs(robot.getCurrentAbsoluteAngle()-turnDegrees) );
+            telemetry.addData("TURN RESULT", String.format("Time=%3.1f  DegErr=$2.1",lastOperationTime,Math.abs(robot.getCurrentAbsoluteAngle()-turnDegrees)));
         }
     }
 

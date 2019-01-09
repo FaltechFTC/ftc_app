@@ -9,11 +9,11 @@ public class OpRotateToHeading extends Operation {
 
     public int onTargetLoopCount=0, maxTargetLoopCount=6;
 
-    public static double drivePidKp = 0.47;
-    public static double drivePidTi = 0.4;
-    public static double drivePidTd = 0.25;
-    public static double drivePidIntMax = 4.0;
-
+    public static double drivePidKp = 0.05;
+    public static double drivePidTi = 0.0;
+    public static double drivePidTd = 0.0;
+    public static double drivePidIntMax = 15.0;
+    public static double minTurnPower =0.01;
 
 
     public OpRotateToHeading(RoverRobot robot, double targetDegrees, double maxTurnPower, double targetDegreesAcceptableError, long timeoutMS) {
@@ -48,16 +48,18 @@ public class OpRotateToHeading extends Operation {
         if (onTargetLoopCount>=maxTargetLoopCount)
             done();
         else {
+
             // if we're not on target, then make sure that power isn't deadzoned to zero, or it won't move
-            if(onTargetLoopCount == 0 && Math.abs(rotatePower) < .02) {
-                if(rotatePower < 0) rotatePower = -.02;
-                else rotatePower = .02;
+            if(onTargetLoopCount == 0 && Math.abs(rotatePower) < minTurnPower) {
+                if(rotatePower < 0) rotatePower = -minTurnPower;
+                else rotatePower = minTurnPower;
 
             }
-            else if (onTargetLoopCount > 0) {
+/*            else if (onTargetLoopCount > 0) {
                 // if we're on target, then stop
                 rotatePower = 0;
             }
+*/
             robot.drive.driveFRS(0.0, rotatePower, 0.0);
         }
 
