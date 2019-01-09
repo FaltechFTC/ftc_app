@@ -1,25 +1,36 @@
 package com.github.pmtischler.control;
 
 /**
- * PID Controller: kp * (e + (integral(e) / ti) + (td * derivative(e))).
- * https://en.wikipedia.org/wiki/PID_controller#Ideal_versus_standard_PID_form
+ * https://en.wikipedia.org/wiki/PID_controller
+ * originally from pmtischler, but with modifications to change forms
  */
 public class Pid {
+    private double kp;     // Proportional factor to scale error to output.
+    private double ki;    // coefficient  for Integral term
+    private double kd;    // coefficient  for Derivative term
+    private double integralMin;    // The min of the running integral.
+    private double integralMax;    // The max of the running integral.
+    private double outputMin;    // The min allowed PID output.
+    private double outputMax;    // The max allowed PID output.
+    private double previousError;    // The last error value.
+    private double runningIntegral;    // The discrete running integral (bounded by integralMax).
+    private double lastOutput, lastPTerm, lastITerm, lastDTerm; // last output and components (for debugging)
+
     /**
      * Creates a PID Controller.
      * @param kp Proportional factor to scale error to output.
-     * @param ti The number of seconds to eliminate all past errors.
-     * @param td The number of seconds to predict the error in the future.
+     * @param ki Factor of the integral
+     * @param kd Factor of the derivative or dampening.
      * @param integralMin The min of the running integral.
      * @param integralMax The max of the running integral.
      * @param outputMin The min of the PID output.
      * @param outputMax The max of the PID output.
      */
-    public Pid(double kp, double ti, double td, double integralMin,
+    public Pid(double kp, double ki, double kd, double integralMin,
                double integralMax, double outputMin, double outputMax) {
         this.kp = kp;
-        this.ti = ti;
-        this.td = td;
+        this.ki = ki;
+        this.kd = kd;
         this.integralMin = integralMin;
         this.integralMax = integralMax;
         this.outputMin = outputMin;
@@ -27,6 +38,10 @@ public class Pid {
 
         this.previousError = 0;
         this.runningIntegral = 0;
+        lastOutput=0.0;
+        lastPTerm=0.0;
+        lastITerm=0.0;
+        lastDTerm=0.0;
     }
 
     /**
@@ -37,17 +52,18 @@ public class Pid {
      * @return The output which impacts state value (e.g. motor throttle).
      */
     public double update(double desiredValue, double actualValue, double dt) {
-        double e = desiredValue - actualValue;
-        runningIntegral = clampValue(runningIntegral + e * dt,
+        double error = desiredValue - actualValue;
+        runningIntegral = clampValue(runningIntegral + error * dt,
                                      integralMin, integralMax);
-        double d = (e - previousError) / dt;
-// Original (flawed!!! because kp is not supposed to multiple through the other 3)
-// double output = clampValue(kp * e + (runningIntegral / ti) + (td * d), outputMin, outputMax);
-        double output = kp * e + (runningIntegral / ti) + (td * d);
+        double dErr = (error - previousError) / dt;
+        lastPTerm=kp*error;
+        lastITerm=runningIntegral * ki;
+        lastDTerm=kd * dErr;
+        double output = lastPTerm + lastITerm + lastDTerm;
         // clamp to expected range
         output = clampValue(output, outputMin, outputMax);
-
-        previousError = e;
+        lastOutput=output;
+        previousError = error;
         return output;
     }
 
@@ -65,35 +81,20 @@ public class Pid {
     @Override
     public String toString() {
         return "Pid{" +
-                "kp=" + kp +
-                ", ti=" + ti +
-                ", td=" + td +
+                "Kp=" + kp +
+                ", Ki=" + ki +
+                ", Kd=" + kd +
                 ", integralMin=" + integralMin +
                 ", integralMax=" + integralMax +
                 ", outputMin=" + outputMin +
                 ", outputMax=" + outputMax +
                 ", previousError=" + previousError +
                 ", runningIntegral=" + runningIntegral +
+                ", lastOutput=" + lastOutput+
+                ", lastPTerm=" + lastPTerm +
+                ", lastITerm=" + lastITerm+
+                ", lastDTerm=" + lastDTerm+
                 '}';
     }
 
-    // Proportional factor to scale error to output.
-    private double kp;
-    // The number of seconds to eliminate all past errors.
-    private double ti;
-    // The number of seconds to predict the error in the future.
-    private double td;
-    // The min of the running integral.
-    private double integralMin;
-    // The max of the running integral.
-    private double integralMax;
-    // The min allowed PID output.
-    private double outputMin;
-    // The max allowed PID output.
-    private double outputMax;
-
-    // The last error value.
-    private double previousError;
-    // The discrete running integral (bounded by integralMax).
-    private double runningIntegral;
 }
