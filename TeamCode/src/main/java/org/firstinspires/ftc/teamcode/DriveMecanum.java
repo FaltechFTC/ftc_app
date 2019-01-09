@@ -81,6 +81,7 @@ public class DriveMecanum extends IDrive{
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         setHaltModeCoast(true);
         setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         stop();
     }
 

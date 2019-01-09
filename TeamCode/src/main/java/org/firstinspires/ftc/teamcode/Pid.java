@@ -1,20 +1,20 @@
-package com.github.pmtischler.control;
+package org.firstinspires.ftc.teamcode;
 
 /**
  * https://en.wikipedia.org/wiki/PID_controller
  * originally from pmtischler, but with modifications to change forms
  */
 public class Pid {
-    private double kp;     // Proportional factor to scale error to output.
-    private double ki;    // coefficient  for Integral term
-    private double kd;    // coefficient  for Derivative term
-    private double integralMin;    // The min of the running integral.
-    private double integralMax;    // The max of the running integral.
-    private double outputMin;    // The min allowed PID output.
-    private double outputMax;    // The max allowed PID output.
-    private double previousError;    // The last error value.
-    private double runningIntegral;    // The discrete running integral (bounded by integralMax).
-    private double lastOutput, lastPTerm, lastITerm, lastDTerm; // last output and components (for debugging)
+    protected double kp;     // Proportional factor to scale error to output.
+    protected double ki;    // coefficient  for Integral term
+    protected double kd;    // coefficient  for Derivative term
+    protected double integralMin;    // The min of the running integral.
+    protected double integralMax;    // The max of the running integral.
+    protected double outputMin;    // The min allowed PID output.
+    protected double outputMax;    // The max allowed PID output.
+    protected double previousError;    // The last error value.
+    protected double runningIntegral;    // The discrete running integral (bounded by integralMax).
+    protected double lastOutput, lastPTerm, lastITerm, lastDTerm; // last output and components (for debugging)
 
     /**
      * Creates a PID Controller.
@@ -42,6 +42,16 @@ public class Pid {
         lastPTerm=0.0;
         lastITerm=0.0;
         lastDTerm=0.0;
+    }
+
+    public Pid clone() {
+        return new Pid(kp, ki, kd, integralMin, integralMax, outputMin, outputMax);
+    }
+
+    public void setOutputLimits(double outputMin,double outputMax)
+    {
+        this.outputMin = outputMin;
+        this.outputMax = outputMax;
     }
 
     /**

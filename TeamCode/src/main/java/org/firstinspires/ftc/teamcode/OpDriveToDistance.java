@@ -1,20 +1,26 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.github.pmtischler.control.Pid;
 import com.qualcomm.robotcore.util.RobotLog;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class OpDriveToDistance extends Operation {
 
+    static Pid pidDrivePrototype = new Pid(.02, 0.0, 0.0, -100.0, 100.0, -.5, .5);
+    static Pid pidRotatePrototype = new Pid(.008, 0.00, 0.0, -4, 4, -.5, .5);
+    static Pid pidStrafePrototype = new Pid(.01, 0.00, 0.0, -20, 20, 0, 0);
 
-    double maxDrivePower, maxRotatePower;
-    double targetDistance;
+    Pid pidDrive, pidRotate, pidStrafe;
+
+    double maxDrivePower, maxRotatePower, maxStrafePower;
+    double targetDistance, targetDistanceToWall;
     double targetTolerance;
     double startingEncoder, targetEncoder;
 
-    Pid pidDrive, pidRotate;
-
-    double curEncoder=0;
-    public int onTargetLoopCount=0, maxTargetLoopCount=1;
+    double currentEncoder=0;
+    public int onTargetLoopCount=0, maxTargetLoopCount=3;
+    public double targetHeading=0.0;
+    public double lastError=0.0;
 
 
     public OpDriveToDistance(RoverRobot robot, double maxDrivePower, long timeoutMS, double targetDistance, double targetTolerance) {
@@ -28,11 +34,17 @@ public class OpDriveToDistance extends Operation {
         this.timeoutMS=timeoutMS;
         this.targetDistance=targetDistance;
 
+        this.maxStrafePower=0.0;
+        this.targetDistanceToWall=0.0;  // NA
+
         // this forces it to halt or brake
         coastOnStop = false;
 
-        pidDrive = new Pid(.6, 0.01, 0.2, -100, 100, -maxDrivePower, maxDrivePower);
-        pidRotate = new Pid(.5, 0.04, 0.3, -20, 20, -maxRotatePower, maxRotatePower);
+        pidDrive=pidDrivePrototype.clone();
+        pidDrive.setOutputLimits(-maxDrivePower,maxDrivePower);
+        pidRotate=pidRotatePrototype.clone();
+        pidRotate.setOutputLimits(-maxRotatePower,maxRotatePower);
+        pidStrafe=pidStrafePrototype.clone();
 
         startingEncoder= robot.drive.getEncoderClicksFront();
         targetEncoder=startingEncoder+robot.drive.convertInchesToClicks(targetDistance);
@@ -41,24 +53,31 @@ public class OpDriveToDistance extends Operation {
         robot.resetRelativeAngleToZero();
     }
 
+    public void setWallride(double maxStrafePower, double targetWallDistance) {
+        this.maxStrafePower=0.0;
+        this.targetDistanceToWall=0.0;  // NA
+        pidStrafe.setOutputLimits(-maxStrafePower, maxStrafePower);
+    }
+
     @Override
     public String toString() {
         return "OpWallride{" +
                 ", maxDrivePower=" + maxDrivePower +
                 ", targetDistance=" + targetDistance +
                 ", targetToleranceClicks=" + targetTolerance +
-                ", curEncoder=" + curEncoder +
+                ", curEncoder=" + currentEncoder +
                 '}';
     }
 
     public boolean loop() {
         if (!super.loop()) return false;
 
-        curEncoder= robot.drive.getEncoderClicksFront();
-        robot.telemetry.addData("encoders", "start=%f  target=%f  current=%f", startingEncoder, targetEncoder, curEncoder);
-        RobotLog.i("DriveToDistance: start=%f  target=%f  current=%f", startingEncoder, targetEncoder, curEncoder);
+        currentEncoder= robot.drive.getEncoderClicksFront();
+        robot.telemetry.addData("encoders", "start=%f  target=%f  current=%f", startingEncoder, targetEncoder, currentEncoder);
+        RobotLog.i("DriveToDistance: start=%f  target=%f  current=%f", startingEncoder, targetEncoder, currentEncoder);
 
-        if (Math.abs(targetEncoder - curEncoder)<= targetTolerance) {
+        lastError=targetEncoder - currentEncoder;
+        if (Math.abs(lastError)<= targetTolerance) {
             onTargetLoopCount++;
         } else {
             onTargetLoopCount = 0;
@@ -67,15 +86,26 @@ public class OpDriveToDistance extends Operation {
         if (onTargetLoopCount>=maxTargetLoopCount) {
             done();
         } else {
-            double relativeAngle = -robot.getRelativeAngle();
-            double rotatePower = pidRotate.update(/*desired*/0, /*actual*/relativeAngle, deltaTime);
-            double drivePower = pidDrive.update(/*desired*/targetEncoder, /*actual*/curEncoder, deltaTime);
-            robot.drive.driveFRS(drivePower, rotatePower, 0);
-            String s=String.format("forward=%3.2f  rotate=%3.2f",drivePower, rotatePower);
-            robot.telemetry.addData("DriveToHeading Powers", s);
-            RobotLog.i("DriveToHeading Powers "+s);
+            double drivePower = pidDrive.update(targetEncoder, currentEncoder, deltaTime);
+
+            double currentHeading = -robot.getRelativeAngle();
+            double rotatePower = pidRotate.update(targetHeading, currentHeading, deltaTime);
+
+            double currentDistanceToWall= robot.sideDistance.getDistance(DistanceUnit.INCH);
+            double strafePower = pidStrafe.update(targetDistanceToWall, currentDistanceToWall, deltaTime);
+
+            robot.drive.driveFRS(drivePower, rotatePower, strafePower);
+            String s=String.format("Power: F=%3.2f  R=%3.2f  Heading: tgt=%4.1f cur=%4.1f",drivePower, rotatePower, targetHeading, currentHeading);
+            robot.telemetry.addData("DriveToHeading", s);
+            RobotLog.i("DriveToHeading "+s);
 
         }
         return !done;
     }
+
+    public String getResult() {
+        double inchesError=robot.drive.convertClicksToInches(lastError);
+        return super.getResult()+String.format(" TicksError=%3.1f  Inches=%3.1f", lastError, inchesError);
+    }
+
 }

@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.github.pmtischler.control.Pid;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class OpDriveToHeading extends Operation {
     double targetDegrees, maxTurnPower, maxDrivePower, targetDegreesAcceptableError, targetDistance;
-    Pid pidR, pidDrive;
+    public static Pid pidRotatePrototype = new Pid(0.006, 0.0, 0.0, -5.0, 5.0, -.5, .5);
+    public Pid pidR;
+
     double startingEncoder=0.0;
     double targetEncoder;
 
@@ -26,13 +27,6 @@ public class OpDriveToHeading extends Operation {
         // restart imu angle tracking.
         robot.resetRelativeAngleToZero();
 
-        double drivePidKp = 0.5;     // Tuning variable for PID.
-        double drivePidTi = 0;   // Eliminate integral error in 1 sec.
-        double drivePidTd = 0.2;   // Account for error in 0.1 sec. // Protect against integral windup by limiting integral term.
-
-        double drivePidIntMax = 180.0;
-        double drivePidIntMin = -drivePidIntMax;
-
         if (targetDistance!=0.0) {
           //  drive.resetEncoders();
             startingEncoder= robot.drive.getEncoderClicksAbs();
@@ -40,7 +34,8 @@ public class OpDriveToHeading extends Operation {
             RobotLog.i("DriveToHeading( startingEncoder=%f  targetEncoder=%f) ", startingEncoder, targetEncoder);
         }
 
-        pidR = new Pid(drivePidKp, drivePidTi, drivePidTd, drivePidIntMin, drivePidIntMax, -maxTurnPower, maxTurnPower);
+        pidR = pidRotatePrototype.clone();
+        pidR.setOutputLimits(-maxTurnPower, maxTurnPower);
         RobotLog.i(pidR.toString());
     }
 
@@ -52,7 +47,7 @@ public class OpDriveToHeading extends Operation {
         double relativeAngle = -robot.getRelativeAngle();
         RobotLog.i("update(%f, %f, %f)", targetDegrees, relativeAngle, deltaTime);
 
-        double rotatePower = 0.0; //pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
+        double rotatePower = pidR.update(/*desired*/targetDegrees, /*actual*/relativeAngle, deltaTime);
         RobotLog.i("update= drivePower=%f  %s", rotatePower, pidR.toString());
 
         robot.drive.driveFRS(maxDrivePower, rotatePower, 0.0);
@@ -81,4 +76,6 @@ public class OpDriveToHeading extends Operation {
         if (onTarget) done();
         return !done;
     }
+
+
 }

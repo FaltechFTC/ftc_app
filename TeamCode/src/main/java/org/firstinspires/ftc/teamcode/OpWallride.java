@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.github.pmtischler.control.Pid;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class OpWallride extends Operation {
 
+
+    static Pid pidDrivePrototype = new Pid(.008, 0.0, 0.0, -100.0, 100.0, -.5, .5);
+    static Pid pidRotatePrototype = new Pid(.008, 0.00, 0.0, -4, 4, -.1, .1);
+    static Pid pidStrafePrototype = new Pid(.01, 0.00, 0.0, -20, 20, -.15, .15);
+
+    Pid pidStrafe, pidDrive, pidRotate;
     double targetDegrees;
     double maxTurnPower, maxDrivePower, maxStrafePower;
     double targetDistance, targetDistanceToWall;
-    Pid pidStrafe, pidDrive, pidRotate;
+    public double lastError=0.0;
 
     double fd=0, sd=0;
 
@@ -29,9 +34,12 @@ public class OpWallride extends Operation {
         coastOnStop = false;
 
 
-        pidDrive = new Pid(.6, 0.01, 0.2, -100, 100, -maxDrivePower, maxDrivePower);
-        pidRotate = new Pid(.5, 0.04, 0.3, -20, 20, -maxTurnPower, maxTurnPower);
-        pidStrafe = new Pid(.5, .04, .3, -10, 10,  -maxStrafePower, maxStrafePower);
+        pidDrive = pidDrivePrototype.clone();
+        pidDrive.setOutputLimits(-maxDrivePower, maxDrivePower);
+        pidRotate = pidRotatePrototype.clone();
+        pidRotate.setOutputLimits(-maxTurnPower, maxTurnPower);
+        pidStrafe = pidStrafePrototype.clone();
+        pidStrafe.setOutputLimits(-maxStrafePower, maxStrafePower);
 
         robot.resetRelativeAngleToZero();
     }
@@ -69,7 +77,15 @@ public class OpWallride extends Operation {
         robot.telemetry.addData("strafe", "target=" + targetDistanceToWall+ " actual=" + sd + " power="+strafePower);
         robot.telemetry.update();
 
-        if (Math.abs(fd-targetDistance)<5) done();
+        lastError=fd-targetDistance;
+        if (Math.abs(lastError)<2) done();
         return !done;
     }
+
+    public String getResult() {
+        double inchesError=robot.drive.convertClicksToInches(lastError);
+        return super.getResult()+String.format(" TicksError=%3.1f  Inches=%3.1f", lastError, inchesError);
+    }
+
+
 }

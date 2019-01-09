@@ -5,7 +5,7 @@ public class Operation {
     public long timeoutMS=9999;
     public long startMS=System.currentTimeMillis();
     public long curMS=startMS, lastTime=startMS;
-    double deltaTime =0;
+    public double deltaTime =0;
 
     public boolean done=false;
     public boolean timeout=false;
@@ -51,5 +51,14 @@ public class Operation {
             }
 
         }
+    }
+
+    public double getRuntime() {
+        double runtime=((double) (curMS - startMS)) / 1000.0;
+        return runtime; // seconds
+    }
+
+    public String getResult() {
+        return String.format("Loops=%d TotalTime=%3.1f",numLoops, getRuntime());
     }
 }

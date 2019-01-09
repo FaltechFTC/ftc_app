@@ -18,7 +18,7 @@ public abstract class RoverAuto extends LinearOpMode {
     boolean isEnableCV=true;
     boolean isStartLatched=true;
     double maxPowerAuto = 0.45;
-    double maxTurningPower = 0.25;
+    double maxTurningPower = 0.45;
     double degreesError =1.5;
     int goldPosition = 1;
     double targetDegrees = 5;
@@ -56,18 +56,30 @@ public abstract class RoverAuto extends LinearOpMode {
             telemetry.addData("Status", "Configuration SAVED.");
             telemetry.update();
         } else {
+            telemetry.addData("Status", "Initializing...");
+            telemetry.update();
+
             initRobot(!configOnly);
-            readConfigValues();
+
+            telemetry.addData("Status", "Initialized.");
+            telemetry.update();
+
+//            readConfigValues();
             configMode();
             writeConfigValues();
             logConfigModes(false);
-            telemetry.addData("Status", "Configuration LOADED. Waiting for Start");
+
+            telemetry.addData("Status", "Configuration loaded.");
             telemetry.update();
 
             if (isEnableCV && !isStopRequested()) {
                 vision = new RoverVision(hardwareMap, telemetry);
                 vision.initVision();
             }
+
+            telemetry.addData("Status", "Everything Ready. Waiting for Start.");
+            telemetry.update();
+
 
             while (!(isStarted() || isStopRequested())) { // equivalent to waitForStart();
                 telemetry.addData("Status", "waiting for start");
@@ -78,9 +90,6 @@ public abstract class RoverAuto extends LinearOpMode {
             telemetry.addData("Status", "Running Autonomous!");
             telemetry.update();
 
-            //    doTempDistance();
-//            doArmOverCrater();
-//            sleep(30000);
             if (!isStopRequested()) doLander();
             if (!isStopRequested()) doMinerals();
             if (!isStopRequested()) doDepot();
@@ -152,7 +161,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
         if (isEnableCV) {
-            goldPosition=vision.doVision(3000, this);
+            goldPosition=vision.doVision(1500, this);
             if (goldPosition==0) goldPosition=1;  // vision failed completely, default to 1
         }
 
@@ -169,20 +178,17 @@ public abstract class RoverAuto extends LinearOpMode {
             targetDegrees = 30;
             targetDistance = 24;
         }
-        robot.drive.setRunModeEncoder(false);
 
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, 9000);
         operation.run();
-        //robot.stop();
-        //sleep(1500);
-        robot.drive.setRunModeEncoder(false);
+
         if (isStopRequested()){
             return;
         }
 //        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
 //        operation.run();
 //        robot.stop();
-        operation = robot.getOperationDriveToDistance(maxPowerAuto,3000,targetDistance,0.5);
+        operation = robot.getOperationDriveToDistance(maxPowerAuto,5000,targetDistance,1.5);
         operation.run();
 
         //sleep(1500);

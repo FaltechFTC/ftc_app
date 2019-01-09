@@ -35,15 +35,20 @@ public class RoverTeleop extends OpMode{
     }
 
     RoverRobot robot = null;
-    Operation operation= null;
+    Operation operation= null, lastOperation= null;
+
     double turnDegrees=0;
     boolean operationsOnly=false;
     ElapsedTime timer = new ElapsedTime();
-    double lastOperationTime = 0;
+
     @Override
     public void init() {
+        telemetry.addData("Robot" , "Initializing...");
+        telemetry.update();
+
         robot.init(hardwareMap, telemetry, true);
-        telemetry.addData("Robot" , "Initialized");
+
+        telemetry.addData("Robot" , "Initialized.  Ready to start.");
         telemetry.update();
     }
 
@@ -57,6 +62,7 @@ public class RoverTeleop extends OpMode{
 
     @Override
     public void loop() {
+        telemetry.addData("Robot" , "Running Teleop.");
         if (operationsOnly || operation!=null)
             doOperations();
         else if (operation==null) {
@@ -69,12 +75,8 @@ public class RoverTeleop extends OpMode{
             doGears();
             robot.logSensors();
         }
-        doTestAngles();
+        telemetry.addData("Robot Angle", robot.getCurrentAbsoluteAngle());
         telemetry.update();
-    }
-
-    void doTestAngles(){
-        telemetry.addData("Absolute Angle", robot.getCurrentAbsoluteAngle());
     }
 
     void doDrive() {
@@ -137,7 +139,6 @@ public class RoverTeleop extends OpMode{
         else armPower = 0.0;
 
         robot.roverCollector.mtrArmExtender.setPower(armPower);
-
     }
 
 
@@ -160,69 +161,134 @@ public class RoverTeleop extends OpMode{
         telemetry.addData("Gear", robot.drive.gearValue);
     }
 
-    double opRotateTestMaxPower=.3;
-    double opRotateTestDegreesError=1.5;
 
+    int opTestMode=0;
     public void doOperations() {
         if (operation!=null) {      // if we have an existing operation
-            if (!operation.loop())  // loop the operation
-            {operation=null;
-              lastOperationTime = timer.seconds();
-            }    // and throw it away if it finished
-        } else {
-
-            if ((gamepad2.right_bumper && gamepad2.left_bumper) || (gamepad1.right_bumper && gamepad1.left_bumper)) {
-                if (gamepad1.a) opRotateTestMaxPower += .01;
-                if (gamepad1.b) opRotateTestMaxPower -= .01;
-                if (gamepad1.x) opRotateTestDegreesError += .2;
-                if (gamepad1.y) opRotateTestDegreesError -= .2;
-
-                if (gamepad2.a) OpRotateToHeading.drivePidKp += .01;
-                if (gamepad2.b) OpRotateToHeading.drivePidKp -= .01;
-                if (gamepad2.x) OpRotateToHeading.drivePidTd += .01;
-                if (gamepad2.y) OpRotateToHeading.drivePidTd -= .01;
-                if (gamepad2.dpad_right) OpRotateToHeading.drivePidTi += .01;
-                if (gamepad2.dpad_left) OpRotateToHeading.drivePidTi -= .01;
-                if (gamepad2.dpad_up) OpRotateToHeading.drivePidIntMax += 1;
-                if (gamepad2.dpad_down) OpRotateToHeading.drivePidIntMax -= 1;
-
-                telemetry.addData("RotatePID", String.format("maxPower=%3.2f degErr=%3.2f p=%3.2f i=%3.2f d=%3.2f maxInt=%3.2f",
-                        opRotateTestMaxPower, opRotateTestDegreesError,
-                        OpRotateToHeading.drivePidKp, OpRotateToHeading.drivePidTi, OpRotateToHeading.drivePidTd,
-                        OpRotateToHeading.drivePidIntMax));
-                robot.sleep(300);
-                return;
+            boolean keepLooping=operation.loop();  // loop the operation
+            if (!keepLooping)
+            {
+              lastOperation=operation; // store it for reporting
+              operation=null; // operation is done
             }
+        } else {
+            if (gamepad2.start && gamepad2.left_bumper) {
+                opTestMode++;
+                if (opTestMode<0 || opTestMode>3) opTestMode=0;
+                robot.sleep(300);
+            }
+            if (opTestMode==1) doOpTurnTesting();
+            else if (opTestMode==2) doOpDistanceTesting();
+            else if (opTestMode==3) doOpWallrideTesting();
 
-
-            double maxTurningPower = .3;
-            double maxDrivePower = .5;
-            double degreesError = 1.0;
-            long timeoutMS = 4000;
-
-//            if (gamepad2.dpad_right) operation = robot.getOperationDriveToDistance(0.4,5000,48,2);
-//            else if (gamepad2.dpad_left) operation = robot.getOperationDriveToDistance(0.3,5000,-9,0.5);
-//            else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
-//            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
-
-            if (gamepad2.dpad_right) {
-                turnDegrees = robot.mapDegreesTo180( -90);
-                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees), opRotateTestMaxPower, opRotateTestDegreesError, 9000);
-                timer.reset();
-                lastOperationTime = 0;
-
-            } else if (gamepad2.dpad_left) {
-                turnDegrees = robot.mapDegreesTo180(0);
-                operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),opRotateTestMaxPower,opRotateTestDegreesError,9000);
-                timer.reset();
-                lastOperationTime = 0;
-            } else if (gamepad2.dpad_up) operation = robot.getOperationDriveToDistance(0.2,5000,48,0.5);
-            else if (gamepad2.dpad_down) operation = new OpWallride(robot,0, .3, .05,0, 10000,14, 5);
-
-            //telemetry.addData("Turn Test", "actual = "+ robot.getCurrentAbsoluteAngle() +" target="+turnDegrees+" diffDegrees="+Math.abs(robot.getCurrentAbsoluteAngle()-turnDegrees) );
-            telemetry.addData("TURN RESULT", String.format("Time=%3.1f  DegErr=$2.1",lastOperationTime,Math.abs(robot.getCurrentAbsoluteAngle()-turnDegrees)));
+            if (lastOperation!=null)
+                telemetry.addData("Last Operation", lastOperation.getResult());
         }
     }
+
+    double opRotateTestMaxPower=.45;
+    double opRotateTestDegreesError=1.5;
+    public void doOpTurnTesting() {
+        telemetry.addData("TEST MODE", "Op Turn Testing");
+
+        Pid pidPrototype=OpRotateToHeading.pidRotatePrototype;
+        if ((gamepad2.right_bumper && gamepad2.left_bumper) || (gamepad1.right_bumper && gamepad1.left_bumper)) {
+            if (gamepad1.a) opRotateTestMaxPower += .01;
+            if (gamepad1.b) opRotateTestMaxPower -= .01;
+            if (gamepad1.x) opRotateTestDegreesError += .2;
+            if (gamepad1.y) opRotateTestDegreesError -= .2;
+
+            if (gamepad2.a) pidPrototype.kp += .01;
+            if (gamepad2.b) pidPrototype.kp -= .002;
+            if (gamepad2.x) pidPrototype.kd += .01;
+            if (gamepad2.y) pidPrototype.kd -= .01;
+            if (gamepad2.dpad_right) pidPrototype.ki += .001;
+            if (gamepad2.dpad_left) pidPrototype.ki -= .001;
+            if (gamepad2.dpad_up) { pidPrototype.integralMax += 1;  pidPrototype.integralMin= -pidPrototype.integralMax; }
+            if (gamepad2.dpad_down) { pidPrototype.integralMax -= 1; pidPrototype.integralMin= -pidPrototype.integralMax;}
+
+            telemetry.addData("RotatePID", "maxPower=%3.2f degErr=%3.2f p=%4.3f i=%4.3f d=%3.2f maxInt=%3.2f",
+                    opRotateTestMaxPower, opRotateTestDegreesError,
+                    pidPrototype.kp, pidPrototype.ki, pidPrototype.kd, pidPrototype.integralMax);
+            robot.sleep(300);
+            return;
+        }
+
+        long timeoutMS = 9000;
+
+        if (gamepad2.dpad_right) {
+            turnDegrees = robot.mapDegreesTo180( -120);
+            operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees), opRotateTestMaxPower, opRotateTestDegreesError, timeoutMS);
+        } else if (gamepad2.dpad_left) {
+            turnDegrees = robot.mapDegreesTo180(0);
+            operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),opRotateTestMaxPower,opRotateTestDegreesError,timeoutMS);
+        }else if (gamepad2.dpad_down) {
+            turnDegrees = robot.mapDegreesTo180(30);
+            operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),opRotateTestMaxPower,opRotateTestDegreesError,timeoutMS);
+        }else if (gamepad2.dpad_down) {
+            turnDegrees = robot.mapDegreesTo180(170);
+            operation = robot.getOperationRotateToHeading(-robot.convertAbsoluteToRelativeAngle(turnDegrees),opRotateTestMaxPower,opRotateTestDegreesError,timeoutMS);
+        }
+    }
+
+    double opDriveTestMaxPower=.5;
+    double opDriveTestError=1;
+    public void doOpDistanceTesting() {
+        telemetry.addData("TEST MODE", "Op Distance Testing");
+
+        long timeoutMS = 9000;
+
+        Pid pidPrototype=OpDriveToDistance.pidDrivePrototype;
+        if ((gamepad2.right_bumper && gamepad2.left_bumper) || (gamepad1.right_bumper && gamepad1.left_bumper)) {
+            if (gamepad1.a) opDriveTestMaxPower += .01;
+            if (gamepad1.b) opDriveTestMaxPower -= .01;
+            if (gamepad1.x) opDriveTestError += .1;
+            if (gamepad1.y) opDriveTestError -= .1;
+
+            if (gamepad2.a) pidPrototype.kp += .002;
+            if (gamepad2.b) pidPrototype.kp -= .002;
+            if (gamepad2.x) pidPrototype.kd += .01;
+            if (gamepad2.y) pidPrototype.kd -= .01;
+            if (gamepad2.dpad_right) pidPrototype.ki += .001;
+            if (gamepad2.dpad_left) pidPrototype.ki -= .001;
+            if (gamepad2.dpad_up) { pidPrototype.integralMax += 1;  pidPrototype.integralMin= -pidPrototype.integralMax; }
+            if (gamepad2.dpad_down) { pidPrototype.integralMax -= 1; pidPrototype.integralMin= -pidPrototype.integralMax;}
+
+            telemetry.addData("DrivePID", "maxPower=%3.2f degErr=%3.2f p=%4.3f i=%4.3f d=%3.2f maxInt=%3.2f",
+                    opRotateTestMaxPower, opRotateTestDegreesError,
+                    pidPrototype.kp, pidPrototype.ki, pidPrototype.kd, pidPrototype.integralMax);
+            robot.sleep(300);
+            return;
+        }
+
+
+        if (gamepad2.dpad_right)        operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,12,opDriveTestError);
+        else if (gamepad2.dpad_left)    operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,-12,opDriveTestError);
+        else if (gamepad2.dpad_up)      operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,24,opDriveTestError);
+        else if (gamepad2.dpad_down)    operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,-24,opDriveTestError);
+
+    }
+
+    public void doOpWallrideTesting() {
+        telemetry.addData("TEST MODE", "Op Wallride Testing");
+
+        long timeoutMS = 9000;
+        double maxDrivePower=.5;
+        double maxStrafePower=.15;
+        double maxTurnPower=.05;
+
+        if (gamepad2.dpad_right)
+            operation = robot.getOperationWallDrive(0, maxDrivePower, maxTurnPower,maxStrafePower, timeoutMS,13, 5);
+        else if (gamepad2.dpad_up) {
+            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, 48, 2);
+            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 5.0);
+        } else if (gamepad2.dpad_down) {
+            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, -48, 2);
+            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0);
+        }
+
+    }
+
 
 }
 
