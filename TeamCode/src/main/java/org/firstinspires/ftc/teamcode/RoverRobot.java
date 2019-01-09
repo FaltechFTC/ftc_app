@@ -53,7 +53,7 @@ public class RoverRobot {
         sideDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "sideDistance");
 
         drive.init(hwMap, telemetry);
-        //drive.setRunModeEncoder(isAutonomous);
+        drive.setRunModeEncoder(isAutonomous);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
        // teamMarker.setPosition(0);
