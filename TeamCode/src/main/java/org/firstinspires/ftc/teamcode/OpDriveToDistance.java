@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class OpDriveToDistance extends Operation {
 
-    static Pid pidDrivePrototype = new Pid(.02, 0.0, 0.0, -100.0, 100.0, -.5, .5);
+    static Pid pidDrivePrototype = new Pid(.001, 0.0, 0.0, -100.0, 100.0, -.5, .5);
     static Pid pidRotatePrototype = new Pid(.008, 0.00, 0.0, -4, 4, -.5, .5);
     static Pid pidStrafePrototype = new Pid(.01, 0.00, 0.0, -20, 20, 0, 0);
 
@@ -54,8 +54,8 @@ public class OpDriveToDistance extends Operation {
     }
 
     public void setWallride(double maxStrafePower, double targetWallDistance) {
-        this.maxStrafePower=0.0;
-        this.targetDistanceToWall=0.0;  // NA
+        this.maxStrafePower=maxStrafePower;
+        this.targetDistanceToWall=targetWallDistance;
         pidStrafe.setOutputLimits(-maxStrafePower, maxStrafePower);
     }
 
@@ -95,7 +95,7 @@ public class OpDriveToDistance extends Operation {
             double strafePower = pidStrafe.update(targetDistanceToWall, currentDistanceToWall, deltaTime);
 
             robot.drive.driveFRS(drivePower, rotatePower, strafePower);
-            String s=String.format("Power: F=%3.2f  R=%3.2f  Heading: tgt=%4.1f cur=%4.1f",drivePower, rotatePower, targetHeading, currentHeading);
+            String s=String.format("Power: F=%3.2f  R=%3.2f  Heading: tgt=%4.1f cur=%4.1f targetWall=%3.1f actualWall=%3.1f",drivePower, rotatePower, targetHeading, currentHeading, targetDistanceToWall, currentDistanceToWall);
             robot.telemetry.addData("DriveToHeading", s);
             RobotLog.i("DriveToHeading "+s);
 

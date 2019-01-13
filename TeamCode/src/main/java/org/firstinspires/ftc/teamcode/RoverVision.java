@@ -39,7 +39,7 @@ public class RoverVision {
         /** Activate Tensor Flow Object Detection. */
         if (tfod == null)  return goldPosition;
 
-        tfod.activate();
+    //    tfod.activate();
 
         ElapsedTime runTime = new ElapsedTime();
         runTime.reset();
@@ -123,6 +123,8 @@ public class RoverVision {
         } else {
             telemetry.addData("Sorry!", "This device is not compatible with TFOD");
         }
+
+        tfod.activate();
 
         telemetry.addData("Status", "Vision Initialized");
         telemetry.update();

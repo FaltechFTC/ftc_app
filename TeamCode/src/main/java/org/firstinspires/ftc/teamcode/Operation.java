@@ -23,6 +23,10 @@ public class Operation {
         while(loop()) {
             robot.telemetry.update();
             robot.sleep(timeBetweenLoopsMS);
+            if (robot.opMode!=null && robot.opMode.isStopRequested()){
+                done();
+                return false;
+            }
         }
         return !timeout; // true if we ran to completion, else false means we timed out
     }

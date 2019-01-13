@@ -46,7 +46,7 @@ public class RoverTeleop extends OpMode{
         telemetry.addData("Robot" , "Initializing...");
         telemetry.update();
 
-        robot.init(hardwareMap, telemetry, true);
+        robot.init(hardwareMap, telemetry, operationsOnly);
 
         telemetry.addData("Robot" , "Initialized.  Ready to start.");
         telemetry.update();
@@ -75,7 +75,7 @@ public class RoverTeleop extends OpMode{
             doGears();
             robot.logSensors();
         }
-        telemetry.addData("Robot Angle", robot.getCurrentAbsoluteAngle());
+        //telemetry.addData("Robot Angle", robot.getCurrentAbsoluteAngle());
         telemetry.update();
     }
 
@@ -231,8 +231,8 @@ public class RoverTeleop extends OpMode{
         }
     }
 
-    double opDriveTestMaxPower=.5;
-    double opDriveTestError=1;
+    double opDriveTestMaxPower=.6;
+    double opDriveTestError=2;
     public void doOpDistanceTesting() {
         telemetry.addData("TEST MODE", "Op Distance Testing");
 
@@ -245,8 +245,8 @@ public class RoverTeleop extends OpMode{
             if (gamepad1.x) opDriveTestError += .1;
             if (gamepad1.y) opDriveTestError -= .1;
 
-            if (gamepad2.a) pidPrototype.kp += .002;
-            if (gamepad2.b) pidPrototype.kp -= .002;
+            if (gamepad2.a) pidPrototype.kp += .0005;
+            if (gamepad2.b) pidPrototype.kp -= .0005;
             if (gamepad2.x) pidPrototype.kd += .01;
             if (gamepad2.y) pidPrototype.kd -= .01;
             if (gamepad2.dpad_right) pidPrototype.ki += .001;
@@ -254,13 +254,12 @@ public class RoverTeleop extends OpMode{
             if (gamepad2.dpad_up) { pidPrototype.integralMax += 1;  pidPrototype.integralMin= -pidPrototype.integralMax; }
             if (gamepad2.dpad_down) { pidPrototype.integralMax -= 1; pidPrototype.integralMin= -pidPrototype.integralMax;}
 
-            telemetry.addData("DrivePID", "maxPower=%3.2f degErr=%3.2f p=%4.3f i=%4.3f d=%3.2f maxInt=%3.2f",
-                    opRotateTestMaxPower, opRotateTestDegreesError,
+            telemetry.addData("DrivePID", "maxPower=%3.2f inchErr=%3.2f p=%5.4f i=%4.3f d=%3.2f maxInt=%3.2f",
+                    opDriveTestMaxPower, opDriveTestError,
                     pidPrototype.kp, pidPrototype.ki, pidPrototype.kd, pidPrototype.integralMax);
             robot.sleep(300);
             return;
         }
-
 
         if (gamepad2.dpad_right)        operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,12,opDriveTestError);
         else if (gamepad2.dpad_left)    operation = robot.getOperationDriveToDistance(opDriveTestMaxPower,timeoutMS,-12,opDriveTestError);
@@ -274,16 +273,16 @@ public class RoverTeleop extends OpMode{
 
         long timeoutMS = 9000;
         double maxDrivePower=.5;
-        double maxStrafePower=.15;
+        double maxStrafePower=.25;
         double maxTurnPower=.05;
 
         if (gamepad2.dpad_right)
             operation = robot.getOperationWallDrive(0, maxDrivePower, maxTurnPower,maxStrafePower, timeoutMS,13, 5);
         else if (gamepad2.dpad_up) {
-            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, 48, 2);
-            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 5.0);
+            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, 48, opDriveTestError);
+            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0);
         } else if (gamepad2.dpad_down) {
-            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, -48, 2);
+            operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, -48, opDriveTestError);
             ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0);
         }
 

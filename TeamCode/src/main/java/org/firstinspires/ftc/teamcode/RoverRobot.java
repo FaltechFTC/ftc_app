@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -15,11 +16,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class RoverRobot {
+public class RoverRobot  {
 
     HardwareMap hwMap = null;
     private ElapsedTime period = new ElapsedTime();
     public Telemetry telemetry = null;
+    LinearOpMode opMode = null;
 
     IDrive drive = null;
     RoverCollector roverCollector = new RoverCollector();
@@ -53,7 +55,7 @@ public class RoverRobot {
         sideDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "sideDistance");
 
         drive.init(hwMap, telemetry);
-        drive.setRunModeEncoder(isAutonomous);
+        drive.setRunModeEncoder(true);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
        // teamMarker.setPosition(0);

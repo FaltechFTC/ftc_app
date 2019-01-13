@@ -19,7 +19,7 @@ public class RoverLift {
         this.telemetry = telemetry;
 
         mtrRoverLift = hwMap.get(DcMotor.class, "mtrRoverLift");
-        mtrRoverLift.setDirection(DcMotor.Direction.FORWARD);
+        mtrRoverLift.setDirection(DcMotor.Direction.REVERSE);
         mtrRoverLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mtrRoverLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
