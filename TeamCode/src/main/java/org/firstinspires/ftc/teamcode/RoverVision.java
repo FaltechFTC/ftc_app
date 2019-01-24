@@ -70,7 +70,7 @@ public class RoverVision {
                 // if we found gold
                 if (obj.getLabel().equals(LABEL_GOLD_MINERAL)) {
                     // if it isn't too high (in crater) and if it has good confidence
-                    if (obj.getTop() > 800 && obj.getConfidence() > 0.50) {
+                    if (obj.getTop() > 760 && obj.getConfidence() > 0.50) {
                         // track this one as the best, if we don't have one yet
                         if (bestGold == null)
                             bestGold = obj;

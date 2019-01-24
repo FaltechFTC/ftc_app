@@ -171,7 +171,7 @@ public class RoverCollector {
     }
 
 
-    int maxArmEncoder=3355;  //convertDegreesToEncoder(110); // was 1355
+    int maxArmEncoder=3700;  //convertDegreesToEncoder(110); // was 1355
 
     public void setCollectorToCoast(){
         mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

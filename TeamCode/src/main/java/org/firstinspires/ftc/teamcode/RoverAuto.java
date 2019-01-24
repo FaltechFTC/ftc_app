@@ -227,9 +227,8 @@ public abstract class RoverAuto extends LinearOpMode {
 
         //backing up 9 inches
 
-        operation = robot.getOperationDriveToDistance(0.4,3000,-10,2);
+        operation = robot.getOperationDriveToDistance(0.5,3000,-12,2);
         operation.run();
-
 
 
 
@@ -243,44 +242,66 @@ public abstract class RoverAuto extends LinearOpMode {
             targetDistance = 42;
 
         } else if (goldPosition == 2){
-            targetDistance = 49;
+            targetDistance = 51;
 
         } else {
-            targetDistance = 57;
+            targetDistance = 59;
 
         }
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,targetDistance,2);
+        operation = robot.getOperationDriveToDistance(0.7,3000,targetDistance,2);
         operation.run();
 
-        targetDegrees = -robot.convertAbsoluteToRelativeAngle(-35);
+        // turn towards wall
+//        targetDegrees = -robot.convertAbsoluteToRelativeAngle(135);
+//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
+//        operation.run();
+//
+//        operation = robot.getOperationDriveToDistance(0.7,3000,-70,2);
+//        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0);
+//        operation.run();
+//
+//        robot.teamMarker.setPosition(1);
+//        robot.sleep(3000);
+//
+//        operation = robot.getOperationDriveToDistance(0.7,3000,72,2);
+//        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0);
+//        operation.run();
+
+
+
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(-30);
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
         operation.run();
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,55,2);
+        operation = robot.getOperationDriveToDistance(0.7,3000,55,2);
         operation.run();
 
 
 
 
         robot.teamMarker.setPosition(1);
-        robot.sleep(1000);
+        robot.sleep(800);
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,-45,2);
+        operation = robot.getOperationDriveToDistance(0.7,3000,-40,2);
         operation.run();
 
         if (!isEnableCraterRun) return;
 
 
-        targetDegrees = -robot.convertAbsoluteToRelativeAngle(110);
-        operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, rotateTimeOut);
-        operation.run();
+//        targetDegrees = -robot.convertAbsoluteToRelativeAngle(110);
+//        operation = robot.getOperationRotateToHeading(targetDegrees, .6, degreesError, rotateTimeOut);
+//        operation.run();
+        robot.drive.driveFRS(0,-0.7,0);
+        sleep(500);
+        robot.stop();
+        sleep(200);
 
-        targetDegrees = -robot.convertAbsoluteToRelativeAngle(130);
-        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
-        operation.run();
+//        targetDegrees = -robot.convertAbsoluteToRelativeAngle(130);
+//        operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
+//        operation.run();
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,30,2);
+        operation = robot.getOperationDriveToDistance(0.7,3000,33,2);
         ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0);
         operation.run();
 
@@ -339,7 +360,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
 //        operation = robot.getOperationDriveToHeading(0, -maxPowerAuto, 0, degreesError, 10000, -9);
 //        operation.run();
-        operation = robot.getOperationDriveToDistance(0.4,3000,-10,2);
+        operation = robot.getOperationDriveToDistance(0.5,3000,-10,2);
         operation.run();
 
 
@@ -413,7 +434,7 @@ public abstract class RoverAuto extends LinearOpMode {
         targetDistance = 28;
 //        operation = robot.getOperationDriveToHeading(0, maxPowerAuto, 0, degreesError, 10000, targetDistance);
 //        operation.run();
-        operation = robot.getOperationDriveToDistance(maxPowerAuto,3000,targetDistance,2);
+        operation = robot.getOperationDriveToDistance(0.7,3000,targetDistance,2);
         operation.run();
 
 //        robot.stop();
