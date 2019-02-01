@@ -35,7 +35,7 @@ public class RoverRobot  {
     public double relativeAngleFromStart = 0;
     public Servo teamMarker = null;
     boolean isAutonomous=false;
-    Rev2mDistanceSensor frontDistance;
+    Rev2mDistanceSensor leftSideDistanceSensor;
     Rev2mDistanceSensor sideDistance;
 
     //Constructor//
@@ -51,15 +51,14 @@ public class RoverRobot  {
 
         teamMarker = hwMap.get(Servo.class, "teamMarker");
 
-        frontDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "frontDistance");
+        leftSideDistanceSensor = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "leftSideDistanceSensor");
         sideDistance = (Rev2mDistanceSensor) hwMap.get(DistanceSensor.class, "sideDistance");
 
         drive.init(hwMap, telemetry);
         drive.setRunModeEncoder(true);
         roverCollector.init(hwMap, telemetry,isAutonomous);
         roverLift.init(hwMap, telemetry, isAutonomous);
-       // teamMarker.setPosition(0);
-        if(isAutonomous)initIMU();
+        if(isAutonomous) initIMU();
 
     }
 
@@ -206,7 +205,7 @@ public class RoverRobot  {
     // OpWallride(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, long timeoutMS, double targetDistance, double targetDistanceToWall)
     public void logSensors()
     {
-       double fd= frontDistance.getDistance(DistanceUnit.INCH);
+       double fd= leftSideDistanceSensor.getDistance(DistanceUnit.INCH);
        double sd= sideDistance.getDistance(DistanceUnit.INCH);
        telemetry.addData("Distance", "(inches) front=" + fd + " side=" + sd);
     }
@@ -216,6 +215,13 @@ public class RoverRobot  {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+    }
+    public double getDistanceFromSensors(boolean rightDistanceSensor){
+        if (rightDistanceSensor ){
+            return sideDistance.getDistance(DistanceUnit.INCH);
+        } else {
+            return leftSideDistanceSensor.getDistance(DistanceUnit.INCH);
         }
     }
 }

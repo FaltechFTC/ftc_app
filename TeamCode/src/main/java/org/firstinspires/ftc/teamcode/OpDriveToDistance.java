@@ -21,6 +21,7 @@ public class OpDriveToDistance extends Operation {
     public int onTargetLoopCount=0, maxTargetLoopCount=3;
     public double targetHeading=0.0;
     public double lastError=0.0;
+    boolean rightDistanceSensor;
 
 
     public OpDriveToDistance(RoverRobot robot, double maxDrivePower, long timeoutMS, double targetDistance, double targetTolerance) {
@@ -53,9 +54,10 @@ public class OpDriveToDistance extends Operation {
         robot.resetRelativeAngleToZero();
     }
 
-    public void setWallride(double maxStrafePower, double targetWallDistance) {
+    public void setWallride(double maxStrafePower, double targetWallDistance, boolean rightDistanceSensor) {
         this.maxStrafePower=maxStrafePower;
         this.targetDistanceToWall=targetWallDistance;
+        this.rightDistanceSensor=rightDistanceSensor;
         pidStrafe.setOutputLimits(-maxStrafePower, maxStrafePower);
     }
 
@@ -91,8 +93,12 @@ public class OpDriveToDistance extends Operation {
             double currentHeading = -robot.getRelativeAngle();
             double rotatePower = pidRotate.update(targetHeading, currentHeading, deltaTime);
 
-            double currentDistanceToWall= robot.sideDistance.getDistance(DistanceUnit.INCH);
+            double currentDistanceToWall= robot.getDistanceFromSensors(rightDistanceSensor);
             double strafePower = pidStrafe.update(targetDistanceToWall, currentDistanceToWall, deltaTime);
+            // need this because this is reversed for right side sensor.
+            if(!rightDistanceSensor){
+                strafePower = -strafePower;
+            }
 
             robot.drive.driveFRS(drivePower, rotatePower, strafePower);
             String s=String.format("Power: F=%3.2f  R=%3.2f  Heading: tgt=%4.1f cur=%4.1f targetWall=%3.1f actualWall=%3.1f",drivePower, rotatePower, targetHeading, currentHeading, targetDistanceToWall, currentDistanceToWall);

@@ -17,6 +17,7 @@ public class OpWallride extends Operation {
     double targetDistance, targetDistanceToWall;
     public double lastError=0.0;
 
+
     double fd=0, sd=0;
 
     public OpWallride(RoverRobot robot, double targetDegrees, double maxDrivePower, double maxTurnPower, double maxStrafePower, long timeoutMS, double targetDistance, double targetDistanceToWall) {
@@ -61,7 +62,7 @@ public class OpWallride extends Operation {
 
         RobotLog.i("begin loop %d : %s", numLoops, pidStrafe.toString());
 
-        fd= robot.frontDistance.getDistance(DistanceUnit.INCH);
+        fd= robot.leftSideDistanceSensor.getDistance(DistanceUnit.INCH);
         sd= robot.sideDistance.getDistance(DistanceUnit.INCH);
         double relativeAngle = -robot.getRelativeAngle();
 

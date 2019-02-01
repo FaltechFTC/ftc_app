@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class RoverTeleop extends OpMode{
-
+    boolean operationsOnly=false;
     @TeleOp(name="Rover TeleOp", group="7079")
     public static class RoverMecanumTeleop extends RoverTeleop {
         @Override public void init() {
@@ -38,7 +38,7 @@ public class RoverTeleop extends OpMode{
     Operation operation= null, lastOperation= null;
 
     double turnDegrees=0;
-    boolean operationsOnly=false;
+
     ElapsedTime timer = new ElapsedTime();
 
     @Override
@@ -280,10 +280,10 @@ public class RoverTeleop extends OpMode{
             operation = robot.getOperationWallDrive(0, maxDrivePower, maxTurnPower,maxStrafePower, timeoutMS,13, 5);
         else if (gamepad2.dpad_up) {
             operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, 48, opDriveTestError);
-            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0);
+            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0,false);
         } else if (gamepad2.dpad_down) {
             operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, -48, opDriveTestError);
-            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0);
+            ((OpDriveToDistance)operation).setWallride(maxStrafePower, 10.0,true);
         }
 
     }
