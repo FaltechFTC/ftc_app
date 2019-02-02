@@ -1,3 +1,7 @@
+/*
+This operation is used whenever we want to rotate to a particular angle.  The function in this class
+uses a PID to rotate, we also have fail safe mechanism based on maximum time for this operation
+ */
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.RobotLog;

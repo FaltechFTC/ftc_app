@@ -1,3 +1,12 @@
+/*
+Our Teleop class functions for both the actual teleop part of the game and also we have
+included a mode to run our Operations for testing mode.
+
+One of the unique thing for telop mode is we give both the drivers the control on arm extension,
+rotation and claw.  This gives both our drive teams a control mechanism based on their preferences
+
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -68,6 +77,7 @@ public class RoverTeleop extends OpMode{
         else if (operation==null) {
             doDrive();
             doArmLift();
+            doSwitchClawSides();
             doClaw();
             doArmExtender();
             doRobotLift();
@@ -112,24 +122,34 @@ public class RoverTeleop extends OpMode{
 
     double clawLeft=0.0;
     double clawRight = 0.0;
+    public boolean switchClaws = false;
+    public void doSwitchClawSides(){
+        if (FaltechUtilities.isValueChangedAndEqualTo("1.dple", gamepad1.dpad_left, true)){
+          switchClaws = !switchClaws;
+        }
+    }
 
     public void doClaw() {
-
         if (FaltechUtilities.isValueChangedAndEqualTo("1.a", gamepad1.a, true)
                 || FaltechUtilities.isValueChangedAndEqualTo("2.a", gamepad2.a, true)
                 ) {
             clawLeft = 1 - clawLeft;
-            robot.roverCollector.leftClaw.setPosition(clawLeft);
+            if (!switchClaws)
+                robot.roverCollector.leftClaw.setPosition(clawLeft);
+            else
+                robot.roverCollector.rightClaw.setPosition(clawLeft);
+
         }
         if (FaltechUtilities.isValueChangedAndEqualTo("1.x", gamepad1.b, true)
                 || FaltechUtilities.isValueChangedAndEqualTo("2.x", gamepad2.b, true)
                 ) {
             clawRight = 1 - clawRight;
-            robot.roverCollector.rightClaw.setPosition(clawRight);
-
+            if(!switchClaws)
+                robot.roverCollector.rightClaw.setPosition(clawRight);
+            else
+                robot.roverCollector.leftClaw.setPosition(clawRight);
 
         }
-
     }
     public void doArmExtender() {
         double armPower;

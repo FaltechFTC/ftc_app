@@ -1,3 +1,7 @@
+/* this class has all the wheel and drive functions defined.  All the scaling functions, and our
+main drive FRS function is also part of this class
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;

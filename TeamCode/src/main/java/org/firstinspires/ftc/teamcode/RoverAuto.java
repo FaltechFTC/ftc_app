@@ -1,3 +1,9 @@
+/*
+This is our main Auto program.  We have a way to live configure our robot based on the conditions
+and also we broke down the auto into different parts for easy maintenance by creating functions.
+We also have high level variables to set our power, degree error etc
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -188,7 +194,7 @@ public abstract class RoverAuto extends LinearOpMode {
         if (isStopRequested()){
             return;
         }
-        operation = robot.getOperationDriveToDistance(maxPowerAuto,5000,targetDistance,2.0);
+        operation = robot.getOperationDriveToDistance(maxPowerAuto,3000,targetDistance,2.0);
         operation.run();
         if (isStopRequested()){
             return;
@@ -214,7 +220,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
         //backing up 9 inches
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,-12,2);
+        operation = robot.getOperationDriveToDistance(0.5,3000,-10,2);
         operation.run();
 
 
@@ -242,12 +248,12 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
 
-        targetDegrees = -robot.convertAbsoluteToRelativeAngle(-30);
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(-38);
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
         operation.run();
 
-        operation = robot.getOperationDriveToDistance(0.7,3000,55,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,false);
+        operation = robot.getOperationDriveToDistance(0.7,3000,60,2);
+        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 3.0,false);
         operation.run();
 
 
@@ -256,19 +262,19 @@ public abstract class RoverAuto extends LinearOpMode {
         robot.teamMarker.setPosition(1);
         robot.sleep(800);
 
-        operation = robot.getOperationDriveToDistance(0.7,3000,-40,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,false);
+        operation = robot.getOperationDriveToDistance(0.7,3000,-44,2);
+        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 3.0,false);
         operation.run();
 
         if (!isEnableCraterRun) return;
 
 
         robot.drive.driveFRS(0,-0.7,0);
-        sleep(500);
+        sleep(400);
         robot.stop();
         sleep(200);
 
-        targetDegrees = -robot.convertAbsoluteToRelativeAngle(130);
+        targetDegrees = -robot.convertAbsoluteToRelativeAngle(120);
         operation = robot.getOperationRotateToHeading(targetDegrees, maxTurningPower, degreesError, rotateTimeOut);
         operation.run();
 
@@ -347,7 +353,7 @@ public abstract class RoverAuto extends LinearOpMode {
             targetDistance = 49;
 
         } else {
-            targetDistance = 57;
+            targetDistance = 59;
 
         }
 

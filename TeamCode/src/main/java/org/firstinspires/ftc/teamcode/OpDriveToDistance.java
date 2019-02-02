@@ -1,3 +1,8 @@
+/* We use this operation for driving to a specific distance with the help of a PID and encoders
+we also have an option to set wallride based on the side distance sensors. 
+ */
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.RobotLog;

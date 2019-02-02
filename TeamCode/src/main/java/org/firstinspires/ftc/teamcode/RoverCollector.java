@@ -1,3 +1,6 @@
+/*
+This class has all the motors and required functions that relate to the collection
+ */
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;

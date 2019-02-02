@@ -1,3 +1,8 @@
+/*
+This is our main Rover Robot class.  We have the sensors, initialize the drive, imu and other robot
+related function on this class.
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;

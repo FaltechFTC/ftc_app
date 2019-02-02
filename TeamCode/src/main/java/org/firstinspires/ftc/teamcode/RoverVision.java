@@ -1,3 +1,9 @@
+/*
+This is our version of Vision, we derived most of the functionality from FTC base program, but
+improvised to suit our camera angle and we calculated the different parts of the mineral detection to get
+a high confidence level on the gold
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 /* all Vuforia/TensorFlow originally from examples provided by First from class ConceptTensorFlowObjectDetection.java */

@@ -1,3 +1,7 @@
+/* this is the super class for Drivemecanum and the initial thought was we would define a class at
+a higher level and we could change between mecanum and tank
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;

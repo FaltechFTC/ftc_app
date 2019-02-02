@@ -1,3 +1,7 @@
+/* we define all the utility functions in this file. Ex: our gear reduction function is in the program.
+Also storing of control values when the drivers are opening and closing the claws.
+ */
+
 package org.firstinspires.ftc.teamcode;
 
 import java.io.File;

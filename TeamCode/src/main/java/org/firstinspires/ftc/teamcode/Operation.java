@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
-
+/*
+Main class of Operation where we set up the max time for each operation and all the other operations
+come from this class
+ */
 public class Operation {
     protected RoverRobot robot;
     public long timeoutMS=9999;
