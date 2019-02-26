@@ -141,7 +141,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
             // rotate hook out of latch
             robot.drive.driveFRS(0, -.25, 0, 0.3);
-            sleep(200);
+            sleep(300);
             robot.drive.stop();
 
             // put the lift arm away
