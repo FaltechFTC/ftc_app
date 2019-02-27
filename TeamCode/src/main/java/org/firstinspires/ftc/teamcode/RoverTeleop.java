@@ -120,6 +120,7 @@ public class RoverTeleop extends OpMode {
     public void doArmLift() {
         telemetry.addData("mtrLeftCollectorData", robot.roverCollector.mtrLeftCollector.getCurrentPosition());
         telemetry.addData("mtrRightCollectorData", robot.roverCollector.mtrRightCollector.getCurrentPosition());
+        //
         double armSpeed = FaltechUtilities.clipDeadzone((gamepad1.right_trigger - gamepad1.left_trigger), .10);
         if (armSpeed == 0)
             armSpeed = FaltechUtilities.clipDeadzone((gamepad2.right_trigger - gamepad2.left_trigger), .10);
@@ -140,13 +141,13 @@ public class RoverTeleop extends OpMode {
 
 
     public void doArmPositioning() {
+
               double armHeight = getClawHeight();
 
 
     }
 
     public double getClawHeight() {
-
         final double heightOfArmAxle = 9.5;  //inches
         double heightOfClawFromAxle = getCurrentArmLength() * Math.cos(getCurrentArmAngle());
         double clawHeight = heightOfArmAxle - heightOfClawFromAxle;

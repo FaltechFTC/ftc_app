@@ -141,12 +141,12 @@ public abstract class RoverAuto extends LinearOpMode {
 
             // rotate hook out of latch
             robot.drive.driveFRS(0, -.25, 0, 0.3);
-            sleep(300);
+            sleep(200);
             robot.drive.stop();
 
             // put the lift arm away
             robot.roverLift.setPower(0.9);  // need to sleep for 2200 to get arm down, but going to drive
-            sleep(600);    // normally 2200 minus the time spent driving last 2 steps
+            sleep(800);    // normally 2200 minus the time spent driving last 2 steps
             if (isStopRequested()) return;
 
             robot.drive.driveFRS(0, .25, 0, 0.3);
@@ -232,13 +232,13 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
         if (goldPosition == 1){
-            targetDistance = 42;
+            targetDistance = 45;
 
         } else if (goldPosition == 2){
-            targetDistance = 51;
+            targetDistance = 54;
 
         } else {
-            targetDistance = 59;
+            targetDistance = 62;
 
         }
 
@@ -283,6 +283,7 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
         doArmOverCrater();
+
     }
 
     public void doArmOverCrater() {
@@ -347,13 +348,13 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
         if (goldPosition == 1){
-            targetDistance = 42;
+            targetDistance = 45;
 
         } else if (goldPosition == 2){
-            targetDistance = 49;
+            targetDistance = 52;
 
         } else {
-            targetDistance = 59;
+            targetDistance = 62;
 
         }
 

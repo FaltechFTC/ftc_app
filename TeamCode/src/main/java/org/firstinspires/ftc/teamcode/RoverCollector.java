@@ -190,7 +190,26 @@ public class RoverCollector {
         double easeInDistance=250; // was 150
         double leftPower=power, rightPower=power;
         if (leftPower>0 && curLeft>maxArmEncoder-easeInDistance)  leftPower*=(maxArmEncoder-curLeft)/easeInDistance;
-        else if (leftPower<0 && curLeft<easeInDistance)  leftPower*=curLeft/easeInDistance;
+        else if (leftPower<0 && curLeft<easeInDistance)  leftPower=leftPower*curLeft/easeInDistance;
+
+        if (rightPower>0 && curRight>maxArmEncoder-easeInDistance)  rightPower*=(maxArmEncoder-curRight)/easeInDistance;
+        else if (rightPower<0 && curRight<easeInDistance)  rightPower*=curRight/easeInDistance;
+
+        mtrLeftCollector.setPower(leftPower);
+        mtrRightCollector.setPower(rightPower);
+
+        telemetry.addData("Arm Lift", "Left="+curLeft+" Right="+curRight+" easeIn="+easeInDistance+" maxPos="+maxArmEncoder);
+        telemetry.addData("Arm Lift Inputs", "power="+power+" Lpower="+leftPower+" Rpower="+rightPower);
+    }
+    public void setPowerToArmExtenderWithClawHeight(double power){
+        double curLeft=mtrLeftCollector.getCurrentPosition();
+        double curRight=mtrRightCollector.getCurrentPosition();
+
+
+        double easeInDistance=250; // was 150
+        double leftPower=power, rightPower=power;
+        if (leftPower>0 && curLeft>maxArmEncoder-easeInDistance)  leftPower*=(maxArmEncoder-curLeft)/easeInDistance;
+        else if (leftPower<0 && curLeft<easeInDistance)  leftPower=leftPower*curLeft/easeInDistance;
 
         if (rightPower>0 && curRight>maxArmEncoder-easeInDistance)  rightPower*=(maxArmEncoder-curRight)/easeInDistance;
         else if (rightPower<0 && curRight<easeInDistance)  rightPower*=curRight/easeInDistance;
