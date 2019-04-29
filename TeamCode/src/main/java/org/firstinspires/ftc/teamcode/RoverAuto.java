@@ -220,7 +220,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
         //backing up 9 inches
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,-10,2);
+        operation = robot.getOperationDriveToDistance(0.5,3000,-9,2);
         operation.run();
 
 
@@ -253,7 +253,7 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
         operation = robot.getOperationDriveToDistance(0.7,3000,60,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 3.0,false);
+        ((OpDriveToDistance)operation).setWallride(0.4, 3.0,false);
         operation.run();
 
 
@@ -263,7 +263,7 @@ public abstract class RoverAuto extends LinearOpMode {
         robot.sleep(800);
 
         operation = robot.getOperationDriveToDistance(0.7,3000,-44,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 3.0,false);
+        ((OpDriveToDistance)operation).setWallride(0.4, 3.0,false);
         operation.run();
 
         if (!isEnableCraterRun) return;
@@ -279,7 +279,7 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
         operation = robot.getOperationDriveToDistance(0.7,3000,33,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,true);
+        ((OpDriveToDistance)operation).setWallride(0.4, 6.0,true);
         operation.run();
 
         doArmOverCrater();
@@ -335,7 +335,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
     //backing up 9 inches
 
-        operation = robot.getOperationDriveToDistance(0.5,3000,-10,2);
+        operation = robot.getOperationDriveToDistance(0.5,3000,-9,2);
         operation.run();
 
 
@@ -348,13 +348,13 @@ public abstract class RoverAuto extends LinearOpMode {
 
 
         if (goldPosition == 1){
-            targetDistance = 45;
+            targetDistance = 51;
 
         } else if (goldPosition == 2){
-            targetDistance = 52;
+            targetDistance = 58;
 
         } else {
-            targetDistance = 62;
+            targetDistance = 65;
 
         }
 
@@ -370,8 +370,8 @@ public abstract class RoverAuto extends LinearOpMode {
         operation.run();
 
 
-         operation = robot.getOperationDriveToDistance(0.7,3000,54,2);
-         ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,true);
+         operation = robot.getOperationDriveToDistance(0.7,3000,56  ,2);
+         ((OpDriveToDistance)operation).setWallride(0.4, 5.0,true);
          operation.run();
 
 
@@ -379,8 +379,8 @@ public abstract class RoverAuto extends LinearOpMode {
 //
         robot.sleep(800);
 
-        operation = robot.getOperationDriveToDistance(0.7,3000,-42,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,true);
+        operation = robot.getOperationDriveToDistance(0.7,3000,-45,2);
+        ((OpDriveToDistance)operation).setWallride(0.4, 5.0,true);
         operation.run();
 
 
@@ -396,7 +396,7 @@ public abstract class RoverAuto extends LinearOpMode {
 
         targetDistance = 36;
         operation = robot.getOperationDriveToDistance(0.7,3000,targetDistance,2);
-        ((OpDriveToDistance)operation).setWallride(maxStrafePower, 6.0,false);
+        ((OpDriveToDistance)operation).setWallride(0.4, 4.5,false);
         operation.run();
 
 

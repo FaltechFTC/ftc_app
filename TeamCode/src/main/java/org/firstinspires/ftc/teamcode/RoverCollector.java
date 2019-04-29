@@ -174,7 +174,7 @@ public class RoverCollector {
     }
 
 
-    int maxArmEncoder=3700;  //convertDegreesToEncoder(110); // was 1355
+int maxArmEncoder=4700;  //convertDegreesToEncoder(110); // was 1355
 
     public void setCollectorToCoast(){
         mtrLeftCollector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -185,6 +185,8 @@ public class RoverCollector {
     public void setPowerToArmExtender(double power){
         double curLeft=mtrLeftCollector.getCurrentPosition();
         double curRight=mtrRightCollector.getCurrentPosition();
+        curLeft = 1000;
+        curRight = 1000;
 
 
         double easeInDistance=250; // was 150
@@ -201,6 +203,7 @@ public class RoverCollector {
         telemetry.addData("Arm Lift", "Left="+curLeft+" Right="+curRight+" easeIn="+easeInDistance+" maxPos="+maxArmEncoder);
         telemetry.addData("Arm Lift Inputs", "power="+power+" Lpower="+leftPower+" Rpower="+rightPower);
     }
+
     public void setPowerToArmExtenderWithClawHeight(double power){
         double curLeft=mtrLeftCollector.getCurrentPosition();
         double curRight=mtrRightCollector.getCurrentPosition();

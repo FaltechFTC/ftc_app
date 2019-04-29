@@ -46,7 +46,6 @@ public class RoverTeleop extends OpMode {
             super.init();
         }
     }
-
     RoverRobot robot = null;
     Operation operation = null, lastOperation = null;
 
@@ -141,8 +140,11 @@ public class RoverTeleop extends OpMode {
 
 
     public void doArmPositioning() {
-
+              
               double armHeight = getClawHeight();
+
+
+
 
 
     }
@@ -241,6 +243,8 @@ public class RoverTeleop extends OpMode {
 
     int opTestMode = 0;
 
+
+
     public void doOperations() {
         if (operation != null) {      // if we have an existing operation
             boolean keepLooping = operation.loop();  // loop the operation
@@ -318,6 +322,7 @@ public class RoverTeleop extends OpMode {
     double opDriveTestMaxPower = .6;
     double opDriveTestError = 2;
 
+
     public void doOpDistanceTesting() {
         telemetry.addData("TEST MODE", "Op Distance Testing");
 
@@ -380,6 +385,12 @@ public class RoverTeleop extends OpMode {
             operation = robot.getOperationDriveToDistance(maxDrivePower, timeoutMS, -48, opDriveTestError);
             ((OpDriveToDistance) operation).setWallride(maxStrafePower, 10.0, true);
         }
+
+    }
+    public void doArmEncoderTest(){
+
+
+
 
     }
 
